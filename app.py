@@ -1,0 +1,632 @@
+"""
+app.py  ─  HSAE v6.0.0  Application Router
+===========================================
+Author : Seifeldin M.G. Alkedir — University of Khartoum
+Version: 6.0.0  |  March 2026
+
+New in v6.0.0:
+  + Real data: Open-Meteo ERA5 + GloFAS + USGS + GRACE-FO (26 basins)
+  + Advanced AI: Ensemble (RF+MLP+GBM) + Anomaly Detection + Forecast
+  + Climate: SSP1-2.6 / SSP2-4.5 / SSP3-7.0 / SSP5-8.5 projections
+  + Database: SQLite persistence (run history, cache, audit)
+  + Export: HTML + Excel + JSON Dossier + GeoJSON
+"""
+import streamlit as st
+import json
+import numpy as np
+import pandas as pd
+
+from gee_engine       import GEEEngine, render_gee_engine_panel
+from basins_global   import GLOBAL_BASINS, search_basins, CONTINENTS, ALL_NAMES
+from hsae_intro      import intro_page
+from hsae_v430       import page_v430
+from hsae_v990       import page_v990
+from hsae_science    import render_science_page
+from hsae_legal      import render_legal_page
+from hsae_devops     import render_devops_page
+from hsae_validation import render_validation_page
+from hsae_alerts     import render_alerts_page
+from hsae_hbv        import render_hbv_page
+from hsae_opsroom    import render_opsroom_page
+from hsae_groundwater import render_groundwater_page
+from hsae_quality    import render_quality_page
+from hsae_audit      import render_audit_page
+
+# New v6.0.0 modules
+from hsae_ai         import render_ai_page
+from hsae_climate    import render_climate_page
+from hsae_db         import render_db_page, init_db, save_run, log_action
+from hsae_export     import render_export_page
+from hsae_gee_data   import render_real_data_panel, fetch_open_meteo, fetch_glofas, fetch_usgs
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# v6.01 ADDITIONS — new modules (try/except — app never crashes if module fails)
+# ─────────────────────────────────────────────────────────────────────────────
+try:
+    from hbv_calibration_page import render_calibration_page; _HAS_HBVCAL=True
+except Exception: _HAS_HBVCAL=False
+
+try:
+    from uncertainty_engine import full_uncertainty_report; _HAS_UNC=True
+except Exception: _HAS_UNC=False
+
+try:
+    from sensitivity_analysis import render_sensitivity_page; _HAS_SENS=True
+except Exception: _HAS_SENS=False
+
+try:
+    from sediment_transport import render_sediment_page; _HAS_SED=True
+except Exception: _HAS_SED=False
+
+try:
+    from grace_fo import render_grace_fo_page; _HAS_GRACE=True
+except Exception: _HAS_GRACE=False
+
+try:
+    from smap_loader import render_smap_page; _HAS_SMAP=True
+except Exception: _HAS_SMAP=False
+
+try:
+    from glofas_loader import render_glofas_page; _HAS_GLOFAS=True
+except Exception: _HAS_GLOFAS=False
+
+try:
+    from treaty_diff import render_treaty_diff_page; _HAS_TDIFF=True
+except Exception: _HAS_TDIFF=False
+
+try:
+    from negotiation_ai import render_negotiation_page; _HAS_NEG=True
+except Exception: _HAS_NEG=False
+
+try:
+    from icj_dossier import render_icj_page; _HAS_ICJ=True
+except Exception: _HAS_ICJ=False
+
+try:
+    from benchmark_comparison import render_benchmark_page; _HAS_BENCH=True
+except Exception: _HAS_BENCH=False
+
+try:
+    from digital_twin import HSAEDigitalTwin, EnKFResult; _HAS_TWIN=True
+except Exception: _HAS_TWIN=False
+
+try:
+    from conflict_index import render_conflict_page; _HAS_CONF=True
+except Exception: _HAS_CONF=False
+
+try:
+    from case_study_gerd import render_case_study_page; _HAS_GERD=True
+except Exception: _HAS_GERD=False
+
+try:
+    from webgis_app import generate_webgis_html; _HAS_WEBGIS=True
+except Exception: _HAS_WEBGIS=False
+
+try:
+    from arabic_ui import inject_rtl_css; _HAS_AR=True
+except Exception: _HAS_AR=False
+
+try:
+    from export_qgis import render_export_qgis_section; _HAS_QGIS_EXP=True
+except Exception: _HAS_QGIS_EXP=False
+
+# ── Init DB ───────────────────────────────────────────────────────────────────
+init_db()
+
+# ── Auto-simulation ───────────────────────────────────────────────────────────
+def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
+    df = st.session_state.get("df")
+    if df is not None:
+        return df
+    try:
+        cfg      = basin_cfg or st.session_state.get("active_basin_cfg", {})
+        n        = 365
+        cap      = float(cfg.get("cap", 40.0))
+        area_max = float(cfg.get("area_max", 1000))
+        head     = float(cfg.get("head", 100.0))
+        a        = float(cfg.get("bathy_a", 0.038))
+        b_exp    = float(cfg.get("bathy_b", 1.12))
+        eff_cat  = float(cfg.get("eff_cat_km2", 35000.0))
+        runoff_c = float(cfg.get("runoff_c", 0.35))
+        evap_r   = float(cfg.get("evap_base", 5.0))
+
+        rng    = np.random.default_rng(abs(hash(cfg.get("id","seed"))) % (2**31))
+        dates  = pd.date_range("2022-01-01", periods=n, freq="D")
+        doy    = np.array([d.dayofyear for d in dates])
+        rain   = rng.gamma(2.0, 12.0, n) * (1 + 0.5*np.sin(2*np.pi*doy/365))
+        rain_n = rain / (rain.max() + 1e-6)
+        area   = np.clip(np.cumsum(rng.normal(0,5,n)) + area_max*0.6, area_max*0.1, area_max)
+        volume = (a * (area**b_exp)).clip(0, cap)
+        inflow = (rain * eff_cat * runoff_c) / 1e6
+        delta_v = np.diff(volume, prepend=volume[0])
+        losses  = area * evap_r / 1000 + volume * 0.005
+        outflow = np.clip(inflow - delta_v - losses, 0, None)
+        flow_m3s = outflow * 1e9 / 86400
+        out_n    = outflow / (outflow.max() + 1e-6)
+        evap_pm  = (area * evap_r / 1000).clip(0)
+        seepage  = (volume * 0.0045).clip(0)
+        dv_full  = inflow - outflow - evap_pm - seepage
+        dv_obs   = np.diff(volume, prepend=volume[0])
+        ndwi     = (volume/cap).clip(0,1)*0.7+0.1
+        Rn       = 15+8*np.cos(2*np.pi*doy/365)
+        T        = 25+8*np.sin(2*np.pi*doy/365)+rng.normal(0,2,n)
+        et0      = np.clip(0.0023*(T+17.8)*np.sqrt(8)*Rn*0.5, 0, 12)
+
+        df_sim = pd.DataFrame({
+            "Date":          dates,
+            "S1_VV_dB":      rng.normal(-18,2.2,n),
+            "S1_Area":       area,
+            "S2_NDWI":       ndwi,
+            "S2_Area":       area*1.05,
+            "Fused_Area":    area,
+            "Effective_Area":area,
+            "Optical_Valid": (ndwi>=0.25).astype(int),
+            "GPM_Rain_mm":   rain,
+            "Inflow_BCM_raw":inflow,
+            "Inflow_BCM":    inflow,
+            "Lag_Effect":    np.ones(n),
+            "Volume_BCM":    volume,
+            "Pct_Full":      (volume/cap*100).clip(0,100),
+            "Delta_V":       delta_v,
+            "Losses":        losses,
+            "Outflow_BCM":   outflow,
+            "Flow_m3s":      flow_m3s,
+            "Power_MW":      np.clip(0.91*1000*9.81*flow_m3s*head/1e6,0,None),
+            "Energy_GWh":    np.clip(0.91*1000*9.81*flow_m3s*head/1e6,0,None)*24/1000,
+            "Evap_PM_BCM":   evap_pm,
+            "Seepage_BCM":   seepage,
+            "ET0_mm_day":    et0,
+            "dV_full":       dv_full,
+            "dV_obs_full":   dv_obs,
+            "MB_full_Error": dv_obs - dv_full,
+            "MB_full_pct":   np.abs(dv_obs-dv_full)/(cap+1e-9)*100,
+            "Evap_BCM":      evap_pm,
+            "TD_Deficit":    np.clip(rain_n-out_n,0,1),
+            "NDVI":          ((ndwi-0.2)/(ndwi+0.2)).clip(-0.2,0.9),
+        })
+        st.session_state["df"]       = df_sim
+        st.session_state["executed"] = True
+        return df_sim
+    except Exception:
+        return None
+
+# ── Page config ───────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="HydroSovereign AI Engine (HSAE) v6.0.0",
+    layout="wide", page_icon="🌐",
+    initial_sidebar_state="expanded",
+)
+
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+[data-testid="stSidebar"] {background:#020617;}
+.stButton>button {border-radius:8px;}
+</style>""", unsafe_allow_html=True)
+
+# ── Session defaults ──────────────────────────────────────────────────────────
+_DEFAULTS = {
+    "active_page":       "🏠 Intro",
+    "active_basin_name": ALL_NAMES[0],
+    "active_basin_cfg":  GLOBAL_BASINS[ALL_NAMES[0]],
+    "custom_geom":       None,
+    "data_mode":         "Simulation",
+    "time_start":        "2020-01-01",
+    "time_end":          "2024-12-31",
+    "df":                None,
+    "executed":          False,
+    "real_df":           None,
+    "ai_ens":            None,
+    "ai_anom":           None,
+    "ai_fore":           None,
+    "cli_results":       None,
+    "last_metrics":      {},
+}
+for k,v in _DEFAULTS.items():
+    if k not in st.session_state:
+        st.session_state[k] = v
+
+# ── Sidebar ───────────────────────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("## 🌐 HSAE **v6.0.0**")
+    st.markdown("""
+<span style='background:#10b981;color:#000;border-radius:4px;padding:2px 8px;font-size:0.7rem;font-weight:700;'>
+  ✨ REAL DATA + AI + CLIMATE
+</span>""", unsafe_allow_html=True)
+
+    st.markdown("### 📑 Navigation")
+
+    PAGES = [
+        "🏠 Intro",
+        "🌐 v430 · Hybrid DSS",
+        "⚖️  v990 · Legal Nexus",
+        "🔬 Science · Water Balance",
+        "📜 Legal · Treaty Engine",
+        "🛠️  DevOps · CI/CD",
+        "📊 Validation · GRDC",
+        "🚨 Alerts · Telegram",
+        "🌊 HBV · Catchment Model",
+        "🏛️  Operations Room",
+        "💧 Groundwater & Irrigation",
+        "🧪 Water Quality",
+        "🗂️  Audit Trail",
+        "─── v6.0 NEW ───",
+        "📡 Real Data · APIs",
+        "🤖 AI · ML Engine",
+        "🌍 Climate · SSP Scenarios",
+        "🗄️  Database · History",
+        "📄 Export · Reports",
+        "🗺️ Export to QGIS",
+        "─── v6.01 SCIENCE+ ───",
+        "🏔️  HBV Calibration",
+        "🎲 Uncertainty Analysis",
+        "🧪 Sensitivity Analysis",
+        "📉 Sediment Transport",
+        "─── v6.01 SATELLITE ───",
+        "🌌 GRACE-FO · Water Storage",
+        "💧 SMAP · Soil Moisture",
+        "🌊 GloFAS · 30-Day Forecast",
+        "─── v6.01 LEGAL+ ───",
+        "🔍 Treaty Diff · Compliance",
+        "🤝 Negotiation AI",
+        "🏛️  ICJ Dossier · Evidence",
+        "─── v6.01 INTELLIGENCE ───",
+        "📊 Benchmark · Peer Tools",
+        "🗺️  WebGIS · Global Map",
+        "⚡ Conflict Index",
+        "🔬 GERD Case Study",
+        "🔄 Digital Twin · EnKF",
+    ]
+    cur = st.session_state["active_page"]
+    if cur not in PAGES: cur = PAGES[0]
+
+    page = st.radio("Module:", PAGES,
+        index=PAGES.index(cur), key="nav_radio",
+        label_visibility="collapsed")
+    st.session_state["active_page"] = page
+
+    st.markdown("---")
+    st.markdown("### 🔍 Basin Search")
+    sq = st.text_input("River / Dam / Country", placeholder="Nile · Mekong · الفرات", key="sb_search")
+    sc = st.selectbox("Continent", ["🌐 All"]+CONTINENTS, key="sb_cont")
+    if sq.strip():
+        pool = search_basins(sq)
+    elif sc != "🌐 All":
+        from basins_global import list_by_continent
+        pool = list_by_continent(sc.split(" ",1)[-1])
+    else:
+        pool = GLOBAL_BASINS
+    pool = pool or GLOBAL_BASINS
+    pool_names = list(pool.keys())
+    cur_b = st.session_state["active_basin_name"]
+    if cur_b not in pool_names: cur_b = pool_names[0]
+    basin_name = st.selectbox(f"Active Basin ({len(pool_names)} found)", pool_names,
+        index=pool_names.index(cur_b), key="sb_basin")
+    st.session_state["active_basin_name"] = basin_name
+    st.session_state["active_basin_cfg"]  = GLOBAL_BASINS[basin_name]
+    basin = GLOBAL_BASINS[basin_name]
+
+    st.markdown(f"""
+<div style='background:#0f172a;border:1px solid #10b981;border-radius:10px;
+            padding:0.8rem;font-size:0.82rem;margin-top:0.5rem;'>
+  <b style='color:#10b981;'>{basin_name}</b><br>
+  <span style='color:#94a3b8;'>
+    🌊 {basin['river']}  ·  🏗️ {basin['dam']}<br>
+    🌍 {basin['continent']}<br>
+    💧 {basin['cap']} BCM  ·  ⚡ {basin['head']} m<br>
+    📜 {basin.get('treaty','—')}
+  </span>
+</div>""", unsafe_allow_html=True)
+
+    st.markdown("---")
+    import datetime as _dt
+    st.markdown("### 📅 Date Range")
+    _c1, _c2 = st.columns(2)
+    with _c1:
+        _s = st.date_input("From", value=_dt.date(2020,1,1), key="sb_start")
+    with _c2:
+        _e = st.date_input("To", value=_dt.date.today(), key="sb_end")
+    if _s > _e:
+        st.warning("⚠️ Start must be before End")
+    st.session_state["date_start"] = str(_s)
+    st.session_state["date_end"]   = str(_e)
+
+    # ── Quick QGIS Export in sidebar ──────────────────────────────────
+    if _HAS_QGIS_EXP:
+        if st.sidebar.button("🗺️ Export to QGIS", use_container_width=True, key="sb_qgis"):
+            st.session_state["page"] = "📄 Export · Reports"
+            st.rerun()
+
+    st.markdown("---")
+    data_mode = st.radio("📡 Data Mode",
+        ["Simulation","Indirect CSV","Direct GEE","🆕 Real APIs (v6)"],
+        index=0, key="sb_mode")
+    st.session_state["data_mode"] = data_mode
+
+    # If real data available, show badge
+    if st.session_state.get("real_df") is not None:
+        n_rd = len(st.session_state["real_df"])
+        st.markdown(f"<span style='color:#22c55e;font-size:0.78rem;'>✅ Real data loaded: {n_rd:,} rows</span>",
+                    unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.caption("HSAE v6.0.0 · Dr. Seifeldin M.G. Alkedir · University of Khartoum")
+
+# ── Use real data if available and mode selected ──────────────────────────────
+def _get_df(basin_cfg: dict) -> pd.DataFrame | None:
+    if st.session_state.get("data_mode") == "🆕 Real APIs (v6)" and st.session_state.get("real_df") is not None:
+        return st.session_state["real_df"]
+    return _get_or_simulate_df(basin_cfg)
+
+# ── Router ────────────────────────────────────────────────────────────────────
+if page == "🏠 Intro":
+    intro_page()
+
+elif page == "🌐 v430 · Hybrid DSS":
+    page_v430()
+
+elif page == "⚖️  v990 · Legal Nexus":
+    page_v990()
+
+elif page == "🔬 Science · Water Balance":
+    df = _get_df(basin)
+    if df is not None: render_science_page(df, basin)
+    else: st.warning("Run v430 first.")
+
+elif page == "📜 Legal · Treaty Engine":
+    render_legal_page(basin)
+
+elif page == "🛠️  DevOps · CI/CD":
+    render_devops_page()
+
+elif page == "📊 Validation · GRDC":
+    render_validation_page(_get_df(basin), basin)
+
+elif page == "🚨 Alerts · Telegram":
+    render_alerts_page(_get_df(basin), basin)
+
+elif page == "🌊 HBV · Catchment Model":
+    render_hbv_page(_get_df(basin), basin)
+
+elif page == "🏛️  Operations Room":
+    render_opsroom_page(_get_df(basin), basin)
+
+elif page == "💧 Groundwater & Irrigation":
+    render_groundwater_page(_get_df(basin), basin)
+
+elif page == "🧪 Water Quality":
+    render_quality_page(_get_df(basin), basin)
+
+elif page == "🗂️  Audit Trail":
+    render_audit_page()
+
+elif page == "─── v6.0 NEW ───":
+    st.info("Select a v6.0 module from the list below.")
+
+elif page == "📡 Real Data · APIs":
+    st.markdown("# 📡 Real Data — v6.0 APIs")
+    df_real = render_real_data_panel(basin_name, basin)
+    if df_real is not None:
+        st.session_state["df"] = df_real   # feed to all modules
+        log_action("REAL_DATA_LOADED", basin_name, f"{len(df_real)} rows")
+        save_run(basin_name, "Real Data", "APIs", len(df_real), {})
+
+elif page == "🤖 AI · ML Engine":
+    df = _get_df(basin)
+    render_ai_page(df, basin)
+    if st.session_state.get("ai_anom") is not None:
+        from hsae_db import save_anomalies
+        n = save_anomalies(basin_name, st.session_state["ai_anom"])
+        if n > 0:
+            log_action("ANOMALIES_DETECTED", basin_name, f"{n} events", "AI")
+
+elif page == "🌍 Climate · SSP Scenarios":
+    df = _get_df(basin)
+    render_climate_page(df, basin)
+
+elif page == "🗄️  Database · History":
+    render_db_page()
+
+elif page == "📄 Export · Reports":
+    df = _get_df(basin)
+    render_export_page(df, basin)
+    # QGIS Export section appended below standard export
+    if _HAS_QGIS_EXP:
+        render_export_qgis_section(df, basin, GLOBAL_BASINS)
+
+elif page == "🗺️ Export to QGIS":
+    st.markdown("## 🗺️ Export to QGIS")
+    st.markdown(f"**Active Basin:** {basin.get('name','—')} · {basin.get('id','—')}")
+    df = _get_df(basin)
+    if _HAS_QGIS_EXP:
+        render_export_qgis_section(df, basin, GLOBAL_BASINS)
+    else:
+        st.error("❌ export_qgis.py not found — place it in hsae_complete\\")
+
+elif page in ("─── v6.01 SCIENCE+ ───","─── v6.01 SATELLITE ───",
+               "─── v6.01 LEGAL+ ───","─── v6.01 INTELLIGENCE ───"):
+    st.info("👆 Select a module from the sidebar.")
+
+elif page == "🏔️  HBV Calibration":
+    df = _get_df(basin)
+    if _HAS_HBVCAL: render_calibration_page(basin)
+    else: st.warning("HBV Calibration module unavailable.")
+
+elif page == "🎲 Uncertainty Analysis":
+    st.markdown("## 🎲 Monte Carlo Uncertainty Analysis")
+    st.caption("ATDI · NSE · KGE · PBIAS — 1,000-sample bootstrap · 95% credible intervals")
+    df = _get_df(basin)
+    if df is None:
+        # Generate synthetic df so page always shows content
+        import pandas as _pd2, numpy as _np2
+        _rng2 = _np2.random.default_rng(42)
+        _dates2 = _pd2.date_range("2022-01-01", periods=365, freq="D")
+        df = _pd2.DataFrame({
+            "Date": _dates2,
+            "Inflow_BCM":  _rng2.exponential(1.0, 365),
+            "Outflow_BCM": _rng2.exponential(0.6, 365),
+            "Evap_BCM":    _rng2.uniform(0.1, 0.3, 365),
+            "Evap_PM_BCM": _rng2.uniform(0.1, 0.3, 365),
+            "TD_Deficit":  _np2.clip(_rng2.normal(0.35, 0.1, 365), 0, 1),
+            "S1_VV_dB":    _rng2.normal(-18, 2, 365),
+            "Pct_Full":    _np2.clip(50 + _rng2.normal(0, 10, 365), 0, 100),
+            "Lag_Effect":  _np2.ones(365) * 0.3,
+        })
+        st.caption("ℹ️ Showing synthetic demo data — run v430 engine for basin-specific results.")
+    if _HAS_UNC:
+        import numpy as _np
+        import plotly.graph_objects as _go
+        from plotly.subplots import make_subplots as _msp
+
+        _atdi_inputs = {
+            "frd": float(df["TD_Deficit"].mean())    if "TD_Deficit"  in df.columns else 0.35,
+            "sri": float(df["S1_VV_dB"].mean()+25)/25 if "S1_VV_dB"  in df.columns else 0.30,
+            "di":  float(1 - df["Pct_Full"].mean()/100) if "Pct_Full" in df.columns else 0.40,
+            "ipi": float(df["Lag_Effect"].mean())    if "Lag_Effect"  in df.columns else 0.30,
+            # backward compatible keys
+            "I_in":  float(df["Inflow_BCM"].mean())  if "Inflow_BCM"  in df.columns else 1.0,
+            "Q_out": float(df["Outflow_BCM"].mean()) if "Outflow_BCM" in df.columns else 0.5,
+        }
+        _obs = list(df["Outflow_BCM"].dropna().values[:200]) if "Outflow_BCM" in df.columns else None
+        _sim = list(df["Inflow_BCM"].dropna().values[:200])  if "Inflow_BCM"  in df.columns else None
+
+        with st.spinner("Running Monte Carlo (1,000 samples)…"):
+            try:
+                _rpt = full_uncertainty_report(basin, _atdi_inputs, obs=_obs, sim=_sim, n_mc=1000)
+            except Exception as _e:
+                st.error(f"Uncertainty engine: {_e}")
+                _rpt = None
+
+        if _rpt:
+            # ── KPI cards ──────────────────────────────────────────────────
+            _uq = _rpt.get("ATDI_UQ", {})
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("ATDI Mean",   f"{_uq.get('mean',0)*100:.1f}%")
+            col2.metric("ATDI 95% CI", f"{_uq.get('ci_95',[0,1])[0]*100:.1f}–{_uq.get('ci_95',[0,1])[1]*100:.1f}%")
+            col3.metric("ATDI Std",    f"±{_uq.get('std',0)*100:.2f}%")
+            col4.metric("MC Samples",  f"{_rpt.get('n_mc',1000):,}")
+
+            # ── ATDI distribution plot ─────────────────────────────────────
+            _samples = _uq.get("samples_hist", None) or _uq.get("samples", None)
+            if _samples:
+                _s = _np.array(_samples) * 100
+                _fig = _go.Figure()
+                _fig.add_trace(_go.Histogram(x=_s, nbinsx=40, name="ATDI samples",
+                    marker_color="#3b82f6", opacity=0.75))
+                _fig.add_vline(x=_uq.get('mean',0)*100, line_color="#ef4444",
+                               line_width=2, annotation_text="Mean")
+                _fig.add_vline(x=_uq.get('ci_95',[0,1])[0]*100, line_color="#eab308",
+                               line_dash="dash", annotation_text="2.5%")
+                _fig.add_vline(x=_uq.get('ci_95',[0,1])[1]*100, line_color="#eab308",
+                               line_dash="dash", annotation_text="97.5%")
+                _fig.update_layout(template="plotly_dark", height=320,
+                    title="ATDI Monte Carlo Distribution (1,000 samples)",
+                    xaxis_title="ATDI (%)", yaxis_title="Count")
+                st.plotly_chart(_fig, use_container_width=True)
+
+            # ── NSE/KGE bootstrap ──────────────────────────────────────────
+            if "NSE_UQ" in _rpt and "KGE_UQ" in _rpt:
+                st.subheader("Hydrological Performance Uncertainty")
+                _nc1, _nc2, _nc3 = st.columns(3)
+                _nuq = _rpt["NSE_UQ"]
+                _kuq = _rpt["KGE_UQ"]
+                _puq = _rpt.get("PBIAS_UQ", {})
+                _nc1.metric("NSE",   f"{_nuq.get('mean',0):.3f}",
+                            f"95% CI: {_nuq.get('ci_95',[0,1])[0]:.3f}–{_nuq.get('ci_95',[0,1])[1]:.3f}")
+                _nc2.metric("KGE",   f"{_kuq.get('mean',0):.3f}",
+                            f"95% CI: {_kuq.get('ci_95',[0,1])[0]:.3f}–{_kuq.get('ci_95',[0,1])[1]:.3f}")
+                _nc3.metric("PBIAS", f"{_puq.get('mean',0):.1f}%",
+                            f"Std: ±{_puq.get('std',0):.2f}%")
+
+            # ── Legal threshold uncertainty ────────────────────────────────
+            st.subheader("UNWC 1997 Threshold Exceedance Probability")
+            _mean_atdi = _uq.get('mean', 0.35)
+            _std_atdi  = _uq.get('std',  0.05)
+            import scipy.stats as _ss
+            _thresholds = {"Art.5 (25%)":0.25, "Art.7 (40%)":0.40,
+                           "Art.9 (55%)":0.55, "Art.12 (70%)":0.70, "Art.33 (85%)":0.85}
+            _rows = []
+            for _art, _thr in _thresholds.items():
+                _prob = 1 - _ss.norm.cdf(_thr, _mean_atdi, max(_std_atdi, 0.001))
+                _rows.append({"Article": _art, "Threshold": f"{_thr*100:.0f}%",
+                              "Exceedance Prob.": f"{_prob*100:.1f}%",
+                              "Status": "🔴 Triggered" if _prob > 0.5 else "🟡 Uncertain" if _prob > 0.1 else "🟢 Safe"})
+            import pandas as _pd
+            st.dataframe(_pd.DataFrame(_rows), use_container_width=True, hide_index=True)
+        else:
+            st.info("Monte Carlo analysis returned no results. Check inputs.")
+    else:
+        st.warning("Uncertainty module unavailable.")
+
+elif page == "🧪 Sensitivity Analysis":
+    if _HAS_SENS: render_sensitivity_page(basin)
+    else: st.warning("Sensitivity Analysis unavailable.")
+
+elif page == "📉 Sediment Transport":
+    if _HAS_SED: render_sediment_page(basin)
+    else: st.warning("Sediment Transport unavailable.")
+
+elif page == "🌌 GRACE-FO · Water Storage":
+    if _HAS_GRACE: render_grace_fo_page(basin)
+    else: st.warning("GRACE-FO module unavailable.")
+
+elif page == "💧 SMAP · Soil Moisture":
+    if _HAS_SMAP: render_smap_page(basin)
+    else: st.warning("SMAP module unavailable.")
+
+elif page == "🌊 GloFAS · 30-Day Forecast":
+    if _HAS_GLOFAS: render_glofas_page(basin)
+    else: st.warning("GloFAS module unavailable.")
+
+elif page == "🔍 Treaty Diff · Compliance":
+    if _HAS_TDIFF: render_treaty_diff_page(basin)
+    else: st.warning("Treaty Diff unavailable.")
+
+elif page == "🤝 Negotiation AI":
+    if _HAS_NEG: render_negotiation_page(basin)
+    else: st.warning("Negotiation AI unavailable.")
+
+elif page == "🏛️  ICJ Dossier · Evidence":
+    if _HAS_ICJ: render_icj_page(basin)
+    else: st.warning("ICJ Dossier unavailable.")
+
+elif page == "📊 Benchmark · Peer Tools":
+    if _HAS_BENCH: render_benchmark_page(basin)
+    else: st.warning("Benchmark module unavailable.")
+
+elif page == "🗺️  WebGIS · Global Map":
+    st.markdown("## 🗺️ WebGIS — Global Basin Network")
+    if _HAS_WEBGIS:
+        try:
+            html = generate_webgis_html(list(GLOBAL_BASINS.values()))
+            st.components.v1.html(html, height=600, scrolling=True)
+        except Exception as e:
+            st.error(f"WebGIS error: {e}")
+    else: st.warning("WebGIS unavailable.")
+
+elif page == "⚡ Conflict Index":
+    if _HAS_CONF: render_conflict_page(basin)
+    else: st.warning("Conflict Index unavailable.")
+
+elif page == "🔬 GERD Case Study":
+    if _HAS_GERD: render_case_study_page(basin)
+    else: st.warning("GERD Case Study unavailable.")
+
+elif page == "🔄 Digital Twin · EnKF":
+    df = _get_df(basin)
+    if _HAS_TWIN and df is not None:
+        st.markdown("## 🔄 Digital Twin — Ensemble Kalman Filter")
+        try:
+            twin = HSAEDigitalTwin(basin, n_ensemble=50)
+            obs = df["Flow_m3s"].dropna().values[:10] if "Flow_m3s" in df.columns else [300.0]*10
+            import pandas as _pd
+            rows = []
+            for i, o in enumerate(obs[:5]):
+                r = twin.assimilate(float(o))
+                rows.append({"Step":i+1,"Obs m³/s":round(float(o),1),
+                             "ATDI%":r.atdi,"HIFD%":r.hifd,"Status":r.legal_status})
+            st.dataframe(_pd.DataFrame(rows), use_container_width=True)
+        except Exception as e:
+            st.error(f"Digital Twin error: {e}")
+    else: st.info("▶️ Run v430 first.")

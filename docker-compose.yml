@@ -1,0 +1,39 @@
+# HSAE v10.0 — docker-compose.yml
+# Usage: docker-compose up
+version: "3.9"
+services:
+  api:
+    build: .
+    container_name: hsae_api
+    ports:
+      - "8000:8000"
+    command: uvicorn api_server:app --host 0.0.0.0 --port 8000 --workers 1
+    volumes:
+      - ./HSAE_Data:/app/HSAE_Data
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v9/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  streamlit:
+    build: .
+    container_name: hsae_ui
+    ports:
+      - "8501:8501"
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true
+    volumes:
+      - ./HSAE_Data:/app/HSAE_Data
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped

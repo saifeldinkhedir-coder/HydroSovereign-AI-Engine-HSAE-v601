@@ -1,0 +1,74 @@
+cff-version: 1.2.0
+message: "If you use HSAE in your research, please cite it as below."
+type: software
+title: "HydroSovereign AI Engine (HSAE) v10.0"
+abstract: >
+  HSAE v10.0 is a transboundary water sovereignty intelligence platform combining
+  v10.0.0 Streamlit foundation with v9.3.0 scientific additions. Provides
+  satellite-based monitoring (SAR/optical/GPM), AI-driven hydrology (HBV, EnKF,
+  RF+MLP+GBM), legal intelligence (ICJ dossier, treaty diff, negotiation AI),
+  and a 30-endpoint REST API. 26 global basins, 74 treaties, 478 TFDD
+  negotiation cases, 240 tests (Groups A-Z).
+authors:
+  - family-names: Alkedir
+    given-names: Seifeldin M. G.
+    orcid: "https://orcid.org/0000-0003-0821-2991"
+    email: saifeldinkhedir@gmail.com
+    affiliation: "University of Khartoum"
+version: "10.0.0"
+date-released: "2026-03-17"
+repository-code: "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-"
+url: "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-"
+doi: PENDING_RELEASE
+license: GPL-3.0
+keywords:
+  - hydrology
+  - water sovereignty
+  - transboundary rivers
+  - remote sensing
+  - SAR
+  - GEE
+  - GRACE-FO
+  - SMAP
+  - GloFAS
+  - HBV model
+  - machine learning
+  - ICJ dossier
+  - UN 1997 Convention
+  - ATDI
+  - AHIFD
+  - ATCI
+  - NSE
+  - KGE
+  - Streamlit
+  - FastAPI
+  - SQLite
+identifiers:
+  - type: url
+    value: "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-"
+    description: "GitHub repository"
+references:
+  - type: article
+    authors:
+      - family-names: Harrigan
+        given-names: S.
+    title: "Benchmarking near-real-time streamflow reanalysis in the ECMWF operational systems"
+    journal: "ESSD"
+    year: 2020
+    doi: "10.5194/essd-12-2043-2020"
+  - type: article
+    authors:
+      - family-names: Moriasi
+        given-names: D. N.
+    title: "Model evaluation guidelines for systematic quantification of accuracy in watershed simulations"
+    journal: "Transactions of the ASABE"
+    year: 2007
+    doi: "10.13031/2013.23153"
+  - type: article
+    authors:
+      - family-names: Munia
+        given-names: H. A.
+    title: "Future transboundary water stress and its drivers under climate change"
+    journal: "Water Resources Research"
+    year: 2020
+    doi: "10.1029/2019WR026545"
