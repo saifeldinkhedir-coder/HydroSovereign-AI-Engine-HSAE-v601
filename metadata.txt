@@ -1,0 +1,17 @@
+[general]
+name=HydroSovereign AI Engine v6.01
+qgisMinimumVersion=3.16
+description=HSAE v6.01 Complete — 26 basins, TDI/ATDI/AFSF, UNWC 1997, GEE scripts, GRDC stations, ICJ dossier, Processing Toolbox (ATDI+HIFD+Report)
+version=6.01.0
+author=Seifeldin M.G. Alkedir
+email=saifeldinkhedir@gmail.com
+about=Complete HSAE QGIS plugin integrating v6.0.0 original tools with v6.01 additions. Original: basin loader, TDI visualiser, UNWC legal layer, export tool, dashboard. New: GEE script generator (7 sensors), GRDC stations, ICJ dossier export, Processing Toolbox with ATDI + HIFD + Basin Report algorithms.
+tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
+repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
+hasProcessingProvider=yes
+tags=hydrology,water,transboundary,ATDI,HIFD,TDI,UNWC,GEE,GRDC,ICJ,Nile,Mekong
+homepage=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
+category=Vector
+icon=icon.png
+experimental=False
+deprecated=False
