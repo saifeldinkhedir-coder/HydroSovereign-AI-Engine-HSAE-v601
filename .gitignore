@@ -1,0 +1,86 @@
+# HSAE v10.0 — Git Ignore
+# ========================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Secrets & credentials (NEVER commit these)
+.env.local
+*.json.secret
+zinc-arc-*.json
+*earthdata*
+~/.netrc
+.cdsapirc
+
+# Data files (too large for git — use DVC or Zenodo)
+HSAE_Data/
+data/grdc/
+data/glofas/
+*.nc
+*.h5
+*.hdf5
+*.tif
+*.tiff
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+hsae_jobs.db
+
+# Logs & outputs
+*.log
+logs/
+outputs/
+*.pdf
+*.html.bak
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Streamlit
+.streamlit/secrets.toml
+
+# QGIS
+*.qgs
+*.qgz
+
+# Docker
+.dockerignore
+
+# Keep data stubs
+!data/.gitkeep
+!HSAE_Data/.gitkeep
