@@ -12,7 +12,7 @@
 [![QGIS](https://img.shields.io/badge/QGIS-Plugin-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
 [![Download QGIS Plugin](https://img.shields.io/badge/⬇️_Download-QGIS_Plugin_v6.01-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis_v601.zip)
 [![CV](https://img.shields.io/badge/CV-Download-6366F1?style=flat&logo=read-the-docs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf)
-[![Live App](https://img.shields.io/badge/Live_App-hsae--v600.streamlit.app-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hsae-v600.streamlit.app)
+[![Live App](https://img.shields.io/badge/Live_App-HSAE_v6.01-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.38-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
@@ -68,7 +68,7 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 | 💼 **LinkedIn** | [seifelden-alkhedir](https://www.linkedin.com/in/seifelden-alkhedir-6b730985/) |
 | 📦 **Zenodo** | [DOI Records & Datasets](https://zenodo.org/search?q=0000-0003-0821-2991) |
 | 🎬 **YouTube** | [HSAE Video Channel](https://www.youtube.com/@seifeldinalkedir) |
-| 🌐 **Website** | [Portfolio](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-) |
+| 🌐 **Website** | [Portfolio](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601) |
 | 📄 **CV** | [Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf) |
 
 ---
@@ -237,7 +237,7 @@ WebGIS · Conflict Index · GERD Case Study · Digital Twin EnKF
 
 ```bash
 # 1. Clone
-git clone https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-.git
+git clone https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601.git
 cd HydroSovereign-AI-Engine-HSAE-
 
 # 2. Install dependencies
@@ -250,7 +250,7 @@ earthengine authenticate
 streamlit run app.py
 ```
 
-Opens at: **http://localhost:8501**
+Opens at: **https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app**
 
 > ✅ The app runs fully without API keys using built-in physics-based simulation.
 > Real data activated by: GRDC key · NASA Earthdata · GEE authentication · CDS API key
@@ -414,7 +414,7 @@ earthengine authenticate
 
 ## 🎬 Demo
 
-[![Live App](https://img.shields.io/badge/🌊_Launch_Live_App-hsae--v600.streamlit.app-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://hsae-v600.streamlit.app)
+[![Live App](https://img.shields.io/badge/🌊_Launch_Live_App-HSAE_v6.01-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 
 [![YouTube](https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
 
@@ -437,7 +437,7 @@ The original contributions listed above (ATDI, AHIFD, AFSF, ASI, ALTM, ASCAF, AW
 [![YouTube](https://img.shields.io/badge/YouTube-Channel-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
 [![QGIS](https://img.shields.io/badge/QGIS-Plugin-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
 [![CV](https://img.shields.io/badge/CV-PDF-6366F1?style=flat&logo=read-the-docs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf)
-[![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hsae-v600.streamlit.app)
+[![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 
 *Combining 10 years of field environmental practice with satellite science and AI*
 *to address the water sovereignty challenges of transboundary river basins.*
