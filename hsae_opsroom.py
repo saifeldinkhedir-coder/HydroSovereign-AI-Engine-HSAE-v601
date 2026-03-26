@@ -499,21 +499,12 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                      "transparency","fill_pct","sovereignty_idx","gpm_24h","treaty"]
         num_cols  = ["equity","transparency","fill_pct","sovereignty_idx","gpm_24h"]
 
-        def _color_val(val, low=30, high=70):
-            """Color cells without matplotlib."""
-            try:
-                v = float(val)
-                if v >= high: return "background-color: #d4edda; color: #155724"
-                if v >= low:  return "background-color: #fff3cd; color: #856404"
-                return "background-color: #f8d7da; color: #721c24"
-            except: return ""
-
-        styled = display_df[cols_show].style \
-            .applymap(_color_val, subset=["equity","transparency"]) \
-            .applymap(lambda v: _color_val(v, 20, 50), subset=["sovereignty_idx"]) \
-            .format({c: "{:.1f}" for c in num_cols})
-
-        st.dataframe(styled, use_container_width=True, height=420)
+        # Display table — no external styling dependencies
+        show = display_df[cols_show].copy()
+        for c in num_cols:
+            if c in show.columns:
+                show[c] = show[c].apply(lambda x: f"{float(x):.1f}" if x is not None else "")
+        st.dataframe(show, use_container_width=True, height=420)
 
         # GPM 30-min pulse
         st.markdown("#### ☔ GPM 30-Minute Pulse — Active Basin")
