@@ -108,7 +108,9 @@ try:
 except Exception: _HAS_AR=False
 
 try:
-    from export_qgis import render_export_qgis_section; _HAS_QGIS_EXP=True
+    from export_qgis import render_export_qgis
+    from upload_real_data import render_upload_real_data
+    _HAS_QGIS_EXP=True
 except Exception: _HAS_QGIS_EXP=False
 
 # ── Init DB ───────────────────────────────────────────────────────────────────
@@ -258,6 +260,7 @@ with st.sidebar:
         "🗄️  Database · History",
         "📄 Export · Reports",
         "🗺️ Export to QGIS",
+        "📂 Upload Real Data",
         "─── v6.01 SCIENCE+ ───",
         "🏔️  HBV Calibration",
         "🎲 Uncertainty Analysis",
@@ -334,7 +337,8 @@ with st.sidebar:
 
     # ── Quick QGIS Export in sidebar ──────────────────────────────────
     if _HAS_QGIS_EXP:
-        if st.sidebar.button("🗺️ Export to QGIS", use_container_width=True, key="sb_qgis"):
+        if st.sidebar.button("🗺️ Export to QGIS",
+        "📂 Upload Real Data", width='stretch', key="sb_qgis"):
             st.session_state["page"] = "📄 Export · Reports"
             st.rerun()
 
@@ -441,8 +445,8 @@ elif page == "🗺️ Export to QGIS":
     df = _get_df(basin)
     if _HAS_QGIS_EXP:
         render_export_qgis_section(df, basin, GLOBAL_BASINS)
-    else:
-        st.error("❌ export_qgis.py not found — place it in hsae_complete\\")
+elif page == "📂 Upload Real Data":
+    render_upload_real_data()
 
 elif page in ("─── v6.01 SCIENCE+ ───","─── v6.01 SATELLITE ───",
                "─── v6.01 LEGAL+ ───","─── v6.01 INTELLIGENCE ───"):
@@ -523,7 +527,7 @@ elif page == "🎲 Uncertainty Analysis":
                 _fig.update_layout(template="plotly_dark", height=320,
                     title="ATDI Monte Carlo Distribution (1,000 samples)",
                     xaxis_title="ATDI (%)", yaxis_title="Count")
-                st.plotly_chart(_fig, use_container_width=True)
+                st.plotly_chart(_fig, width='stretch')
 
             # ── NSE/KGE bootstrap ──────────────────────────────────────────
             if "NSE_UQ" in _rpt and "KGE_UQ" in _rpt:
@@ -553,7 +557,7 @@ elif page == "🎲 Uncertainty Analysis":
                               "Exceedance Prob.": f"{_prob*100:.1f}%",
                               "Status": "🔴 Triggered" if _prob > 0.5 else "🟡 Uncertain" if _prob > 0.1 else "🟢 Safe"})
             import pandas as _pd
-            st.dataframe(_pd.DataFrame(_rows), use_container_width=True, hide_index=True)
+            st.dataframe(_pd.DataFrame(_rows), width='stretch', hide_index=True)
         else:
             st.info("Monte Carlo analysis returned no results. Check inputs.")
     else:
@@ -626,7 +630,7 @@ elif page == "🔄 Digital Twin · EnKF":
                 r = twin.assimilate(float(o))
                 rows.append({"Step":i+1,"Obs m³/s":round(float(o),1),
                              "ATDI%":r.atdi,"HIFD%":r.hifd,"Status":r.legal_status})
-            st.dataframe(_pd.DataFrame(rows), use_container_width=True)
+            st.dataframe(_pd.DataFrame(rows), width='stretch')
         except Exception as e:
             st.error(f"Digital Twin error: {e}")
     else: st.info("▶️ Run v430 first.")
