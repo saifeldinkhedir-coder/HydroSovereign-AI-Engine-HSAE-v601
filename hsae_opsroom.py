@@ -446,7 +446,7 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                     font=dict(color="#e2e8f0", size=14),
                 ),
             )
-            st.plotly_chart(fig_map, use_container_width=True)
+            st.plotly_chart(fig_map, width='stretch')
 
         with col_legend:
             st.markdown("#### 🎨 Legend")
@@ -499,15 +499,21 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                      "transparency","fill_pct","sovereignty_idx","gpm_24h","treaty"]
         num_cols  = ["equity","transparency","fill_pct","sovereignty_idx","gpm_24h"]
 
-        st.dataframe(
-            display_df[cols_show].style
-                .background_gradient(subset=["equity"],        cmap="RdYlGn", vmin=0, vmax=100)
-                .background_gradient(subset=["transparency"],  cmap="RdYlGn", vmin=0, vmax=100)
-                .background_gradient(subset=["sovereignty_idx"],cmap="Blues",  vmin=0, vmax=100)
-                .format({c: "{:.1f}" for c in num_cols}),
-            use_container_width=True,
-            height=420,
-        )
+        def _color_val(val, low=30, high=70):
+            """Color cells without matplotlib."""
+            try:
+                v = float(val)
+                if v >= high: return "background-color: #d4edda; color: #155724"
+                if v >= low:  return "background-color: #fff3cd; color: #856404"
+                return "background-color: #f8d7da; color: #721c24"
+            except: return ""
+
+        styled = display_df[cols_show].style \
+            .applymap(_color_val, subset=["equity","transparency"]) \
+            .applymap(lambda v: _color_val(v, 20, 50), subset=["sovereignty_idx"]) \
+            .format({c: "{:.1f}" for c in num_cols})
+
+        st.dataframe(styled, use_container_width=True, height=420)
 
         # GPM 30-min pulse
         st.markdown("#### ☔ GPM 30-Minute Pulse — Active Basin")
@@ -541,7 +547,7 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
             )
-            spark_cols[i % 3].plotly_chart(fig_s, use_container_width=True)
+            spark_cols[i % 3].plotly_chart(fig_s, width='stretch')
 
     # ── Tab 3: Legal Timeline ─────────────────────────────────────────────────
     with tabs[2]:
@@ -599,12 +605,12 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
             paper_bgcolor="#020617", plot_bgcolor="#0f172a",
             yaxis=dict(categoryorder="total ascending"),
         )
-        st.plotly_chart(fig_gnt, use_container_width=True)
+        st.plotly_chart(fig_gnt, width='stretch')
 
         # Filter by article
         sel_art = st.selectbox("Filter by Article:", ["All","Art.5","Art.7","Art.12","Art.9"])
         view_df = df_timeline if sel_art == "All" else df_timeline[df_timeline["Article"]==sel_art]
-        st.dataframe(view_df.tail(30), use_container_width=True, hide_index=True)
+        st.dataframe(view_df.tail(30), width='stretch', hide_index=True)
 
     # ── Tab 4: War Room — Scenario Comparison ─────────────────────────────────
     with tabs[3]:
@@ -673,7 +679,7 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                           annotation_text=f"Max cap {cap} BCM")
         fig_war.update_layout(template="plotly_dark", height=560,
                                title=f"Filling Scenario Comparison — {basin.get('id','—')}")
-        st.plotly_chart(fig_war, use_container_width=True)
+        st.plotly_chart(fig_war, width='stretch')
 
         # KPI comparison
         kk1, kk2, kk3 = st.columns(3)
@@ -729,7 +735,7 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
                                fillcolor="#dc2626", opacity=0.05, layer="below",
                                line_width=0)
         fig_risk.update_traces(textposition="top center", textfont_size=8)
-        st.plotly_chart(fig_risk, use_container_width=True)
+        st.plotly_chart(fig_risk, width='stretch')
 
         # Sovereignty Index bar
         df_sov = df_live.sort_values("sovereignty_idx")
@@ -746,7 +752,7 @@ def render_opsroom_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
             xaxis_title="Sovereignty Index (0–100)",
             margin=dict(l=120),
         )
-        st.plotly_chart(fig_sov, use_container_width=True)
+        st.plotly_chart(fig_sov, width='stretch')
 
     # ── Tab 6: Intelligence Feed ───────────────────────────────────────────────
     with tabs[5]:

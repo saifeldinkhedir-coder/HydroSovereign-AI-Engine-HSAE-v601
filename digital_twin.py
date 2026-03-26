@@ -851,9 +851,7 @@ class HSAEDigitalTwin:
         self.basin      = basin
         self.basin_id   = basin.get("id", "unknown")
         self._assimilator = EnKFAssimilator(
-            n_ensemble=n_ensemble,
-            noise_obs=noise_obs,
-            noise_model=noise_model,
+            n_members=n_ensemble,
         )
         self._step = 0
 
