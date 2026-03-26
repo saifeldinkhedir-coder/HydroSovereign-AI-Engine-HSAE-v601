@@ -109,9 +109,16 @@ except Exception: _HAS_AR=False
 
 try:
     from export_qgis import render_export_qgis
-    from upload_real_data import render_upload_real_data
     _HAS_QGIS_EXP=True
 except Exception: _HAS_QGIS_EXP=False
+
+try:
+    from upload_real_data import render_upload_real_data
+    _HAS_UPLOAD=True
+except Exception as e:
+    _HAS_UPLOAD=False
+    import streamlit as _st
+    def render_upload_real_data(): _st.error(f"upload_real_data.py not found: {e}")
 
 # ── Init DB ───────────────────────────────────────────────────────────────────
 init_db()
