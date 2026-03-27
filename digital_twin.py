@@ -1,9 +1,9 @@
 """
-digital_twin.py — HSAE v9.2.0  Digital Twin per Basin
+digital_twin.py — HSAE v6.01  Digital Twin per Basin
 =======================================================
 Real-time Digital Twin with EnKF Data Assimilation:
   • Open-Meteo ERA5 live forcing (precipitation + temperature)
-  • Monte Carlo parameter uncertainty (n≥200 runs)
+  • Monte Carlo parameter uncertainty (n=200 runs, EnKF n_members=50–200)
   • GRDC observed discharge integration
   • Anomaly detection (IsolationForest)
   • Daily update capability
@@ -164,7 +164,7 @@ class DigitalTwin:
     html   = dt.to_html(report)
     """
 
-    VERSION = "9.1.1"
+    VERSION = "6.01"
 
     def __init__(self, basin_id: str):
         self.display_id  = basin_id
@@ -483,7 +483,7 @@ td{{padding:7px 8px;border-bottom:1px solid #334155}}
   <span class="badge" style="background:rgba(56,189,248,0.1);color:#38bdf8;border:1px solid rgba(56,189,248,0.3)">
     GRDC No. {report.get('grdc_no','N/A')}</span>
   <span class="badge" style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)">
-    HSAE v{report.get('hsae_version','9.1.1')}</span>
+    HSAE v{report.get('hsae_version','6.01')}</span>
   <span style="font-size:11px;color:#64748b;margin-top:3px">{report.get('generated','')[:16]} UTC</span>
 </div>
 
@@ -548,7 +548,7 @@ td{{padding:7px 8px;border-bottom:1px solid #334155}}
             return (f"DigitalTwin({self.grdc_key!r}, "
                     f"NSE={r['NSE']:.3f}, KGE={r['KGE']:.3f}, "
                     f"AHIFD={r['AHIFD']:.1f}%)")
-        return f"DigitalTwin({self.grdc_key!r}, not yet run)"
+        return f"DigitalTwin({self.grdc_key!r}, not yet run — call .run() first)"
 
 
 # ── Convenience function ──────────────────────────────────────────────────────
@@ -580,7 +580,7 @@ def batch_digital_twin(basin_ids: Optional[List[str]] = None,
     """
     Run Digital Twin for multiple basins. Returns list of reports.
 
-    Defaults to all 50 HSAE basins if basin_ids not specified.
+    Defaults to all 26 HSAE basins if basin_ids not specified.
     """
     if basin_ids is None:
         try:
@@ -601,7 +601,7 @@ def batch_digital_twin(basin_ids: Optional[List[str]] = None,
 
 
 if __name__ == "__main__":
-    print("=== HSAE Digital Twin v9.1.1 ===")
+    print("=== HSAE Digital Twin v6.01 ===")
     for basin in ["GERD_ETH", "KAKHOVKA_UKR", "FARAKKA_IND"]:
         dt = DigitalTwin(basin)
         r  = dt.run(n_sim=100)
@@ -614,12 +614,14 @@ if __name__ == "__main__":
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# HSAE v9.2.0 ADDITION: Ensemble Kalman Filter + SMAP Data Assimilation
+# HSAE v6.01 ADDITION: Ensemble Kalman Filter + SMAP Data Assimilation
 # ══════════════════════════════════════════════════════════════════════════════
 
 class EnKFAssimilator:
     """
     Ensemble Kalman Filter for real-time discharge + SMAP assimilation.
+
+    Default n_members=50 for fast runs; use n_members=200 for publication quality.
 
     References
     ----------
@@ -629,7 +631,7 @@ class EnKFAssimilator:
         NASA GSFC, Greenbelt, MD. doi:10.5067/EVKPQZ4AFC4D
     """
 
-    VERSION = "9.2.0"
+    VERSION = "6.01"
 
     def __init__(self, n_members: int = 50, obs_sigma_q: float = 5.0,
                  obs_sigma_sm: float = 0.03):
@@ -801,7 +803,7 @@ def run_enkf_twin(basin_id: str, n_days: int = 30) -> dict:
 
 
 def generate_twin_html(basin_id: str) -> str:
-    """Generate HTML summary card for EnKF digital twin (v9.2.0)."""
+    """Generate HTML summary card for EnKF digital twin (v6.01)."""
     enkf = EnKFAssimilator(n_members=20)
     rng  = random.Random(hash(basin_id))
     # Synthetic update
@@ -869,14 +871,18 @@ class HSAEDigitalTwin:
         # Map to HIFD/ATDI
         q_sim = float(result.get("analysis_q_mean", obs))
         state = [q_sim, summary.get("sm_mean", 0.5)]
-        q_nat = float(self.basin.get("q_nat_mean", q_sim * 1.3))
+        # q_nat_m3s is the key used in basins_data; q_nat_mean as fallback
+        q_nat = float(self.basin.get("q_nat_m3s",
+                      self.basin.get("q_nat_mean",
+                      self.basin.get("q_mean_m3s", q_sim) * 1.15)))
         hifd  = max(0.0, (q_nat - q_sim) / q_nat * 100) if q_nat > 0 else 0.0
         atdi  = min(100.0, hifd * 0.85)
 
-        if atdi >= 70: legal = "Critical — Art.12"
-        elif atdi >= 40: legal = "Concern — Art.7"
-        elif atdi >= 25: legal = "Review — Art.5"
-        else: legal = "Compliant"
+        if atdi >= 70:   legal = "Critical — Art.12 Significant Harm"
+        elif atdi >= 55: legal = "Alert — Art.9 Notification Required"
+        elif atdi >= 40: legal = "Concern — Art.7 No-Harm Rule"
+        elif atdi >= 20: legal = "Monitor — Art.5 Equitable Use"
+        else:            legal = "Compliant"
 
         return EnKFResult(
             state_mean   = state,
