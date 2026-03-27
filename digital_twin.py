@@ -856,14 +856,19 @@ class HSAEDigitalTwin:
         self._step = 0
 
     def assimilate(self, obs: float) -> EnKFResult:
-        """Run one assimilation step with observed value."""
+        """Run one assimilation step with observed discharge value."""
         import datetime
         self._step += 1
-        result = self._assimilator.step(obs)
+
+        # Call correct EnKFAssimilator method
+        result = self._assimilator.update_discharge(obs)
+
+        # Get full state summary
+        summary = self._assimilator.get_state_summary()
 
         # Map to HIFD/ATDI
-        state = result.get("state_mean", [obs])
-        q_sim = float(state[0]) if state else obs
+        q_sim = float(result.get("analysis_q_mean", obs))
+        state = [q_sim, summary.get("sm_mean", 0.5)]
         q_nat = float(self.basin.get("q_nat_mean", q_sim * 1.3))
         hifd  = max(0.0, (q_nat - q_sim) / q_nat * 100) if q_nat > 0 else 0.0
         atdi  = min(100.0, hifd * 0.85)
@@ -875,9 +880,9 @@ class HSAEDigitalTwin:
 
         return EnKFResult(
             state_mean   = state,
-            state_std    = result.get("state_std", [0.0]),
-            innovation   = result.get("innovation", 0.0),
-            kalman_gain  = result.get("kalman_gain", [0.0]),
+            state_std    = [summary.get("q_std", 0.0), summary.get("sm_std", 0.0)],
+            innovation   = round(obs - q_sim, 3),
+            kalman_gain  = [result.get("kalman_gain", 0.0)],
             timestamp    = datetime.datetime.utcnow().isoformat(),
             basin_id     = self.basin_id,
             atdi         = round(atdi, 2),
