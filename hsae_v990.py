@@ -411,13 +411,15 @@ body {background: #020617;}
                 "Critical alerts in this module can be interpreted as triggers for **provisional measures** "
                 "under Annex, Article 7 (temporary protective measures)."
             )
-            # Ensure basin is always available inside this tab
+            # Bulletproof rng — never fails
+            _rng_eco = np.random.default_rng(42)
             try:
-                _basin_t3 = basin if isinstance(basin, dict) else {}
-                _bid = str(_basin_t3.get('id', _basin_t3.get('name', 'X')))
+                if isinstance(basin, dict) and basin:
+                    _rng_eco = np.random.default_rng(
+                        abs(hash(str(basin.get('id', basin.get('name', 'X'))))) % (2**31)
+                    )
             except Exception:
-                _bid = 'X'
-            _rng_eco = np.random.default_rng(abs(hash(_bid)) % (2**31))
+                pass
 
             col_impact1, col_impact2 = st.columns(2)
             with col_impact1:
@@ -465,6 +467,9 @@ body {background: #020617;}
 
         # -------- Tab 4: Global Comparative Analytics --------
         with t4:
+            try:
+             if not isinstance(basin,dict): basin=basin_data[list(basin_data.keys())[0]][0]
+            except: pass
             st.markdown("### 🌍 Global Comparative Analytics")
             st.info(
                 "Compare the active basin with another global dam to assess regimes and equity.\n"
@@ -485,7 +490,7 @@ body {background: #020617;}
                 )
                 basin_b = next(b for b in basins_b_list if b['name'] == basin_b_name)
 
-            if basin_b['id'] != basin['id']:
+            if basin_b['id'] != basin.get('id','X'):
                 df_b = df.copy()
                 df_b['Volume_b'] = basin_b['cap'] * (df_b['Volume'] / max(df_b['Volume'].max(), 1))
 
@@ -493,7 +498,7 @@ body {background: #020617;}
                 fig_comp = go.Figure()
                 fig_comp.add_trace(go.Scatter(
                     x=df['Date'], y=df['Volume'],
-                    name=f"Current: {basin['name']}",
+                    name=f"Current: {basin.get('name','Basin')}",
                     line=dict(color='#10b981', width=3)
                 ))
                 fig_comp.add_trace(go.Scatter(
@@ -518,9 +523,9 @@ body {background: #020617;}
                             "Hydraulic Head (m)",
                             "Eco Sensitivity Level"
                         ],
-                        basin['name']: [
-                            str(basin['cap']),
-                            str(basin['head']),
+                        basin.get('name','Basin'): [
+                            str(basin.get('cap',40.0)),
+                            str(basin.get('head',100.0)),
                             str(basin.get('eco_level','—'))
                         ],
                         basin_b['name']: [
@@ -536,7 +541,7 @@ body {background: #020617;}
                     avg_out_b = df_b['Outflow'].mean()
                     fig_p_comp = go.Figure()
                     fig_p_comp.add_trace(go.Bar(
-                        x=[basin['name'], basin_b['name']],
+                        x=[basin.get('name','Basin'), basin_b['name']],
                         y=[avg_out, avg_out_b],
                         marker_color=['#10b981', '#3b82f6']
                     ))
@@ -551,6 +556,9 @@ body {background: #020617;}
 
         # -------- Tab 5: MODIS ET Enrichment --------
         with t5:
+            try:
+             if not isinstance(basin,dict): basin=basin_data[list(basin_data.keys())[0]][0]
+            except: pass
             st.subheader("🌡️ MODIS-Inspired Evapotranspiration Enrichment")
             st.info(
                 "**Data Enrichment strategy (MODIS ET):** "
@@ -631,6 +639,9 @@ body {background: #020617;}
 
         # -------- Tab 6: Sediment & Water Quality --------
         with t6:
+            try:
+             if not isinstance(basin,dict): basin=basin_data[list(basin_data.keys())[0]][0]
+            except: pass
             st.subheader("🪨 Sediment Load & Water Quality Proxies")
             st.info(
                 "**Legal relevance:** Articles 20 & 21 (UN 1997) mandate protection of "
@@ -741,7 +752,7 @@ reviewed by states, river-basin organizations, and arbitral bodies.
         st.download_button(
             "Export Integrity & Nexus CSV",
             df.to_csv(index=False).encode('utf-8'),
-            file_name=f"HSAE_v990_Integrity_{basin['id']}.csv",
+            file_name=f"HSAE_v990_Integrity_{basin.get('id','X')}.csv",
             mime="text/csv"
         )
 
@@ -750,7 +761,7 @@ reviewed by states, river-basin organizations, and arbitral bodies.
             <html>
             <head>
             <meta charset="utf-8" />
-            <title>HSAE Legal Technical Dossier - {basin['name']}</title>
+            <title>HSAE Legal Technical Dossier - {basin.get('name','Basin')}</title>
             <style>
             body {{ font-family: Arial, sans-serif; margin: 20px; }}
             h1 {{ color: #0f766e; }}
@@ -761,8 +772,8 @@ reviewed by states, river-basin organizations, and arbitral bodies.
             </head>
             <body>
             <h1>HydroSovereign AI Engine – Legal Technical Dossier</h1>
-            <h2>{basin['name']} ({basin['id']})</h2>
-            <p><b>Context:</b> {basin['context']}</p>
+            <h2>{basin.get('name','Basin')} ({basin.get('id','X')})</h2>
+            <p><b>Context:</b> {basin.get('context','')}</p>
             <div class="section">
               <h3>1. Key Indicators</h3>
               <p class="metric">Average Equity Index: {df['Equity'].mean():.1f} %</p>
