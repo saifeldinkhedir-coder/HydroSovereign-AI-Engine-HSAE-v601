@@ -399,10 +399,10 @@ body {background: #020617;}
                 "under Annex, Article 7 (temporary protective measures)."
             )
 
-            try:
-                _bid = str(basin.get('id','X')) if isinstance(basin, dict) else 'X'
-            except Exception:
-                _bid = 'X'
+            _bid = 'X'
+            if isinstance(basin, dict):
+                try: _bid = str(basin['id'])
+                except: _bid = 'X'
             _rng_eco = np.random.default_rng(abs(hash(_bid)) % (2**31))
 
             col_impact1, col_impact2 = st.columns(2)

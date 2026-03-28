@@ -866,13 +866,15 @@ elif page == "🌌 GRACE-FO · Water Storage":
     st.caption("NASA GRACE-FO MASCON RL06v4 — Liquid Water Equivalent Thickness anomaly (cm)")
     try:
         import plotly.graph_objects as go
+        import pandas as _pd_g
+        import numpy as _np_g
         tws_cm   = st.session_state.get("tws_cm", [])
         tws_mean = st.session_state.get("gee_tws_mean", 0)
         gee_year = st.session_state.get("gee_year", "2024")
         data_mode_now = st.session_state.get("data_mode","Simulation")
 
         if tws_cm and data_mode_now == "Direct GEE":
-            months = _pd_grace.date_range(f"{gee_year}-01-01", periods=len(tws_cm), freq="MS")
+            months = _pd_g.date_range(f"{gee_year}-01-01", periods=len(tws_cm), freq="MS")
             fig_tws = go.Figure()
             fig_tws.add_trace(go.Bar(
                 x=months, y=tws_cm,
@@ -895,9 +897,10 @@ elif page == "🌌 GRACE-FO · Water Storage":
         else:
             # Simulation mode — generate synthetic TWS
             n = 12
-            rng_tws = _np_grace.random.default_rng(abs(hash(basin.get('id','X'))) % 2**31)
+            _bid_g  = basin.get('id','X') if isinstance(basin,dict) else 'X'
+            rng_tws = _np_g.random.default_rng(abs(hash(_bid_g)) % 2**31)
             tws_syn = list(rng_tws.normal(2.5, 8.0, n))
-            months  = _pd_grace.date_range("2024-01-01", periods=n, freq="MS")
+            months  = _pd_g.date_range("2024-01-01", periods=n, freq="MS")
             fig_tws = go.Figure()
             fig_tws.add_trace(go.Bar(
                 x=months, y=tws_syn,
