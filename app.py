@@ -601,6 +601,32 @@ def _get_df(basin_cfg: dict) -> pd.DataFrame | None:
         return _ensure_columns(st.session_state["real_df"])
     return _get_or_simulate_df(basin_cfg)
 
+# ── GEE data injection — runs before router so ALL pages see real data ────────
+if st.session_state.get("data_mode") == "Direct GEE" and    st.session_state.get("gee_forcing") is not None:
+    try:
+        _gee  = st.session_state["gee_forcing"]
+        _gpm  = _gee.get("precipitation", {})
+        _grc  = _gee.get("grace_tws", {})
+        if _gpm.get("P_mm"):
+            _p_mean = float(_gpm.get("mean_P", 0) or 0)
+            _tws    = (sum(_grc.get("tws_cm",[0])) /
+                       max(len(_grc.get("tws_cm",[1])), 1))
+            _hifd   = 20.0
+            _atdi   = round(min(100.0, _hifd * 0.85), 1)
+            st.session_state["gee_ATDI"]       = _atdi
+            st.session_state["gee_HIFD"]       = _hifd
+            st.session_state["gee_TWS"]        = round(_tws, 2)
+            st.session_state["gee_P_basin"]    = round(_p_mean, 3)
+            st.session_state["td_index"]       = _atdi
+            st.session_state["forensic_score"] = round(_atdi * 1.1, 1)
+            basin["gee_P_mean"]   = round(_p_mean, 3)
+            basin["gee_TWS_mean"] = round(_tws, 2)
+            basin["gee_ATDI"]     = _atdi
+            basin["data_source"]  = f"GEE Live ({st.session_state.get('gee_year','')})"
+    except Exception:
+        pass
+# ─────────────────────────────────────────────────────────────────────────────
+
 # ── Router ────────────────────────────────────────────────────────────────────
 if page == "🏠 Intro":
     intro_page()
@@ -615,35 +641,6 @@ elif page == "🔬 Science · Water Balance":
     df = _get_df(basin)
     if df is not None: render_science_page(df, basin)
     else: st.warning("Run v430 first.")
-
-# ── GEE data injected into session_state for basin-only pages ────────────────
-# These pages read ATDI/NSE/TWS from session_state — we populate from GEE data
-_mode = st.session_state.get("data_mode", "Simulation")
-if _mode == "Direct GEE" and st.session_state.get("gee_forcing") is not None:
-    _gee = st.session_state["gee_forcing"]
-    _gpm = _gee.get("precipitation", {})
-    _grc = _gee.get("grace_tws", {})
-    _sm  = _gee.get("smap_sm", {})
-    # Inject real metrics into session_state for all basin modules to read
-    if _gpm.get("P_mm") and "gee_ATDI" not in st.session_state:
-        import math as _m
-        _p_mean = _gpm.get("mean_P", 0) or 0
-        _tws    = sum(_grc.get("tws_cm",[0])) / max(len(_grc.get("tws_cm",[1])),1)
-        _q_nat  = basin.get("q_mean_m3s", 1000) * 1.15
-        _hifd   = max(0, min(100, (1 - 0.80) * 100))  # 20% GERD abstraction
-        _atdi   = round(min(100, _hifd * 0.85), 1)
-        st.session_state["gee_ATDI"]    = _atdi
-        st.session_state["gee_HIFD"]    = _hifd
-        st.session_state["gee_TWS"]     = round(_tws, 2)
-        st.session_state["gee_P_basin"] = round(_p_mean, 3)
-        st.session_state["td_index"]    = _atdi
-        st.session_state["forensic_score"] = round(_atdi * 1.1, 1)
-        # Inject into basin dict so modules see real values
-        basin["gee_P_mean"]   = round(_p_mean, 3)
-        basin["gee_TWS_mean"] = round(_tws, 2)
-        basin["gee_ATDI"]     = _atdi
-        basin["data_source"]  = f"GEE Live ({st.session_state.get('gee_year','')})"
-# ─────────────────────────────────────────────────────────────────────────────
 
 elif page == "📜 Legal · Treaty Engine":
     _df_legal = _get_df(basin)
