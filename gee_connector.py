@@ -58,7 +58,12 @@ BASIN_BBOX: Dict[str, Tuple[float, float, float, float]] = {
 
 
 def _init_ee():
-    """Initialize GEE with HSAE project."""
+    """Initialize GEE via Service Account (Streamlit) or personal creds (local)."""
+    try:
+        from gee_auth import get_ee
+        return get_ee()
+    except ImportError:
+        pass
     try:
         import ee
         try:
@@ -68,7 +73,7 @@ def _init_ee():
             ee.Initialize(project=GEE_PROJECT)
         return ee
     except ImportError:
-        raise ImportError("earthengine-api not installed. Run: pip install earthengine-api")
+        raise ImportError("earthengine-api not installed.")
 
 
 def fetch_gpm_precipitation(basin_id: str, start_date: str, end_date: str) -> dict:
