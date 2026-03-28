@@ -402,7 +402,8 @@ body {background: #020617;}
             col_impact1, col_impact2 = st.columns(2)
             with col_impact1:
                 st.markdown("#### 🛰️ Downstream Vegetation Health (NDVI Proxy)")
-                _rng_eco = np.random.default_rng(abs(hash(str(basin.get('id','X')))) % (2**31))
+                _basin_id_safe = basin.get('id','X') if isinstance(basin, dict) else 'X'
+                _rng_eco = np.random.default_rng(abs(hash(str(_basin_id_safe))) % (2**31))
                 ds_ndvi  = df['NDVI'] * 0.9 + _rng_eco.normal(0.0, 0.05, len(df))
                 fig_eco = go.Figure()
                 fig_eco.add_trace(go.Scatter(

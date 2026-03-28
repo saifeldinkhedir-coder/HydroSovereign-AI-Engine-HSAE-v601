@@ -335,7 +335,15 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
 
     except Exception as exc:
         st.session_state["_gee_fetching"] = False
-        st.warning(f"⚠️ GEE fetch failed: {exc} — using simulation data")
+        err_msg = str(exc)
+        if "earthengine" in err_msg.lower() or "not installed" in err_msg.lower():
+            st.error("❌ earthengine-api not installed on server")
+        elif "credentials" in err_msg.lower() or "authentication" in err_msg.lower():
+            st.error("❌ GEE credentials error — check Streamlit Secrets [gee] section")
+        elif "quota" in err_msg.lower():
+            st.error("❌ GEE quota exceeded — try again later")
+        else:
+            st.warning(f"⚠️ GEE failed: {err_msg[:120]}")
         return False
 
 
@@ -501,19 +509,23 @@ with st.sidebar:
 
     # ── Direct GEE: fetch real data for ALL pages ─────────────────────────────
     if data_mode == "Direct GEE":
+        basin_cfg_now = st.session_state.get("active_basin_cfg", {})
+        cache_key     = f"gee_forcing_{basin_cfg_now.get('id','unknown')}"
+
+        # Clear stuck fetching flag and retry on basin change
         basin_changed = (cur_basin != prev_basin)
-        mode_changed  = (prev_mode != "Direct GEE")
-        if mode_changed or basin_changed:
-            st.session_state["_gee_basin"] = cur_basin
-            # Clear old cache so fresh fetch happens
-            cache_key = f"gee_forcing_{st.session_state.get('active_basin_cfg',{}).get('id','unknown')}"
+        if basin_changed:
+            st.session_state["_gee_basin"]   = cur_basin
+            st.session_state["_gee_fetching"] = False
             st.session_state.pop(cache_key, None)
 
-        ok = _fetch_gee_global_state(
-            st.session_state.get("active_basin_cfg", {}),
-            cur_basin
-        )
-        if ok:
+        # Clear stuck fetching flag — retry every time if not cached
+        if not st.session_state.get(cache_key):
+            st.session_state["_gee_fetching"] = False
+
+        ok = _fetch_gee_global_state(basin_cfg_now, cur_basin)
+
+        if ok and st.session_state.get(cache_key):
             p_mean   = st.session_state.get("gee_P_mean", 0)
             t_mean   = st.session_state.get("gee_T_mean", 0)
             tws_mean = st.session_state.get("gee_tws_mean", 0)
@@ -527,7 +539,13 @@ with st.sidebar:
                 unsafe_allow_html=True
             )
         else:
-            st.info("🛰️ GEE connecting... pages show simulation data meanwhile.")
+            # Show retry button + status
+            st.warning("⚠️ GEE not connected yet")
+            if st.button("🔄 Retry GEE Connection", key="gee_retry"):
+                st.session_state["_gee_fetching"] = False
+                st.session_state.pop(cache_key, None)
+                st.rerun()
+            st.caption("Pages show simulation data until GEE connects.")
 
     # If real data available, show badge
     if st.session_state.get("real_df") is not None and data_mode != "Direct GEE":
