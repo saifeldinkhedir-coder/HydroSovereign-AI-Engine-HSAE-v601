@@ -280,7 +280,20 @@ body {background: #020617;}
     if st.session_state.executed_v990 and st.session_state.df_v990 is not None:
         df   = st.session_state.df_v990
         _b   = st.session_state.basin_v990
-        basin = _b if _b is not None else basin  # keep sidebar basin as fallback
+        # Always ensure basin is a valid dict
+        if isinstance(_b, dict) and _b:
+            basin = _b
+        # basin fallback already set at function top scope
+        if not isinstance(basin, dict):
+            basin = basin_data[list(basin_data.keys())[0]][0]
+        # Ensure minimum keys always present to prevent KeyError/UnboundLocalError
+        _defaults = {'id': basin.get('name','X'), 'name': 'Basin',
+                     'cap': 40.0, 'head': 100.0, 'area_max': 1000,
+                     'bathy_a': 0.038, 'bathy_b': 1.12, 'evap_base': 5.0,
+                     'context': '', 'lat': 15.0, 'lon': 32.0}
+        for _k, _v in _defaults.items():
+            if _k not in basin:
+                basin[_k] = _v
 
         # --- Global integrity summary ---
         st.markdown("### 🛰️ Global Integrity Summary")
@@ -398,11 +411,12 @@ body {background: #020617;}
                 "Critical alerts in this module can be interpreted as triggers for **provisional measures** "
                 "under Annex, Article 7 (temporary protective measures)."
             )
-
-            _bid = 'X'
-            if isinstance(basin, dict):
-                try: _bid = str(basin['id'])
-                except: _bid = 'X'
+            # Ensure basin is always available inside this tab
+            try:
+                _basin_t3 = basin if isinstance(basin, dict) else {}
+                _bid = str(_basin_t3.get('id', _basin_t3.get('name', 'X')))
+            except Exception:
+                _bid = 'X'
             _rng_eco = np.random.default_rng(abs(hash(_bid)) % (2**31))
 
             col_impact1, col_impact2 = st.columns(2)
