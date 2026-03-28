@@ -36,8 +36,8 @@ python-telegram-bot>=20.0
 # ── Optional: Production Scheduler ───────────────────────
 # APScheduler>=3.10.0   # alternative to schedule for Streamlit Cloud
 
-# ── Optional: GEE Python API (advanced users) ─────────────
-# earthengine-api>=0.1.390   # pip install earthengine-api && earthengine authenticate
+# ── GEE Python API (required for Direct GEE mode) ────────
+earthengine-api>=0.1.400
 
 # ── Install command ───────────────────────────────────────
 # pip install streamlit pandas numpy scipy plotly folium streamlit-folium \
