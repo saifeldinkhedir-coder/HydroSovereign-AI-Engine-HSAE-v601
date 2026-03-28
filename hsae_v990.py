@@ -399,11 +399,13 @@ body {background: #020617;}
                 "under Annex, Article 7 (temporary protective measures)."
             )
 
+            # Define _rng_eco BEFORE columns to avoid UnboundLocalError
+            _basin_id_safe = basin.get('id','X') if isinstance(basin, dict) else 'X'
+            _rng_eco = np.random.default_rng(abs(hash(str(_basin_id_safe))) % (2**31))
+
             col_impact1, col_impact2 = st.columns(2)
             with col_impact1:
                 st.markdown("#### 🛰️ Downstream Vegetation Health (NDVI Proxy)")
-                _basin_id_safe = basin.get('id','X') if isinstance(basin, dict) else 'X'
-                _rng_eco = np.random.default_rng(abs(hash(str(_basin_id_safe))) % (2**31))
                 ds_ndvi  = df['NDVI'] * 0.9 + _rng_eco.normal(0.0, 0.05, len(df))
                 fig_eco = go.Figure()
                 fig_eco.add_trace(go.Scatter(
@@ -647,7 +649,8 @@ body {background: #020617;}
                 with col_s2:
                     st.markdown("#### Water Quality Indicators (Proxy)")
                     # Derive simple proxies
-                    rng_q = np.random.default_rng(abs(hash(basin.get('id','X'))) % (2**31) + 7)
+                    _bid_q = basin.get('id','X') if isinstance(basin, dict) else 'X'
+                    rng_q = np.random.default_rng(abs(hash(_bid_q)) % (2**31) + 7)
                     n_df  = len(df)
                     # EC (electrical conductivity) — increases when flow is low
                     ec = 300 + 200 / (df['Outflow'].clip(0.01) + 0.1) + rng_q.normal(0, 30, n_df)
@@ -799,7 +802,7 @@ reviewed by states, river-basin organizations, and arbitral bodies.
             st.download_button(
                 "Download HTML Dossier",
                 st.session_state.report_html.encode('utf-8'),
-                file_name=f"HSAE_Legal_Dossier_{basin['id']}.html",
+                file_name=f"HSAE_Legal_Dossier_{basin.get('id','basin') if isinstance(basin,dict) else 'basin'}.html",
                 mime="text/html"
             )
             st.info("Open the HTML in a browser and use Ctrl+P to save as PDF.")
