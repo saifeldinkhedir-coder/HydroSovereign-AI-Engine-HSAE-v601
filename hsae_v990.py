@@ -315,6 +315,10 @@ body {background: #020617;}
             st.metric("TDI Enhanced", f"{tdi_val:.1f}%",
                       help="Corrected for natural ET — more forensically accurate")
 
+        import numpy as _np990
+        import plotly.graph_objects as _go990
+        import pandas as _pd990
+
         t1, t2, t3, t4, t5, t6 = st.tabs([
             "⚖️ Legal & Transparency",
             "🌿 Nexus: Water–Climate–Food",
@@ -412,14 +416,8 @@ body {background: #020617;}
                 "under Annex, Article 7 (temporary protective measures)."
             )
             # Bulletproof rng — never fails
-            _rng_eco = np.random.default_rng(42)
-            try:
-                if isinstance(basin, dict) and basin:
-                    _rng_eco = np.random.default_rng(
-                        abs(hash(str(basin.get('id', basin.get('name', 'X'))))) % (2**31)
-                    )
-            except Exception:
-                pass
+            _b3 = basin if isinstance(basin, dict) and basin else {}
+            _rng_eco = _np990.random.default_rng(abs(hash(str(_b3.get('id','X')))) % (2**31))
 
             col_impact1, col_impact2 = st.columns(2)
             with col_impact1:
