@@ -674,44 +674,46 @@ body {background: #020617;}
 
                 with col_s2:
                     st.markdown("#### Water Quality Indicators (Proxy)")
-                    # Derive simple proxies
-                    _bid_q = basin.get('id','X') if isinstance(basin, dict) else 'X'
-                    rng_q = np.random.default_rng(abs(hash(_bid_q)) % (2**31) + 7)
-                    n_df  = len(df)
-                    # EC (electrical conductivity) — increases when flow is low
-                    ec = 300 + 200 / (df['Outflow'].clip(0.01) + 0.1) + rng_q.normal(0, 30, n_df)
-                    # DO (dissolved oxygen) — decreases in hot, stagnant water
-                    do = 8.5 - 0.08 * df['MODIS_ET_BCM'].clip(0) * 1000 + rng_q.normal(0, 0.5, n_df)
-                    do = do.clip(3, 14)
+                    try:
+                        _bid_q = basin.get('id','X') if isinstance(basin, dict) else 'X'
+                        rng_q  = _np990.random.default_rng(abs(hash(str(_bid_q))) % (2**31) + 7)
+                        n_df   = len(df)
+                        # Safe column access
+                        _outflow = df['Outflow'].clip(0.01) if 'Outflow' in df.columns else                                    df['Outflow_BCM'].clip(0.01) if 'Outflow_BCM' in df.columns else                                    _pd990.Series([1.0]*n_df)
+                        _et_col  = df['MODIS_ET_BCM'] if 'MODIS_ET_BCM' in df.columns else                                    _pd990.Series([0.01]*n_df)
+                        _dates   = df['Date'] if 'Date' in df.columns else                                    _pd990.date_range('2023-01-01', periods=n_df, freq='D')
+                        # EC and DO
+                        ec = 300 + 200 / (_outflow + 0.1) + rng_q.normal(0, 30, n_df)
+                        do = (8.5 - 0.08 * _et_col.clip(0) * 1000
+                              + rng_q.normal(0, 0.5, n_df))
+                        do = do.clip(3, 14)
 
-                    fig_wq = go.Figure()
-                    fig_wq.add_trace(go.Scatter(
-                        x=df['Date'], y=ec,
-                        name='EC (μS/cm)', line=dict(color='#8b5cf6')
-                    ))
-                    fig_wq.add_hline(y=800, line_dash='dash', line_color='#fbbf24',
-                                    annotation_text='Salinity limit 800 μS/cm')
-                    fig_wq.update_layout(
-                        template='plotly_dark', height=200,
-                        title='Electrical Conductivity (Salinity Proxy)',
-                        yaxis_title='μS/cm'
-                    )
-                    st.plotly_chart(fig_wq, use_container_width=True)
+                        fig_wq = _go990.Figure()
+                        fig_wq.add_trace(_go990.Scatter(
+                            x=_dates, y=ec,
+                            name='EC (μS/cm)', line=dict(color='#8b5cf6')
+                        ))
+                        fig_wq.add_hline(y=800, line_dash='dash', line_color='#fbbf24',
+                                        annotation_text='Salinity limit 800 μS/cm')
+                        fig_wq.update_layout(template='plotly_dark', height=200,
+                            title='Electrical Conductivity (Salinity Proxy)',
+                            yaxis_title='μS/cm')
+                        st.plotly_chart(fig_wq, use_container_width=True)
 
-                    fig_do = go.Figure()
-                    fig_do.add_trace(go.Scatter(
-                        x=df['Date'], y=do,
-                        name='DO (mg/L)', line=dict(color='#22d3ee'),
-                        fill='tozeroy', fillcolor='rgba(34,211,238,0.1)'
-                    ))
-                    fig_do.add_hline(y=5, line_dash='dash', line_color='#ef4444',
-                                    annotation_text='Minimum DO = 5 mg/L')
-                    fig_do.update_layout(
-                        template='plotly_dark', height=200,
-                        title='Dissolved Oxygen (Ecological Health)',
-                        yaxis_title='mg/L'
-                    )
-                    st.plotly_chart(fig_do, use_container_width=True)
+                        fig_do = _go990.Figure()
+                        fig_do.add_trace(_go990.Scatter(
+                            x=_dates, y=do,
+                            name='DO (mg/L)', line=dict(color='#22d3ee'),
+                            fill='tozeroy', fillcolor='rgba(34,211,238,0.1)'
+                        ))
+                        fig_do.add_hline(y=5, line_dash='dash', line_color='#ef4444',
+                                        annotation_text='Minimum DO = 5 mg/L')
+                        fig_do.update_layout(template='plotly_dark', height=200,
+                            title='Dissolved Oxygen (Ecological Health)',
+                            yaxis_title='mg/L')
+                        st.plotly_chart(fig_do, use_container_width=True)
+                    except Exception as _e_wq:
+                        st.warning(f"Water Quality chart: {_e_wq}")
 
                 # Art. 20/21 compliance checker
                 st.markdown("#### ⚖️ Art. 20 / 21 Compliance Status")
