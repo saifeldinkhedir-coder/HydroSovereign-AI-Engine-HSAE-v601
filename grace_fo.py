@@ -260,52 +260,50 @@ def build_hbv_input(basin_id: str,
     P_mm = met.get("P_mm", [0.0] * n)[:n]
     sources = {"T": met["source"], "P": met["source"]}
 
+    # ── Single GEE call — reuse for P, TWS, SM (prevents 3x slowdown) ─────
+    _gee_cache = None
     if use_gee:
-        gee = fetch_gee_forcing(basin_id, start_date, end_date)
-        if "error" not in gee and gee.get("P_mm"):
-            # Align GPM daily to our date list
-            gpm_dict = dict(zip(gee["P_dates"], gee["P_mm"]))
-            P_mm_gee = [gpm_dict.get(d, P_mm[i] if i < len(P_mm) else 0.0)
-                        for i, d in enumerate(dates)]
-            P_mm = P_mm_gee
-            sources["P"] = f"GEE GPM IMERG (mean={gee['P_mean']:.3f} mm/day)"
-        else:
-            sources["P"] += " (GEE failed, Open-Meteo used)"
+        _gee_cache = fetch_gee_forcing(basin_id, start_date, end_date)
+
+    if _gee_cache and "error" not in _gee_cache and _gee_cache.get("P_mm"):
+        gpm_dict = dict(zip(_gee_cache["P_dates"], _gee_cache["P_mm"]))
+        P_mm = [gpm_dict.get(d, P_mm[i] if i < len(P_mm) else 0.0)
+                for i, d in enumerate(dates)]
+        sources["P"] = f"GEE GPM IMERG (mean={_gee_cache['P_mean']:.3f} mm/day)"
+    else:
+        sources["P"] += " (GEE failed, Open-Meteo used)"
 
     # 3. PET — Hamon method from temperature
     PET_mm = []
     for i, t in enumerate(T_C):
         doy = (datetime.date.fromisoformat(dates[i]) -
                datetime.date(year, 1, 1)).days + 1
-        # Hamon PET approximation
         if t > 0:
             es = 0.6108 * math.exp(17.27 * t / (t + 237.3))
-            dl = 12 + 4 * math.sin(2 * math.pi * (doy - 80) / 365)  # daylight hrs
+            dl = 12 + 4 * math.sin(2 * math.pi * (doy - 80) / 365)
             pet = max(0.0, 0.165 * 216.7 * (dl / 12) * es / (t + 273.3))
         else:
             pet = 0.0
         PET_mm.append(round(pet, 3))
     sources["PET"] = "Hamon (from Open-Meteo T)"
 
-    # 4. GRACE-FO TWS
+    # 4. GRACE-FO TWS — reuse cached GEE result
     tws_cm = []
-    if use_gee:
-        gee = fetch_gee_forcing(basin_id, start_date, end_date)
-        tws_cm = gee.get("tws_cm", [])
+    if _gee_cache and "error" not in _gee_cache:
+        tws_cm = _gee_cache.get("tws_cm", [])
         if tws_cm:
-            sources["TWS"] = f"GRACE-FO MASCON (mean={gee['tws_mean']:.2f} cm)"
+            sources["TWS"] = f"GRACE-FO MASCON (mean={_gee_cache['tws_mean']:.2f} cm)"
         else:
             sources["TWS"] = "GRACE-FO unavailable"
     else:
-        sources["TWS"] = "Not requested"
+        sources["TWS"] = "Not requested" if not use_gee else "GEE unavailable"
 
-    # 5. SMAP soil moisture for EnKF assimilation
+    # 5. SMAP — reuse cached GEE result
     sm_obs = []
-    if use_gee:
-        gee2 = fetch_gee_forcing(basin_id, start_date, end_date)
-        sm_obs = gee2.get("sm_m3m3", [])
+    if _gee_cache and "error" not in _gee_cache:
+        sm_obs = _gee_cache.get("sm_m3m3", [])
         if sm_obs:
-            sources["SM"] = f"SMAP L3 10km (mean={gee2['sm_mean']:.4f} m3/m3)"
+            sources["SM"] = f"SMAP L3 10km (mean={_gee_cache['sm_mean']:.4f} m3/m3)"
         else:
             sources["SM"] = "SMAP unavailable"
 

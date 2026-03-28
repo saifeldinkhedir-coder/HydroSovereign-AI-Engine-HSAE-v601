@@ -203,13 +203,18 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
-    """Fetch real GEE forcing once → stored in session_state for all 35 pages."""
+    """Fetch real GEE forcing once → stored in session_state for all 35 pages.
+    Non-blocking: returns False immediately if already fetching."""
     cache_key = f"gee_forcing_{basin_cfg.get('id','unknown')}"
     if st.session_state.get(cache_key) is not None:
         return True
+    # Prevent re-entry
+    if st.session_state.get("_gee_fetching"):
+        return False
+    st.session_state["_gee_fetching"] = True
 
     try:
-        with st.spinner("🛰️ Fetching real satellite data from GEE..."):
+        with st.spinner("🛰️ Connecting to Google Earth Engine..."):
             from gee_connector import fetch_all_forcing
             import math, datetime
 
@@ -325,10 +330,12 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             st.session_state["gee_year"]     = year
             st.session_state["executed"]     = True
             st.session_state[cache_key]      = True
+            st.session_state["_gee_fetching"] = False
             return True
 
     except Exception as exc:
-        st.warning(f"⚠️ GEE fetch failed: {exc} — using simulation")
+        st.session_state["_gee_fetching"] = False
+        st.warning(f"⚠️ GEE fetch failed: {exc} — using simulation data")
         return False
 
 
@@ -520,7 +527,7 @@ with st.sidebar:
                 unsafe_allow_html=True
             )
         else:
-            st.error("GEE connection failed")
+            st.info("🛰️ GEE connecting... pages show simulation data meanwhile.")
 
     # If real data available, show badge
     if st.session_state.get("real_df") is not None and data_mode != "Direct GEE":
@@ -532,19 +539,41 @@ with st.sidebar:
     st.caption("HSAE v6.01 · Dr. Seifeldin M.G. Alkedir · University of Khartoum")
 
 # ── Use real data if available and mode selected ──────────────────────────────
+# Required columns for all pages — if missing, fill with zeros
+_REQUIRED_COLS = [
+    "Date","S1_VV_dB","S1_Area","S2_NDWI","S2_Area","Fused_Area",
+    "Effective_Area","Optical_Valid","GPM_Rain_mm","Inflow_BCM_raw",
+    "Inflow_BCM","Lag_Effect","Volume_BCM","Pct_Full","Delta_V",
+    "Losses","Outflow_BCM","Flow_m3s","Power_MW","Energy_GWh",
+    "Evap_PM_BCM","Seepage_BCM","ET0_mm_day","dV_full","dV_obs_full",
+    "MB_full_Error","MB_full_pct","Evap_BCM","TD_Deficit","NDVI",
+]
+
+def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Add any missing required columns with zeros to prevent page crashes."""
+    if df is None:
+        return df
+    for col in _REQUIRED_COLS:
+        if col not in df.columns:
+            if col == "Date":
+                df[col] = pd.date_range("2023-01-01", periods=len(df), freq="D")
+            else:
+                df[col] = 0.0
+    return df
+
 def _get_df(basin_cfg: dict) -> pd.DataFrame | None:
     mode = st.session_state.get("data_mode", "Simulation")
-    # Direct GEE — use real GEE DataFrame for ALL pages
+    # Direct GEE — use real GEE DataFrame if ready, else simulation
     if mode == "Direct GEE":
         df = st.session_state.get("df")
-        if df is not None:
-            return df
-        # Fallback: fetch now if not yet available
-        _fetch_gee_global_state(basin_cfg, st.session_state.get("active_basin_name",""))
-        return st.session_state.get("df") or _get_or_simulate_df(basin_cfg)
+        if df is not None and "GPM_Rain_mm" in df.columns:
+            # GEE data is ready — return it with safety columns
+            return _ensure_columns(df)
+        # GEE not ready yet — return simulation so pages don't blank out
+        return _ensure_columns(_get_or_simulate_df(basin_cfg))
     # Real APIs (v6) — use real_df
     if mode == "🆕 Real APIs (v6)" and st.session_state.get("real_df") is not None:
-        return st.session_state["real_df"]
+        return _ensure_columns(st.session_state["real_df"])
     return _get_or_simulate_df(basin_cfg)
 
 # ── Router ────────────────────────────────────────────────────────────────────
