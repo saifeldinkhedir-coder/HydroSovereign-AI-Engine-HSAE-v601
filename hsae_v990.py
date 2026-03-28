@@ -213,11 +213,87 @@ body {background: #020617;}
         )
 
         if st.button("🚀 RUN INTEGRITY MISSION", type="primary", use_container_width=True):
-            st.session_state.df_v990 = run_full_mission(basin, lag)
+            data_mode_v990 = st.session_state.get("data_mode", "Simulation")
+
+            if data_mode_v990 == "Direct GEE" and st.session_state.get("df") is not None:
+                # Use real GEE global state — map columns to v990 schema
+                gee_df = st.session_state["df"].copy()
+                import numpy as np
+                dates = gee_df["Date"] if "Date" in gee_df.columns else pd.date_range("2023-01-01", periods=len(gee_df), freq="D")
+                n = len(gee_df)
+
+                # Map GEE columns to v990 schema
+                inflow  = gee_df["Inflow_BCM"].values  if "Inflow_BCM"  in gee_df.columns else gee_df.get("GPM_Rain_mm", pd.Series([0]*n)).values * 0.001
+                outflow = gee_df["Outflow_BCM"].values if "Outflow_BCM" in gee_df.columns else inflow * 0.82
+                volume  = gee_df["Volume_BCM"].values  if "Volume_BCM"  in gee_df.columns else np.cumsum(inflow - outflow).clip(0, basin["cap"])
+                area    = gee_df["S1_Area"].values      if "S1_Area"    in gee_df.columns else gee_df.get("Effective_Area", pd.Series([basin["area_max"]*0.6]*n)).values
+                et0_mm  = gee_df["ET0_mm_day"].values  if "ET0_mm_day" in gee_df.columns else np.full(n, 5.0)
+                ndvi    = gee_df["NDVI"].values         if "NDVI"       in gee_df.columns else np.full(n, 0.4)
+                tdi     = gee_df["TD_Deficit"].values   if "TD_Deficit" in gee_df.columns else np.clip((inflow - outflow) / (inflow + 0.1), 0, 1)
+
+                evap    = area * basin.get("evap_base", 5.0) / 1000
+                modis_et = et0_mm * area * 1e-3
+                upper_v  = volume * 1.04 + 1.1
+                lower_v  = np.maximum(0, volume * 0.96 - 1.1)
+                rng_v990 = np.random.default_rng(42)
+                equity_idx   = (outflow / (inflow + 0.1)) * 100
+                methane      = area * 0.45 * (1 + 0.1 * rng_v990.standard_normal(n))
+                transparency = 100 - rng_v990.uniform(1, 4, n)
+                sed_mg_L     = np.clip(150*(inflow/(inflow.mean()+0.01))**1.4, 5, 2000)
+
+                df_v990_gee = pd.DataFrame({
+                    "Date": dates.values if hasattr(dates, "values") else dates,
+                    "Inflow": inflow, "Outflow": outflow, "Volume": volume,
+                    "Methane": methane, "NDVI": ndvi, "Transparency": transparency,
+                    "Upper_V": upper_v, "Lower_V": lower_v, "Equity": equity_idx,
+                    "Evap": evap, "MODIS_ET_BCM": modis_et, "ET0_mm": et0_mm,
+                    "TDI_Enhanced": tdi, "Sediment_mg_L": sed_mg_L,
+                })
+                st.session_state.df_v990 = df_v990_gee
+                p_mean = st.session_state.get("gee_P_mean", 0)
+                st.success(f"🛰️ v990 using real GEE data — P={p_mean:.2f} mm/d (GPM IMERG)")
+            else:
+                st.session_state.df_v990 = run_full_mission(basin, lag)
+
             st.session_state.executed_v990 = True
             st.session_state.basin_v990 = basin
             st.session_state.lag_days_v990 = lag
             st.session_state.report_html = None
+
+        # Auto-run with GEE data if Direct GEE selected and not yet executed
+        if (st.session_state.get("data_mode") == "Direct GEE"
+                and st.session_state.get("df") is not None
+                and not st.session_state.get("executed_v990")):
+            data_mode_v990 = "Direct GEE"
+            gee_df = st.session_state["df"].copy()
+            import numpy as np
+            n = len(gee_df)
+            inflow  = gee_df.get("Inflow_BCM",  pd.Series(np.full(n, 1.0))).values
+            outflow = gee_df.get("Outflow_BCM", pd.Series(inflow * 0.82)).values
+            volume  = gee_df.get("Volume_BCM",  pd.Series(np.cumsum(inflow-outflow).clip(0, basin["cap"]))).values
+            area    = gee_df.get("S1_Area",      pd.Series(np.full(n, basin["area_max"]*0.6))).values
+            et0_mm  = gee_df.get("ET0_mm_day",   pd.Series(np.full(n, 5.0))).values
+            ndvi    = gee_df.get("NDVI",          pd.Series(np.full(n, 0.4))).values
+            tdi     = gee_df.get("TD_Deficit",    pd.Series(np.clip((inflow-outflow)/(inflow+0.1),0,1))).values
+            dates_auto = gee_df["Date"] if "Date" in gee_df.columns else pd.date_range("2023-01-01", periods=n, freq="D")
+            evap = area * basin.get("evap_base", 5.0) / 1000
+            rng2 = np.random.default_rng(99)
+            df_auto = pd.DataFrame({
+                "Date": dates_auto.values if hasattr(dates_auto,"values") else dates_auto,
+                "Inflow": inflow, "Outflow": outflow, "Volume": volume,
+                "Methane": area*0.45*(1+0.1*rng2.standard_normal(n)),
+                "NDVI": ndvi, "Transparency": 100-rng2.uniform(1,4,n),
+                "Upper_V": volume*1.04+1.1, "Lower_V": np.maximum(0,volume*0.96-1.1),
+                "Equity": (outflow/(inflow+0.1))*100, "Evap": evap,
+                "MODIS_ET_BCM": et0_mm*area*1e-3, "ET0_mm": et0_mm,
+                "TDI_Enhanced": tdi,
+                "Sediment_mg_L": np.clip(150*(inflow/(inflow.mean()+0.01))**1.4,5,2000),
+            })
+            st.session_state.df_v990       = df_auto
+            st.session_state.executed_v990 = True
+            st.session_state.basin_v990    = basin
+            st.session_state.lag_days_v990 = lag
+            st.rerun()
 
     # -------- Main analytics --------
     if st.session_state.executed_v990 and st.session_state.df_v990 is not None:

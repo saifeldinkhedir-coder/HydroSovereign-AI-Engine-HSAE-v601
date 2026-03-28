@@ -532,40 +532,67 @@ def page_v430():
                 else:
                     st.info("ℹ️ No CSV uploaded — running pure simulation fallback.")
 
-            # ── MODE: Direct GEE Live — replace with satellite columns ───
-            elif data_mode == "Direct GEE (Live)":
-                gee_df = st.session_state.get("gee_df_v430", pd.DataFrame())
-                if not gee_df.empty:
-                    gee_idx = gee_df.set_index("Date")
-                    gee_cols = [c for c in gee_idx.columns
+            # ── MODE: Direct GEE Live — use global state from app.py ────
+            elif data_mode in ("Direct GEE (Live)", "Direct GEE"):
+                # Priority 1: GEE Global State set by app.py sidebar
+                gee_global = st.session_state.get("df")
+                if gee_global is not None and "GPM_Rain_mm" in gee_global.columns:
+                    # Merge GEE global df columns into physics baseline
+                    gee_idx = gee_global.set_index("Date") if "Date" in gee_global.columns else gee_global
+                    gee_cols = [c for c in gee_global.columns
                                 if c in df.columns and c != "Date"]
                     if gee_cols:
-                        merged = gee_idx[gee_cols].reindex(
-                            df["Date"], method="nearest",
-                            tolerance=pd.Timedelta("32D")
-                        )
-                        for c in gee_cols:
-                            valid = merged[c].notna()
-                            df.loc[valid, c] = merged.loc[valid, c].values
-                        # Recompute ATDI from GEE TD_Deficit if present
-                        if "TD_Deficit" in gee_cols:
-                            td_index = float(df["TD_Deficit"].mean() * 100)
-                            forensic  = float(
-                                df["TD_Deficit"].rolling(4).mean().max() * 100
+                        try:
+                            merged = gee_idx[gee_cols].reindex(
+                                df["Date"], method="nearest",
+                                tolerance=pd.Timedelta("32D")
                             )
+                            for c in gee_cols:
+                                valid = merged[c].notna()
+                                df.loc[valid, c] = merged.loc[valid, c].values
+                        except Exception:
+                            for c in gee_cols:
+                                if c in gee_global.columns and len(gee_global) >= len(df):
+                                    df[c] = gee_global[c].values[:len(df)]
+                        # Update ATDI from real GPM data
+                        if "TD_Deficit" in df.columns:
+                            td_index = float(df["TD_Deficit"].mean() * 100)
+                            forensic  = float(df["TD_Deficit"].rolling(4).mean().max() * 100)
                             st.session_state["td_index"]       = td_index
                             st.session_state["forensic_score"] = forensic
+                        p_mean = st.session_state.get("gee_P_mean", 0)
+                        t_mean = st.session_state.get("gee_T_mean", 0)
                         st.success(
-                            f"⚡ GEE Live columns merged: "
-                            f"{', '.join(gee_cols[:8])}"
+                            f"🛰️ GEE Live (GPM IMERG + GRACE-FO) — "
+                            f"P={p_mean:.2f} mm/d · T={t_mean:.1f}°C · "
+                            f"{len(gee_cols)} columns merged"
                         )
                     else:
-                        st.warning("⚠️ No matching GEE columns. Using simulation baseline.")
+                        st.info("ℹ️ GEE data loaded but no matching columns — using physics baseline.")
+
+                # Priority 2: Manual GEE CSV upload (legacy)
                 else:
-                    st.info(
-                        "ℹ️ No GEE export uploaded yet. "
-                        "Running simulation. Upload {basin}_atdi.csv to activate live mode."
-                    )
+                    gee_df = st.session_state.get("gee_df_v430", pd.DataFrame())
+                    if not gee_df.empty:
+                        gee_idx  = gee_df.set_index("Date")
+                        gee_cols = [c for c in gee_idx.columns
+                                    if c in df.columns and c != "Date"]
+                        if gee_cols:
+                            merged = gee_idx[gee_cols].reindex(
+                                df["Date"], method="nearest",
+                                tolerance=pd.Timedelta("32D")
+                            )
+                            for c in gee_cols:
+                                valid = merged[c].notna()
+                                df.loc[valid, c] = merged.loc[valid, c].values
+                            st.success(f"⚡ GEE CSV merged: {', '.join(gee_cols[:8])}")
+                        else:
+                            st.warning("⚠️ No matching GEE columns. Using simulation baseline.")
+                    else:
+                        st.info(
+                            "ℹ️ Select **Direct GEE** in the sidebar to auto-fetch "
+                            "satellite data, or upload a GEE CSV below."
+                        )
 
             st.session_state["df"]          = df
             st.session_state["basin_v430"]  = basin
