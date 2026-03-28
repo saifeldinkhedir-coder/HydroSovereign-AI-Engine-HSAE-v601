@@ -706,10 +706,31 @@ elif page == "📄 Export · Reports":
 
 elif page == "🗺️ Export to QGIS":
     st.markdown("## 🗺️ Export to QGIS")
-    st.markdown(f"**Active Basin:** {basin.get('name','—')} · {basin.get('id','—')}")
+    _basin_id_display = basin.get('id', basin.get('name','—'))
+    _basin_name_display = basin.get('name', basin_name)
+    st.markdown(f"**Active Basin:** {_basin_name_display}  |  ID: `{_basin_id_display}`  |  "
+                f"Area: {basin.get('area_max','—')} km²  |  Cap: {basin.get('cap','—')} BCM")
     df = _get_df(basin)
     if _HAS_QGIS_EXP:
         render_export_qgis_section(df, basin, GLOBAL_BASINS)
+    else:
+        st.info("🗺️ QGIS export module loading...")
+        # Provide direct download anyway
+        import json
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": {"type": "Point",
+                             "coordinates": [basin.get('lon',0), basin.get('lat',0)]},
+                "properties": {k: str(v) for k, v in basin.items()
+                               if k not in ('gee_df',)}
+            }]
+        }
+        st.download_button("⬇️ Download Basin GeoJSON",
+                          json.dumps(geojson, indent=2),
+                          file_name=f"{_basin_id_display}_basin.geojson",
+                          mime="application/json")
 elif page == "📂 Upload Real Data":
     render_upload_real_data()
 
@@ -841,13 +862,56 @@ elif page == "📉 Sediment Transport":
     else: st.warning("Sediment Transport unavailable.")
 
 elif page == "🌌 GRACE-FO · Water Storage":
-    if _HAS_GRACE:
-        # Pass real TWS from GEE session_state if available
-        if st.session_state.get("data_mode") == "Direct GEE" and st.session_state.get("tws_cm"):
-            basin["gee_tws_cm"]   = st.session_state["tws_cm"]
-            basin["gee_tws_mean"] = st.session_state.get("gee_tws_mean", 0)
-        render_grace_fo_page(basin)
-    else: st.warning("GRACE-FO module unavailable.")
+    st.markdown("## 🌌 GRACE-FO · Terrestrial Water Storage")
+    st.caption("NASA GRACE-FO MASCON RL06v4 — Liquid Water Equivalent Thickness anomaly (cm)")
+    try:
+        import plotly.graph_objects as go
+        tws_cm   = st.session_state.get("tws_cm", [])
+        tws_mean = st.session_state.get("gee_tws_mean", 0)
+        gee_year = st.session_state.get("gee_year", "2024")
+        data_mode_now = st.session_state.get("data_mode","Simulation")
+
+        if tws_cm and data_mode_now == "Direct GEE":
+            months = _pd_grace.date_range(f"{gee_year}-01-01", periods=len(tws_cm), freq="MS")
+            fig_tws = go.Figure()
+            fig_tws.add_trace(go.Bar(
+                x=months, y=tws_cm,
+                name="TWS Anomaly (cm)",
+                marker_color=["#3b82f6" if v >= 0 else "#ef4444" for v in tws_cm]
+            ))
+            fig_tws.add_hline(y=0, line_color="#94a3b8", line_width=1)
+            fig_tws.update_layout(
+                template="plotly_dark", height=400,
+                title=f"GRACE-FO TWS Anomaly — {basin.get('name','Basin')} ({gee_year})",
+                yaxis_title="LWE Thickness (cm)",
+                xaxis_title="Month"
+            )
+            st.plotly_chart(fig_tws, use_container_width=True)
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Mean TWS", f"{tws_mean:.2f} cm")
+            col2.metric("Max TWS", f"{max(tws_cm):.2f} cm")
+            col3.metric("Min TWS", f"{min(tws_cm):.2f} cm")
+            st.success(f"✅ GRACE-FO MASCON — {len(tws_cm)} months · Source: NASA JPL")
+        else:
+            # Simulation mode — generate synthetic TWS
+            n = 12
+            rng_tws = _np_grace.random.default_rng(abs(hash(basin.get('id','X'))) % 2**31)
+            tws_syn = list(rng_tws.normal(2.5, 8.0, n))
+            months  = _pd_grace.date_range("2024-01-01", periods=n, freq="MS")
+            fig_tws = go.Figure()
+            fig_tws.add_trace(go.Bar(
+                x=months, y=tws_syn,
+                name="TWS Anomaly (cm)",
+                marker_color=["#3b82f6" if v >= 0 else "#ef4444" for v in tws_syn]
+            ))
+            fig_tws.add_hline(y=0, line_color="#94a3b8", line_width=1)
+            fig_tws.update_layout(template="plotly_dark", height=400,
+                title=f"GRACE-FO TWS (Simulation) — {basin.get('name','Basin')}",
+                yaxis_title="LWE Thickness (cm)")
+            st.plotly_chart(fig_tws, use_container_width=True)
+            st.info("📊 Simulation mode — select **Direct GEE** for real GRACE-FO data")
+    except Exception as _e_grace:
+        st.error(f"GRACE-FO error: {_e_grace}")
 
 elif page == "💧 SMAP · Soil Moisture":
     if _HAS_SMAP:

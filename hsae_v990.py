@@ -399,14 +399,17 @@ body {background: #020617;}
                 "under Annex, Article 7 (temporary protective measures)."
             )
 
-            # Define _rng_eco BEFORE columns to avoid UnboundLocalError
-            _basin_id_safe = basin.get('id','X') if isinstance(basin, dict) else 'X'
-            _rng_eco = np.random.default_rng(abs(hash(str(_basin_id_safe))) % (2**31))
+            try:
+                _bid = str(basin.get('id','X')) if isinstance(basin, dict) else 'X'
+            except Exception:
+                _bid = 'X'
+            _rng_eco = np.random.default_rng(abs(hash(_bid)) % (2**31))
 
             col_impact1, col_impact2 = st.columns(2)
             with col_impact1:
                 st.markdown("#### 🛰️ Downstream Vegetation Health (NDVI Proxy)")
-                ds_ndvi  = df['NDVI'] * 0.9 + _rng_eco.normal(0.0, 0.05, len(df))
+                _ndvi_col = df['NDVI'] if 'NDVI' in df.columns else pd.Series([0.4]*len(df))
+                ds_ndvi  = _ndvi_col * 0.9 + _rng_eco.normal(0.0, 0.05, len(df))
                 fig_eco = go.Figure()
                 fig_eco.add_trace(go.Scatter(
                     x=df['Date'], y=ds_ndvi,
