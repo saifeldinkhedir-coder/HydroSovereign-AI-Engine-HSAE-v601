@@ -1326,10 +1326,10 @@ def render_real_data_panel(basin_name: str, basin: dict) -> pd.DataFrame | None:
         if results:
             # Metrics row
             m1,m2,m3,m4 = st.columns(4)
-            m1.metric("🌤️ Open-Meteo", f"{len(results.get('meteo') or [])} rows" if results.get('meteo') is not None else "⬜")
-            src = (results.get('q') or pd.DataFrame()).get("source_q", pd.Series()).iloc[0] if results.get('q') is not None and len(results.get('q',[])) else "⬜"
+            m1.metric("🌤️ Open-Meteo", f"{len(results['meteo'])} rows" if results.get('meteo') is not None and hasattr(results.get('meteo'), '__len__') else "⬜")
+            _q = results.get('q'); src = _q.get("source_q", pd.Series()).iloc[0] if _q is not None and not _q.empty and "source_q" in _q.columns else "⬜"
             m2.metric("💧 Discharge", src)
-            m3.metric("🛰️ GRACE-FO", f"{len(results.get('grace') or [])} pts" if results.get('grace') is not None else "⬜")
+            m3.metric("🛰️ GRACE-FO", f"{len(results['grace'])} pts" if results.get('grace') is not None and hasattr(results.get('grace'), '__len__') else "⬜")
             m4.metric("🌊 Source", basin.get("continent","—"))
 
             # Charts
