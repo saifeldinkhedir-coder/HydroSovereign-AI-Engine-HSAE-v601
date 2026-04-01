@@ -232,8 +232,8 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             basin_id = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
             import datetime as _dt2
             _fy = str(_dt2.date.today().year - 1)
-            start    = f"{year}-01-01"
-            end      = f"{year}-12-31"
+            start = st.session_state.get("date_start", f"{_fy}-01-01")
+            end   = st.session_state.get("date_end",   f"{_fy}-12-31")
 
             gee   = fetch_all_forcing(basin_id, start, end)
             gpm   = gee.get("precipitation", {})
