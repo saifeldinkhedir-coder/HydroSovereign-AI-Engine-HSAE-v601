@@ -213,8 +213,10 @@ def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
     try:
         with open(json_path) as f:
             data = json.load(f)
-        computed_year = data.get("computed_at", "2025")[:4]
-        if computed_year != str(year):
+        # Check data year from date_range, not computed_at
+        dr = data.get("date_range", {})
+        data_year = dr.get("start", "2025-01-01")[:4]
+        if data_year != str(year):
             return None
         basin_data = data.get("basins", {}).get(basin_id)
         if not basin_data:
@@ -469,7 +471,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             st.session_state["gee_P_mean"]   = round(float(P_arr.mean()), 3)
             st.session_state["gee_T_mean"]   = round(float(T_arr.mean()), 1)
             st.session_state["gee_tws_mean"] = round(sum(tws_cm)/len(tws_cm),2) if tws_cm else 0
-            st.session_state["gee_year"]     = _fy
+            st.session_state["gee_year"]     = start[:4]
             st.session_state["executed"]     = True
             st.session_state[cache_key]      = True
             st.session_state["_gee_fetching"] = False
