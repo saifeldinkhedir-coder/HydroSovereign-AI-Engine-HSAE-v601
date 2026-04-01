@@ -28,7 +28,7 @@ GEE_PROJECT = "zinc-arc-484714-j8"
 
 # ── Basin bounding boxes (lon_min, lat_min, lon_max, lat_max) ─────────────────
 BASIN_BBOX: Dict[str, Tuple[float, float, float, float]] = {
-    "blue_nile_gerd":      (34.0, 10.0, 38.0, 13.0),
+    "blue_nile_gerd":      (33.0,  7.0, 40.0, 15.0),
     "nile_aswan":          (31.0, 22.0, 34.0, 25.0),
     "mekong_xayaburi":     (99.0, 17.0, 104.0, 22.0),
     "indus_tarbela":       (70.0, 32.0, 75.0, 36.0),
