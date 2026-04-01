@@ -404,7 +404,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             st.session_state["gee_P_mean"]   = round(float(P_arr.mean()), 3)
             st.session_state["gee_T_mean"]   = round(float(T_arr.mean()), 1)
             st.session_state["gee_tws_mean"] = round(sum(tws_cm)/len(tws_cm),2) if tws_cm else 0
-            st.session_state["gee_year"]     = year
+            st.session_state["gee_year"]     = _fy
             st.session_state["executed"]     = True
             st.session_state[cache_key]      = True
             st.session_state["_gee_fetching"] = False
