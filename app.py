@@ -203,7 +203,7 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
-def _load_precomputed(basin_id: str) -> dict | None:
+def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
     """Load pre-computed GEE data from JSON if available."""
     import json
     from pathlib import Path
@@ -213,6 +213,9 @@ def _load_precomputed(basin_id: str) -> dict | None:
     try:
         with open(json_path) as f:
             data = json.load(f)
+        computed_year = data.get("computed_at", "2025")[:4]
+        if computed_year != str(year):
+            return None
         basin_data = data.get("basins", {}).get(basin_id)
         if not basin_data:
             return None
@@ -253,7 +256,8 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
 
     # ── Try pre-computed JSON first (instant) ────────────────────────────────
     basin_id_pc = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
-    precomputed = _load_precomputed(basin_id_pc)
+    _req_year = st.session_state.get("date_start", "2025-01-01")[:4]
+    precomputed = _load_precomputed(basin_id_pc, _req_year)
     if precomputed:
         try:
             import numpy as _np, math as _math
