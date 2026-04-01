@@ -57,16 +57,6 @@ BASIN_BBOX: Dict[str, Tuple[float, float, float, float]] = {
 }
 
 
-# Cache GEE results at module level for 24 hours
-import functools as _functools
-_GEE_CACHE = {}  # {cache_key: result}
-
-def _cached_gee(key, fn):
-    """Simple in-memory cache for GEE results."""
-    if key not in _GEE_CACHE:
-        _GEE_CACHE[key] = fn()
-    return _GEE_CACHE[key]
-
 def _init_ee():
     """Initialize GEE via Service Account (Streamlit) or personal creds (local)."""
     try:
@@ -109,34 +99,37 @@ def fetch_gpm_precipitation(basin_id: str, start_date: str, end_date: str) -> di
     region = ee.Geometry.Rectangle([lon_min, lat_min, lon_max, lat_max])
 
     try:
-        # Single server-side aggregation — much faster than 365 separate calls
-        collection = (ee.ImageCollection("NASA/GPM_L3/IMERG_V07")
-                      .filterDate(start_date, end_date)
-                      .filterBounds(region)
-                      .select("precipitation"))
-
-        # Group by day server-side
+        # Build daily dates list
         start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
         end_dt   = datetime.datetime.strptime(end_date,   "%Y-%m-%d")
-        n_days   = (end_dt - start_dt).days + 1
+        date_list = []
+        cur = start_dt
+        while cur <= end_dt:
+            date_list.append(cur.strftime("%Y-%m-%d"))
+            cur += datetime.timedelta(days=1)
 
-        def make_daily(day_offset):
-            d0  = ee.Date(start_date).advance(day_offset, "day")
-            d1  = d0.advance(1, "day")
-            img = collection.filterDate(d0, d1).mean()
-            val = img.reduceRegion(
+        # Aggregate half-hourly GPM to daily mean (mm/hr → mm/day)
+        def daily_mean(date_str):
+            d0 = ee.Date(date_str)
+            d1 = d0.advance(1, "day")
+            img = (ee.ImageCollection("NASA/GPM_L3/IMERG_V07")
+                   .filterDate(d0, d1)
+                   .select("precipitation")
+                   .mean())  # mean of 48 half-hourly → mm/hr
+            mean_p = img.reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=region,
                 scale=11132,
                 maxPixels=1e9
             ).get("precipitation")
+            # mm/hr × 24 = mm/day
             return ee.Feature(None, {
-                "date": d0.format("YYYY-MM-dd"),
-                "P_mm": ee.Number(val).multiply(24)  # mm/hr → mm/day
+                "date": date_str,
+                "P_mm": ee.Number(mean_p).multiply(24)
             })
 
         features_col = ee.FeatureCollection(
-            ee.List.sequence(0, n_days - 1).map(make_daily)
+            [daily_mean(d) for d in date_list]
         )
         features = features_col.getInfo()["features"]
         dates = [f["properties"]["date"] for f in features]
@@ -351,218 +344,6 @@ def fetch_smap_soil_moisture(basin_id: str, start_date: str, end_date: str) -> d
         return {"error": str(exc), "basin_id": basin_id}
 
 
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Sentinel-1 SAR — Surface Water Extent & Backscatter
-# ══════════════════════════════════════════════════════════════════════════════
-
-def fetch_sentinel1(basin_id: str, start_date: str, end_date: str) -> dict:
-    """
-    Fetch Sentinel-1 SAR backscatter and water extent for a basin.
-    Returns: S1_VV_dB (monthly mean), S1_Area (water extent km²)
-    """
-    try:
-        ee     = _init_ee()
-        bbox   = BASIN_BBOX.get(basin_id)
-        if not bbox:
-            return {"error": f"Unknown basin: {basin_id}"}
-        region = ee.Geometry.Rectangle(list(bbox))
-
-        s1 = (ee.ImageCollection("COPERNICUS/S1_GRD")
-              .filterDate(start_date, end_date)
-              .filterBounds(region)
-              .filter(ee.Filter.eq("instrumentMode", "IW"))
-              .filter(ee.Filter.listContains("transmitterReceiverPolarisation", "VV"))
-              .select("VV"))
-
-        n = s1.size().getInfo()
-        if n == 0:
-            return {"error": "No Sentinel-1 images", "basin_id": basin_id}
-
-        def extract_s1(img):
-            vv_mean = img.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=region, scale=10, maxPixels=1e9
-            ).get("VV")
-            # Water pixels: VV < -15 dB
-            water = img.lt(-15)
-            water_area = (water.multiply(ee.Image.pixelArea())
-                         .reduceRegion(ee.Reducer.sum(), region, 10, maxPixels=1e9)
-                         .get("VV"))
-            return ee.Feature(None, {
-                "date":       img.date().format("YYYY-MM-dd"),
-                "S1_VV_dB":  vv_mean,
-                "S1_Area_m2": water_area,
-            })
-
-        feats = s1.map(extract_s1).getInfo()["features"]
-        dates, vv_vals, area_vals = [], [], []
-        for f in feats:
-            p = f["properties"]
-            if p.get("S1_VV_dB") is not None:
-                dates.append(p["date"])
-                vv_vals.append(round(float(p["S1_VV_dB"]), 3))
-                area_km2 = float(p.get("S1_Area_m2") or 0) / 1e6
-                area_vals.append(round(area_km2, 2))
-
-        return {
-            "basin_id":  basin_id,
-            "dates":     dates,
-            "S1_VV_dB":  vv_vals,
-            "S1_Area":   area_vals,
-            "mean_VV":   round(sum(vv_vals)/len(vv_vals), 3) if vv_vals else 0,
-            "mean_area": round(sum(area_vals)/len(area_vals), 2) if area_vals else 0,
-            "n_images":  len(dates),
-            "source":    "Copernicus Sentinel-1 GRD IW VV",
-        }
-    except Exception as exc:
-        return {"error": str(exc), "basin_id": basin_id}
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# Sentinel-2 — NDWI & NDVI (cloud-masked)
-# ══════════════════════════════════════════════════════════════════════════════
-
-def fetch_sentinel2(basin_id: str, start_date: str, end_date: str) -> dict:
-    """
-    Fetch Sentinel-2 NDWI and NDVI (cloud-masked) for a basin.
-    """
-    try:
-        ee     = _init_ee()
-        bbox   = BASIN_BBOX.get(basin_id)
-        if not bbox:
-            return {"error": f"Unknown basin: {basin_id}"}
-        region = ee.Geometry.Rectangle(list(bbox))
-
-        s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-              .filterDate(start_date, end_date)
-              .filterBounds(region)
-              .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 20)))
-
-        n = s2.size().getInfo()
-        if n == 0:
-            # Try less strict cloud filter
-            s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-                  .filterDate(start_date, end_date)
-                  .filterBounds(region)
-                  .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 60)))
-            n = s2.size().getInfo()
-            if n == 0:
-                return {"error": "No Sentinel-2 images", "basin_id": basin_id}
-
-        def extract_s2(img):
-            # NDWI = (Green - NIR) / (Green + NIR)
-            ndwi = img.normalizedDifference(["B3", "B8"])
-            # NDVI = (NIR - Red) / (NIR + Red)
-            ndvi = img.normalizedDifference(["B8", "B4"])
-            ndwi_val = ndwi.reduceRegion(ee.Reducer.mean(), region, 20, maxPixels=1e9).get("nd")
-            ndvi_val = ndvi.reduceRegion(ee.Reducer.mean(), region, 20, maxPixels=1e9).get("nd")
-            return ee.Feature(None, {
-                "date":  img.date().format("YYYY-MM-dd"),
-                "NDWI":  ndwi_val,
-                "NDVI":  ndvi_val,
-            })
-
-        feats = s2.map(extract_s2).getInfo()["features"]
-        dates, ndwi_vals, ndvi_vals = [], [], []
-        for f in feats:
-            p = f["properties"]
-            if p.get("NDWI") is not None and p.get("NDVI") is not None:
-                dates.append(p["date"])
-                ndwi_vals.append(round(float(p["NDWI"]), 4))
-                ndvi_vals.append(round(float(p["NDVI"]), 4))
-
-        return {
-            "basin_id":  basin_id,
-            "dates":     dates,
-            "NDWI":      ndwi_vals,
-            "NDVI":      ndvi_vals,
-            "mean_NDWI": round(sum(ndwi_vals)/len(ndwi_vals), 4) if ndwi_vals else 0,
-            "mean_NDVI": round(sum(ndvi_vals)/len(ndvi_vals), 4) if ndvi_vals else 0,
-            "n_images":  len(dates),
-            "source":    "Copernicus Sentinel-2 SR Harmonized",
-        }
-    except Exception as exc:
-        return {"error": str(exc), "basin_id": basin_id}
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# GloFAS ERA5 — River Discharge Reanalysis
-# ══════════════════════════════════════════════════════════════════════════════
-
-def fetch_glofas_discharge(basin_id: str, start_date: str, end_date: str) -> dict:
-    """
-    Fetch GloFAS v4 ERA5 reanalysis discharge for a basin outlet.
-    Collection: ECMWF/CEMS_GLOFAS/v4 or similar
-    """
-    try:
-        ee     = _init_ee()
-        bbox   = BASIN_BBOX.get(basin_id)
-        if not bbox:
-            return {"error": f"Unknown basin: {basin_id}"}
-
-        # Basin outlet = downstream corner
-        lon_min, lat_min, lon_max, lat_max = bbox
-        outlet = ee.Geometry.Point([lon_max, lat_min])
-
-        glofas_collections = [
-            ("ECMWF/CEMS_GLOFAS/v4",           "dis06"),
-            ("ECMWF/CEMS_GLOFAS_HISTORICAL/v4", "dis06"),
-        ]
-
-        collection = None
-        band = "dis06"
-        for cid, b in glofas_collections:
-            try:
-                c = (ee.ImageCollection(cid)
-                     .filterDate(start_date, end_date)
-                     .filterBounds(outlet))
-                if c.size().getInfo() > 0:
-                    collection = c.select(b)
-                    band = b
-                    break
-            except Exception:
-                continue
-
-        if collection is None:
-            return {"error": "GloFAS collection not found", "basin_id": basin_id}
-
-        def extract_q(img):
-            q = img.reduceRegion(
-                reducer=ee.Reducer.mean(),
-                geometry=outlet.buffer(5000),
-                scale=1000, maxPixels=1e9
-            ).get(band)
-            return ee.Feature(None, {
-                "date": img.date().format("YYYY-MM-dd"),
-                "Q_m3s": q,
-            })
-
-        feats = collection.map(extract_q).getInfo()["features"]
-        dates, q_vals = [], []
-        for f in feats:
-            p = f["properties"]
-            if p.get("Q_m3s") is not None:
-                dates.append(p["date"])
-                q_vals.append(round(float(p["Q_m3s"]), 2))
-
-        if not q_vals:
-            return {"error": "No GloFAS data", "basin_id": basin_id}
-
-        return {
-            "basin_id": basin_id,
-            "dates":    dates,
-            "Q_m3s":    q_vals,
-            "mean_Q":   round(sum(q_vals)/len(q_vals), 2),
-            "max_Q":    round(max(q_vals), 2),
-            "n_days":   len(dates),
-            "source":   "GloFAS ERA5 v4 reanalysis",
-        }
-    except Exception as exc:
-        return {"error": str(exc), "basin_id": basin_id}
-
-
 def fetch_all_forcing(basin_id: str,
                       start_date: str = "2023-01-01",
                       end_date:   str = "2023-12-31") -> dict:
@@ -576,9 +357,6 @@ def fetch_all_forcing(basin_id: str,
     grace = fetch_grace_tws(basin_id, start_date, end_date)
     et    = fetch_modis_et(basin_id, start_date, end_date)
     smap  = fetch_smap_soil_moisture(basin_id, start_date, end_date)
-    s1    = fetch_sentinel1(basin_id, start_date, end_date)
-    s2    = fetch_sentinel2(basin_id, start_date, end_date)
-    glofas = fetch_glofas_discharge(basin_id, start_date, end_date)
 
     return {
         "basin_id":    basin_id,
@@ -589,17 +367,11 @@ def fetch_all_forcing(basin_id: str,
         "grace_tws":   grace,
         "modis_et":    et,
         "smap_sm":     smap,
-        "sentinel1":   s1,
-        "sentinel2":   s2,
-        "glofas":      glofas,
         "status": {
-            "gpm":    "ok" if "error" not in gpm    else gpm["error"],
-            "grace":  "ok" if "error" not in grace  else grace["error"],
-            "et":     "ok" if "error" not in et     else et["error"],
-            "smap":   "ok" if "error" not in smap   else smap["error"],
-            "s1":     "ok" if "error" not in s1     else s1["error"],
-            "s2":     "ok" if "error" not in s2     else s2["error"],
-            "glofas": "ok" if "error" not in glofas else glofas["error"],
+            "gpm":   "ok" if "error" not in gpm   else gpm["error"],
+            "grace": "ok" if "error" not in grace  else grace["error"],
+            "et":    "ok" if "error" not in et     else et["error"],
+            "smap":  "ok" if "error" not in smap   else smap["error"],
         }
     }
 
