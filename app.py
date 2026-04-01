@@ -203,6 +203,30 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
+def _load_precomputed(basin_id: str) -> dict | None:
+    """Load pre-computed GEE data from JSON if available."""
+    import json
+    from pathlib import Path
+    json_path = Path("data/gee_realtime.json")
+    if not json_path.exists():
+        return None
+    try:
+        with open(json_path) as f:
+            data = json.load(f)
+        basin_data = data.get("basins", {}).get(basin_id)
+        if not basin_data:
+            return None
+        # Check data age — use if less than 36 hours old
+        import datetime
+        computed_at = data.get("computed_at", "")
+        if computed_at:
+            age = datetime.datetime.utcnow() - datetime.datetime.fromisoformat(computed_at)
+            if age.total_seconds() > 36 * 3600:
+                return None  # too old
+        return basin_data
+    except Exception:
+        return None
+
 def _fetch_gee_data_cached(basin_id: str, year: int) -> dict:
     """Cached GEE fetch — runs once per basin per day."""
     try:
@@ -216,13 +240,50 @@ def _fetch_gee_data_cached(basin_id: str, year: int) -> dict:
 def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
     """Fetch real GEE forcing once → stored in session_state for all 35 pages.
     Uses st.cache_data for 24-hour caching — fast after first load."""
-    cache_key = f"gee_forcing_{basin_cfg.get('id','unknown')}"
+    _d_s = st.session_state.get("date_start","")
+    _d_e = st.session_state.get("date_end",  "")
+    cache_key = (f"gee_forcing_{basin_cfg.get('id','unknown')}"
+                 f"_{_d_s}_{_d_e}")
     if st.session_state.get(cache_key) is not None:
         return True
     # Prevent re-entry
     if st.session_state.get("_gee_fetching"):
         return False
     st.session_state["_gee_fetching"] = True
+
+    # ── Try pre-computed JSON first (instant) ────────────────────────────────
+    basin_id_pc = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
+    precomputed = _load_precomputed(basin_id_pc)
+    if precomputed:
+        try:
+            import numpy as _np, math as _math
+            P_mm   = precomputed.get("gpm", {}).get("P_mm", [])
+            tws_cm = precomputed.get("grace", {}).get("tws_cm", [])
+            sm_obs = precomputed.get("smap", {}).get("sm_m3m3", [])
+            T_C    = precomputed.get("temperature", {}).get("T_C", [P_mm[0]*0+25.0 for _ in P_mm])
+            if P_mm:
+                import pandas as _pd
+                P_arr  = _np.array(P_mm, dtype=float)
+                T_arr  = _np.array(T_C[:len(P_mm)], dtype=float)
+                n2     = min(len(P_arr), len(T_arr))
+                PET_mm = [max(0.0, 0.165*216.7*(12/12)*0.6108*_math.exp(17.27*t/(t+237.3))/(t+273.3)) if t>0 else 0.0 for t in T_arr[:n2]]
+                st.session_state["P_mm"]          = list(P_arr[:n2])
+                st.session_state["T_C"]           = list(T_arr[:n2])
+                st.session_state["PET_mm"]        = PET_mm
+                st.session_state["tws_cm"]        = tws_cm
+                st.session_state["sm_obs"]        = sm_obs
+                st.session_state["gee_P_mean"]    = round(float(P_arr.mean()), 3)
+                st.session_state["gee_T_mean"]    = round(float(T_arr.mean()), 1)
+                st.session_state["gee_tws_mean"]  = round(sum(tws_cm)/len(tws_cm), 2) if tws_cm else 0
+                st.session_state["gee_year"]      = precomputed.get("computed_at","")[:4]
+                st.session_state["gee_forcing"]   = precomputed
+                st.session_state["executed"]      = True
+                st.session_state[cache_key]       = True
+                st.session_state["_gee_fetching"] = False
+                st.session_state["data_mode"]     = "Direct GEE"
+                return True
+        except Exception:
+            pass  # fall through to live GEE
 
     try:
         with st.spinner("🛰️ Connecting to Google Earth Engine..."):
@@ -598,11 +659,12 @@ with st.sidebar:
             _d_e = st.session_state.get("date_end",  "")
             cache_key = (f"gee_forcing_{basin_cfg_now.get('id','unknown')}"
                          f"_{_d_s}_{_d_e}")
-
-            # Clear stuck fetching flag on basin change
             basin_changed = (cur_basin != prev_basin)
-            if basin_changed:
+            date_changed  = (st.session_state.get("_gee_dates","")
+                             != f"{_d_s}_{_d_e}")
+            if basin_changed or date_changed:
                 st.session_state["_gee_basin"]    = cur_basin
+                st.session_state["_gee_dates"]    = f"{_d_s}_{_d_e}"
                 st.session_state["_gee_fetching"] = False
                 st.session_state.pop(cache_key, None)
 
