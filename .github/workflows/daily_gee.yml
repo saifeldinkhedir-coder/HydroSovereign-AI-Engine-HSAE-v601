@@ -23,7 +23,8 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install earthengine-api requests
+        run: |
+          pip install earthengine-api numpy requests pandas
 
       - name: Write GEE service account key
         run: |
