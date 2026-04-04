@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "computed_at": "2026-04-03T06:56:34.057254",
+  "computed_at": "2026-04-04T06:45:39.419801",
   "date_range": {
-    "start": "2025-04-03",
-    "end": "2026-04-03"
+    "start": "2025-04-04",
+    "end": "2026-04-04"
   },
   "n_basins": 10,
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-03T06:56:34.057598",
+      "fetched_at": "2026-04-04T06:45:39.420113",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -39,11 +39,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:36.115276"
+      "computed_at": "2026-04-04T06:45:40.516493"
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-03T06:56:36.115492",
+      "fetched_at": "2026-04-04T06:45:40.516724",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -73,11 +73,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:38.231838"
+      "computed_at": "2026-04-04T06:45:41.633638"
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-03T06:56:38.232003",
+      "fetched_at": "2026-04-04T06:45:41.633804",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -107,11 +107,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:40.264667"
+      "computed_at": "2026-04-04T06:45:42.715074"
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-03T06:56:40.264836",
+      "fetched_at": "2026-04-04T06:45:42.715305",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -141,11 +141,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:42.222492"
+      "computed_at": "2026-04-04T06:45:43.860305"
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-03T06:56:42.222717",
+      "fetched_at": "2026-04-04T06:45:43.860471",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -175,11 +175,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:43.895146"
+      "computed_at": "2026-04-04T06:45:44.889898"
     },
     "amu_darya": {
       "basin_id": "amu_darya",
-      "fetched_at": "2026-04-03T06:56:43.895312",
+      "fetched_at": "2026-04-04T06:45:44.890058",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -209,11 +209,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:45.209453"
+      "computed_at": "2026-04-04T06:45:45.934534"
     },
     "jordan_river": {
       "basin_id": "jordan_river",
-      "fetched_at": "2026-04-03T06:56:45.209673",
+      "fetched_at": "2026-04-04T06:45:45.934716",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -243,11 +243,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:47.213695"
+      "computed_at": "2026-04-04T06:45:46.949082"
     },
     "senegal_river": {
       "basin_id": "senegal_river",
-      "fetched_at": "2026-04-03T06:56:47.213866",
+      "fetched_at": "2026-04-04T06:45:46.949297",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -277,11 +277,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:48.828186"
+      "computed_at": "2026-04-04T06:45:47.549919"
     },
     "danube_iron_gates": {
       "basin_id": "danube_iron_gates",
-      "fetched_at": "2026-04-03T06:56:48.828328",
+      "fetched_at": "2026-04-04T06:45:47.550071",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -311,11 +311,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:50.387660"
+      "computed_at": "2026-04-04T06:45:48.551441"
     },
     "brahmaputra": {
       "basin_id": "brahmaputra",
-      "fetched_at": "2026-04-03T06:56:50.387835",
+      "fetched_at": "2026-04-04T06:45:48.551621",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -345,7 +345,7 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-03T06:56:51.937237"
+      "computed_at": "2026-04-04T06:45:49.566802"
     }
   }
 }
