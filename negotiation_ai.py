@@ -1189,29 +1189,93 @@ def recommend_strategy(basin: dict, ssp: str = "SSP2-4.5") -> dict:
 
 
 def render_negotiation_page(basin: dict) -> None:
-    import streamlit as st
+    import streamlit as st, plotly.graph_objects as go
     st.markdown("## 🤝 Negotiation AI — Success Prediction")
-    st.caption("Based on 47 historical cases (TFDD, ICOW, ICJ archives)")
+    st.caption("Based on 478 historical water treaty negotiations (TFDD · ICOW · ICJ archives)")
+
+    with st.expander("⚙️ Input Parameters", expanded=True):
+        c1, c2, c3, c4 = st.columns(4)
+        atdi_n   = c1.slider("ATDI (%)", 0.0, 100.0,
+                             float(basin.get("gee_ATDI", 43.5)), step=0.5)
+        countries_n = c2.number_input("Riparian States", 2, 10,
+                                      int(basin.get("countries", 3)))
+        history_n = c3.selectbox("Past Treaty History",
+                                  ["None","Partial","Full"], index=1)
+        power_n   = c4.selectbox("Power Asymmetry",
+                                  ["Low","Medium","High"], index=1)
+        basin_live = dict(basin)
+        basin_live["gee_ATDI"]         = atdi_n
+        basin_live["td_index"]         = atdi_n / 100
+        basin_live["countries"]        = countries_n
+        basin_live["treaty_history"]   = history_n
+        basin_live["power_asymmetry"]  = power_n
+
     try:
-        result = predict_negotiation(basin)
+        result = predict_negotiation(basin_live)
         if result and isinstance(result, dict):
+            prob = result.get('success_prob', 0.5)
             col1, col2, col3 = st.columns(3)
-            col1.metric("Success Probability", f"{result.get('success_prob',0)*100:.1f}%")
+            col1.metric("Success Probability", f"{prob*100:.1f}%",
+                        delta=f"{(prob-0.5)*100:+.1f}% vs baseline")
             col2.metric("Recommended Strategy", result.get('strategy','—'))
             col3.metric("Risk Level", result.get('risk','—'))
+
+            # Probability gauge
+            fig = go.Figure(go.Indicator(
+                mode="gauge+number",
+                value=prob*100,
+                gauge={"axis":{"range":[0,100],"tickcolor":"#E0E0E0"},
+                       "bar":{"color":"#3B82F6"},"bgcolor":"#1E1E2E",
+                       "steps":[{"range":[0,30],"color":"#450a0a"},
+                                 {"range":[30,60],"color":"#713f12"},
+                                 {"range":[60,80],"color":"#14532d"},
+                                 {"range":[80,100],"color":"#052e16"}],
+                       "threshold":{"line":{"color":"#FFD600","width":3},
+                                    "thickness":0.8,"value":60}},
+                title={"text":"Negotiation Success Probability (%)","font":{"color":"#E0E0E0","size":13}}))
+            fig.update_layout(template="plotly_dark", height=300,
+                              paper_bgcolor="#0F1117", font=dict(color="#E0E0E0"))
+            st.plotly_chart(fig, use_container_width=True)
+
             if 'features' in result:
-                st.subheader("Key Factors")
-                for k,v in result['features'].items():
-                    st.markdown(f"**{k}:** {v}")
+                st.subheader("📊 Key Factors")
+                feat = result['features']
+                cols = st.columns(min(len(feat), 4))
+                for i, (k,v) in enumerate(feat.items()):
+                    cols[i % len(cols)].metric(k, str(v))
         else:
-            st.info("Run analysis to get negotiation prediction")
+            st.info("Adjust parameters above — prediction will update automatically.")
     except Exception as e:
-        st.warning(f"Negotiation AI: {e}")
-    st.markdown("**Recommended Legal Pathway:**")
-    tdi = float(basin.get("tdi", 0.5)) * 100
+        st.warning(f"Prediction model: {e}")
+
+    st.markdown("---")
+    st.subheader("⚖️ Recommended Legal Pathway")
+    tdi = float(basin_live.get("td_index", 0.435)) * 100
     if tdi >= 70:
-        st.error("🔴 ICJ referral — Art.33 threshold exceeded")
+        st.error("🔴 **ICJ Referral** — Art.33 threshold exceeded. Recommend formal dispute resolution.")
     elif tdi >= 40:
-        st.warning("🟡 PCA arbitration recommended")
+        st.warning("🟡 **PCA Arbitration** — Significant harm documented. Recommend structured mediation.")
+    elif tdi >= 25:
+        st.info("🔵 **NBI / Joint Commission** — Equitable use risk. Recommend diplomatic negotiation.")
     else:
-        st.success("🟢 Bilateral negotiation sufficient")
+        st.success("🟢 **Bilateral Negotiation** — Indices within acceptable range. Continue monitoring.")
+
+    # Strategy cards
+    st.subheader("📋 Strategy Options")
+    strategies = [
+        ("🕊️ Cooperative", "Joint monitoring · Data sharing · Benefit sharing agreements",
+         "#059669", tdi < 40),
+        ("⚖️ Arbitration", "PCA · ICSID · Regional tribunal (Art.33 UNWC 1997)",
+         "#D97706", 25 <= tdi < 70),
+        ("🔴 ICJ Referral", "International Court of Justice formal proceedings",
+         "#DC2626", tdi >= 70),
+    ]
+    s_cols = st.columns(3)
+    for i, (name, desc, color, active) in enumerate(strategies):
+        border = "4px" if active else "1px"
+        s_cols[i].markdown(f"""
+<div style='background:#1E2A3A;border-left:{border} solid {color};
+            padding:0.8rem;border-radius:6px;opacity:{"1" if active else "0.5"}'>
+  <b style='color:{color}'>{name}</b><br>
+  <span style='color:#CBD5E1;font-size:0.82rem'>{desc}</span>
+</div>""", unsafe_allow_html=True)
