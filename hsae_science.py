@@ -393,6 +393,9 @@ def monte_carlo_balance(
 
 def render_science_page(df: pd.DataFrame, basin: dict) -> None:
     """Full scientific enhancement UI — embed in any HSAE tab or page."""
+    # Handle empty df gracefully
+    if df is None:
+        df = pd.DataFrame()
 
     st.markdown("""
 <style>

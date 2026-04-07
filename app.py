@@ -806,9 +806,11 @@ elif page == "⚖️  v990 · Legal Nexus":
     page_v990()
 
 elif page == "🔬 Science · Water Balance":
+    import pandas as _pd_sci
     df = _get_df(basin)
-    if df is not None: render_science_page(df, basin)
-    else: st.warning("Run v430 first.")
+    if df is None:
+        df = _pd_sci.DataFrame()  # empty df — Figure 3 tab works without it
+    render_science_page(df, basin)
 
 elif page == "📜 Legal · Treaty Engine":
     _df_legal = _get_df(basin)
