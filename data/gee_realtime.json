@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "computed_at": "2026-04-07T21:27:42.059389",
+  "computed_at": "2026-04-07T22:16:51.913115",
   "date_range": {
     "start": "2025-04-07",
     "end": "2026-04-07"
@@ -9,7 +9,7 @@
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-07T21:27:42.059685",
+      "fetched_at": "2026-04-07T22:16:51.913464",
       "gpm": {
         "months": [
           "2025-01",
@@ -51,7 +51,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -84,11 +84,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:27:44.088244"
+      "computed_at": "2026-04-07T22:16:54.121615"
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-07T21:27:44.088391",
+      "fetched_at": "2026-04-07T22:16:54.121777",
       "gpm": {
         "months": [
           "2025-01",
@@ -130,7 +130,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -163,11 +163,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:27:45.809883"
+      "computed_at": "2026-04-07T22:16:56.115352"
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-07T21:27:45.810012",
+      "fetched_at": "2026-04-07T22:16:56.115497",
       "gpm": {
         "months": [
           "2025-01",
@@ -209,7 +209,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -242,11 +242,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:27:47.601600"
+      "computed_at": "2026-04-07T22:16:58.338568"
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-07T21:27:47.601727",
+      "fetched_at": "2026-04-07T22:16:58.338713",
       "gpm": {
         "months": [
           "2025-01",
@@ -288,7 +288,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -300,32 +300,15 @@
         "n_obs": 0
       },
       "temperature": {
-        "months": [
-          "2025-04"
-        ],
-        "T_C": [
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0,
-          20.0
-        ],
-        "mean_T": 20.0,
-        "source": "Open-Meteo ERA5",
-        "n_months": 12
+        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
+        "T_C": [],
+        "mean_T": 0
       },
-      "computed_at": "2026-04-07T21:27:49.174716"
+      "computed_at": "2026-04-07T22:17:15.028319"
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-07T21:27:49.174815",
+      "fetched_at": "2026-04-07T22:17:15.028478",
       "gpm": {
         "months": [
           "2025-01",
@@ -367,7 +350,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -379,15 +362,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T21:28:05.454804"
+      "computed_at": "2026-04-07T22:17:17.432968"
     },
     "amu_darya": {
       "basin_id": "amu_darya",
-      "fetched_at": "2026-04-07T21:28:05.455004",
+      "fetched_at": "2026-04-07T22:17:17.433149",
       "gpm": {
         "months": [
           "2025-01",
@@ -429,7 +429,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -462,11 +462,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:28:07.440900"
+      "computed_at": "2026-04-07T22:17:19.607242"
     },
     "jordan_river": {
       "basin_id": "jordan_river",
-      "fetched_at": "2026-04-07T21:28:07.441086",
+      "fetched_at": "2026-04-07T22:17:19.607386",
       "gpm": {
         "months": [
           "2025-01",
@@ -508,7 +508,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -541,11 +541,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:28:08.957005"
+      "computed_at": "2026-04-07T22:17:21.506016"
     },
     "senegal_river": {
       "basin_id": "senegal_river",
-      "fetched_at": "2026-04-07T21:28:08.957145",
+      "fetched_at": "2026-04-07T22:17:21.506195",
       "gpm": {
         "months": [
           "2025-01",
@@ -587,7 +587,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "list index out of range",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -603,11 +603,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-07T21:28:09.775894"
+      "computed_at": "2026-04-07T22:17:22.375534"
     },
     "danube_iron_gates": {
       "basin_id": "danube_iron_gates",
-      "fetched_at": "2026-04-07T21:28:09.776014",
+      "fetched_at": "2026-04-07T22:17:22.375662",
       "gpm": {
         "months": [
           "2025-01",
@@ -649,7 +649,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -682,11 +682,11 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:28:11.373672"
+      "computed_at": "2026-04-07T22:17:44.100396"
     },
     "brahmaputra": {
       "basin_id": "brahmaputra",
-      "fetched_at": "2026-04-07T21:28:11.373770",
+      "fetched_at": "2026-04-07T22:17:44.100541",
       "gpm": {
         "months": [
           "2025-01",
@@ -728,7 +728,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
+        "error": "HTTP Error 400: Bad Request",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -761,7 +761,7 @@
         "source": "Open-Meteo ERA5",
         "n_months": 12
       },
-      "computed_at": "2026-04-07T21:28:12.883832"
+      "computed_at": "2026-04-07T22:17:46.664515"
     }
   }
 }
