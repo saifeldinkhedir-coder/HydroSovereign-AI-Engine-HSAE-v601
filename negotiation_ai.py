@@ -1188,6 +1188,34 @@ def recommend_strategy(basin: dict, ssp: str = "SSP2-4.5") -> dict:
 
 
 
+def _basin_defaults(basin: dict) -> dict:
+    """Compute realistic ATDI/HIFD defaults from basin physical parameters."""
+    cap     = float(basin.get("cap", 5.0))
+    disp    = int(basin.get("dispute_level", 0))
+    country = basin.get("country", [])
+    n       = len(country) if isinstance(country, list) else 2
+    runoff  = float(basin.get("runoff_c", 0.30))
+    # ATDI: dispute level + dam size + multi-state + low runoff
+    atdi = min(95.0, max(5.0,
+        15.0 + disp * 12.0 + min(cap / 2.0, 20.0) + (n - 2) * 8.0 + (1 - runoff) * 10.0
+    ))
+    # HIFD: dam size + low runoff + dispute
+    hifd = min(80.0, max(5.0,
+        8.0 + min(cap / 3.0, 15.0) + (1 - runoff) * 12.0 + disp * 5.0
+    ))
+    # Override with real GEE session values if available
+    import streamlit as st
+    _atdi_s = st.session_state.get("gee_ATDI", None)
+    _hifd_s = st.session_state.get("gee_HIFD", None)
+    if _atdi_s is not None:
+        _v = float(_atdi_s)
+        atdi = _v if _v > 1 else _v * 100
+    if _hifd_s is not None:
+        _v = float(_hifd_s)
+        hifd = _v if _v > 1 else _v * 100
+    return {"atdi": round(atdi, 1), "hifd": round(hifd, 1)}
+
+
 def render_negotiation_page(basin: dict) -> None:
     import streamlit as st, plotly.graph_objects as go
     st.markdown("## 🤝 Negotiation AI — Success Prediction")
@@ -1200,12 +1228,9 @@ def render_negotiation_page(basin: dict) -> None:
     context     = basin.get("context", "")
     cap_bcm     = float(basin.get("cap", 10.0))
 
-    _atdi_sess = float(st.session_state.get("gee_ATDI",
-                 basin.get("gee_ATDI", basin.get("td_index", 0.435))))
-    _atdi_def  = _atdi_sess if _atdi_sess > 1 else _atdi_sess * 100
-    _hifd_sess = float(st.session_state.get("gee_HIFD",
-                 basin.get("gee_HIFD", basin.get("hifd", 0.20))))
-    _hifd_def  = _hifd_sess if _hifd_sess > 1 else _hifd_sess * 100
+    _bd        = _basin_defaults(basin)
+    _atdi_def  = _bd["atdi"]
+    _hifd_def  = _bd["hifd"]
 
     countries_str = ", ".join(countries) if isinstance(countries, list) else str(countries)
     st.info(f"🌍 **{basin_name}** · {countries_str} · {n_countries} riparian state(s) · Treaty: {treaty}")
