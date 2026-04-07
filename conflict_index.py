@@ -414,54 +414,78 @@ def compute_atdi(inputs: dict) -> float:
 def render_conflict_page(basin: dict) -> None:
     import streamlit as st, plotly.graph_objects as go
     st.markdown("## ⚡ Conflict Index — Risk Assessment")
-    st.caption("Composite conflict likelihood · ATDI + Political + Hydrological factors")
+    st.caption("Composite conflict likelihood · ATDI + Political + Hydrological factors · Updates with basin selection")
 
-    # ── Live Input Controls ────────────────────────────────────────────────
-    with st.expander("⚙️ Input Parameters", expanded=True):
+    # ── Extract live basin values ──────────────────────────────────────────
+    basin_name   = basin.get("name", "Unknown Basin")
+    countries    = basin.get("country", ["Unknown"])
+    n_countries  = len(countries) if isinstance(countries, list) else 1
+    treaty       = basin.get("treaty", "UN1997")
+    cap_bcm      = float(basin.get("cap", 10.0))
+    area_km2     = float(basin.get("eff_cat_km2", 100000))
+    context      = basin.get("context", "")
+
+    # Dispute level from basin or session ATDI
+    _atdi_sess   = float(st.session_state.get("gee_ATDI",
+                   basin.get("gee_ATDI", basin.get("td_index", 0.435))))
+    _atdi_def    = _atdi_sess if _atdi_sess > 1 else _atdi_sess * 100
+    _hifd_sess   = float(st.session_state.get("gee_HIFD",
+                   basin.get("gee_HIFD", basin.get("hifd", 0.20))))
+    _hifd_def    = _hifd_sess if _hifd_sess > 1 else _hifd_sess * 100
+    _disp_raw    = int(basin.get("dispute_level", 0))
+    _disp_labels = ["LOW", "LOW", "MEDIUM", "HIGH", "CRITICAL", "CRITICAL"]
+    _disp_def    = _disp_labels[min(_disp_raw, 5)]
+    _disp_idx    = ["LOW","MEDIUM","HIGH","CRITICAL"].index(_disp_def) if _disp_def in ["LOW","MEDIUM","HIGH","CRITICAL"] else 1
+
+    # ── Input Controls ────────────────────────────────────────────────────
+    st.info(f"🌍 **{basin_name}** · {', '.join(countries) if isinstance(countries,list) else countries} · Treaty: {treaty}")
+
+    with st.expander("⚙️ Adjust Parameters", expanded=True):
         c1, c2, c3 = st.columns(3)
-        atdi_in    = c1.slider("ATDI (%)", 0.0, 100.0,
-                               float(basin.get("gee_ATDI", 43.5)), step=0.5)
-        hifd_in    = c2.slider("HIFD (%)", 0.0, 100.0,
-                               float(basin.get("gee_HIFD", 20.0) * (100 if basin.get("gee_HIFD", 1) <= 1 else 1)),
-                               step=0.5)
-        dispute_in = c3.selectbox("Dispute Level",
-                                  ["LOW", "MEDIUM", "HIGH", "CRITICAL"], index=1)
+        atdi_in    = c1.slider("ATDI (%)", 0.0, 100.0, round(_atdi_def, 1), step=0.5,
+                               help="Alkedir Transparency Deficit Index — auto-loaded from GEE if available")
+        hifd_in    = c2.slider("HIFD (%)", 0.0, 100.0, round(_hifd_def, 1), step=0.5,
+                               help="Human-Induced Flow Deficit — auto-loaded from GEE if available")
+        dispute_in = c3.selectbox("Dispute Level", ["LOW","MEDIUM","HIGH","CRITICAL"],
+                                  index=_disp_idx,
+                                  help="Political dispute intensity — pre-set from basin data")
 
-    # ── Direct calculation (always works) ──────────────────────────────────
+    # ── Compute Conflict Index ─────────────────────────────────────────────
     _dispute_map = {"LOW": 0.15, "MEDIUM": 0.35, "HIGH": 0.60, "CRITICAL": 0.85}
-    _disp_score  = _dispute_map.get(dispute_in, 0.35)
+    _cap_factor  = min(1.0, cap_bcm / 100.0)        # larger dam → higher risk
+    _country_fac = min(1.0, (n_countries - 1) * 0.15)  # more countries → higher risk
+    _disp_score  = _dispute_map[dispute_in]
     _atdi_score  = atdi_in / 100.0
     _hifd_score  = hifd_in / 100.0
-    ci_value     = (0.40 * _atdi_score + 0.25 * _disp_score +
-                    0.20 * _hifd_score + 0.15 * min(1.0, _atdi_score * 1.2))
+    ci_value     = (0.35 * _atdi_score + 0.25 * _disp_score +
+                    0.20 * _hifd_score + 0.12 * _country_fac + 0.08 * _cap_factor)
     ci_value     = max(0.0, min(1.0, ci_value))
 
-    # Try full compute — use if available
+    # Try full ML compute
     try:
         basin_live = dict(basin)
         basin_live.update({"gee_ATDI": atdi_in, "td_index": atdi_in/100,
                            "hifd": hifd_in/100, "gee_HIFD": hifd_in,
                            "dispute_level": dispute_in})
         ci_full = compute_conflict_index(basin_live)
-        if ci_full and isinstance(ci_full, dict):
-            ci_value = float(ci_full.get("conflict_index", ci_value))
+        if ci_full and isinstance(ci_full, dict) and "conflict_index" in ci_full:
+            ci_value = float(ci_full["conflict_index"])
     except Exception:
         ci_full = {}
 
-    risk_level = ("🟢 LOW"      if ci_value < 0.25 else
-                  "🟡 MEDIUM"   if ci_value < 0.50 else
-                  "🟠 HIGH"     if ci_value < 0.75 else
-                  "🔴 CRITICAL")
-    pol_score  = round(_disp_score * 0.8 + _hifd_score * 0.2, 2)
-    hyd_score  = round(_atdi_score * 0.7 + _hifd_score * 0.3, 2)
+    pol_score = round(_disp_score * 0.7 + _country_fac * 0.3, 2)
+    hyd_score = round(_atdi_score * 0.6 + _hifd_score * 0.4, 2)
+    risk_level = ("🟢 LOW" if ci_value < 0.25 else
+                  "🟡 MEDIUM" if ci_value < 0.50 else
+                  "🟠 HIGH"   if ci_value < 0.75 else "🔴 CRITICAL")
 
     # ── Metrics ───────────────────────────────────────────────────────────
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Conflict Index",  f"{ci_value*100:.1f}%",
-                delta=f"{(ci_value-0.5)*100:+.1f}% vs baseline")
-    col2.metric("Risk Level",     risk_level)
-    col3.metric("Political Score",f"{pol_score:.2f}")
-    col4.metric("Hydro Score",    f"{hyd_score:.2f}")
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Conflict Index",  f"{ci_value*100:.1f}%")
+    m2.metric("Risk Level",      risk_level)
+    m3.metric("Political Score", f"{pol_score:.2f}")
+    m4.metric("Hydro Score",     f"{hyd_score:.2f}")
+    m5.metric("Riparian States", str(n_countries))
 
     # ── Gauge ─────────────────────────────────────────────────────────────
     fig = go.Figure(go.Indicator(
@@ -479,27 +503,30 @@ def render_conflict_page(basin: dict) -> None:
                               {"range": [75,100], "color": "#450a0a"}],
                "threshold": {"line": {"color": "#FFD600", "width": 3},
                              "thickness": 0.8, "value": 50}},
-        title={"text": "Conflict Risk Index (%)",
-               "font": {"color": "#E0E0E0", "size": 14}}))
+        title={"text": f"Conflict Risk — {basin_name}",
+               "font": {"color": "#E0E0E0", "size": 13}}))
     fig.update_layout(template="plotly_dark", height=320,
                       paper_bgcolor="#0F1117", font=dict(color="#E0E0E0"))
     st.plotly_chart(fig, use_container_width=True)
 
-    # ── ICJ Precedents ─────────────────────────────────────────────────────
+    # ── Context ───────────────────────────────────────────────────────────
+    if context:
+        st.info(f"🌐 **Basin Context:** {context}")
+
+    # ── ICJ Precedents ────────────────────────────────────────────────────
     try:
         cases = ci_full.get("relevant_cases", []) if ci_full else []
     except Exception:
         cases = []
 
     if not cases:
-        # Default relevant cases based on conflict level
         cases = [
             {"case": "Gabčíkovo-Nagymaros (Hungary v. Slovakia)", "year": "1997",
-             "relevance": "Equitable utilisation · significant harm doctrine"},
+             "relevance": "Equitable utilisation · significant harm doctrine · Art.5 & 7"},
             {"case": "Pulp Mills on the River Uruguay", "year": "2010",
-             "relevance": "Environmental impact · notification obligations Art.12"},
-            {"case": "Nile Basin · NBI Framework", "year": "2010",
-             "relevance": "Multi-state water sharing · GERD precedent"},
+             "relevance": "Environmental impact assessment · notification Art.12"},
+            {"case": "Nile Basin Initiative Framework", "year": "2010",
+             "relevance": "Multi-state water sharing · direct GERD/Nile precedent"},
         ]
 
     st.subheader("⚖️ Relevant ICJ/PCA Precedents")
@@ -515,14 +542,10 @@ def render_conflict_page(basin: dict) -> None:
     # ── Legal Assessment ───────────────────────────────────────────────────
     st.markdown("---")
     if ci_value >= 0.75:
-        st.error(f"🔴 **Critical Risk ({ci_value*100:.0f}%)** — Art.33 UNWC threshold exceeded. "
-                 "Recommend immediate ICJ referral.")
+        st.error(f"🔴 **Critical Risk ({ci_value*100:.0f}%)** — ICJ referral recommended under Art.33 UNWC 1997.")
     elif ci_value >= 0.50:
-        st.warning(f"🟠 **High Risk ({ci_value*100:.0f}%)** — Significant harm documented. "
-                   "Recommend PCA arbitration or UN mediation.")
+        st.warning(f"🟠 **High Risk ({ci_value*100:.0f}%)** — PCA arbitration or UN mediation recommended.")
     elif ci_value >= 0.25:
-        st.info(f"🟡 **Medium Risk ({ci_value*100:.0f}%)** — Equitable use concerns. "
-                "Recommend bilateral negotiation with data sharing.")
+        st.info(f"🟡 **Medium Risk ({ci_value*100:.0f}%)** — Bilateral negotiation with data sharing recommended.")
     else:
-        st.success(f"🟢 **Low Risk ({ci_value*100:.0f}%)** — Within acceptable range. "
-                   "Continue monitoring via HSAE.")
+        st.success(f"🟢 **Low Risk ({ci_value*100:.0f}%)** — Continue monitoring via HSAE.")

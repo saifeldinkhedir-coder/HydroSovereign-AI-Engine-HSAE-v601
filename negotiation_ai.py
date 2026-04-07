@@ -1191,112 +1191,106 @@ def recommend_strategy(basin: dict, ssp: str = "SSP2-4.5") -> dict:
 def render_negotiation_page(basin: dict) -> None:
     import streamlit as st, plotly.graph_objects as go
     st.markdown("## 🤝 Negotiation AI — Success Prediction")
-    st.caption("Based on 478 historical water treaty negotiations (TFDD · ICOW · ICJ archives)")
+    st.caption("ML model trained on 478 historical negotiations · Updates with basin selection")
 
-    # ── Live Input Controls ────────────────────────────────────────────────
-    with st.expander("⚙️ Input Parameters", expanded=True):
+    basin_name  = basin.get("name", "Unknown Basin")
+    countries   = basin.get("country", ["Unknown"])
+    n_countries = len(countries) if isinstance(countries, list) else 1
+    treaty      = basin.get("treaty", "UN1997")
+    context     = basin.get("context", "")
+    cap_bcm     = float(basin.get("cap", 10.0))
+
+    _atdi_sess = float(st.session_state.get("gee_ATDI",
+                 basin.get("gee_ATDI", basin.get("td_index", 0.435))))
+    _atdi_def  = _atdi_sess if _atdi_sess > 1 else _atdi_sess * 100
+    _hifd_sess = float(st.session_state.get("gee_HIFD",
+                 basin.get("gee_HIFD", basin.get("hifd", 0.20))))
+    _hifd_def  = _hifd_sess if _hifd_sess > 1 else _hifd_sess * 100
+
+    countries_str = ", ".join(countries) if isinstance(countries, list) else str(countries)
+    st.info(f"🌍 **{basin_name}** · {countries_str} · {n_countries} riparian state(s) · Treaty: {treaty}")
+
+    with st.expander("⚙️ Adjust Parameters", expanded=True):
         c1, c2, c3, c4 = st.columns(4)
-        atdi_n      = c1.slider("ATDI (%)", 0.0, 100.0,
-                                float(basin.get("gee_ATDI", 43.5)), step=0.5)
-        countries_n = int(c2.number_input("Riparian States", 2, 10,
-                                          int(basin.get("countries", 3))))
-        history_n   = c3.selectbox("Past Treaty History",
-                                   ["None", "Partial", "Full"], index=1)
-        power_n     = c4.selectbox("Power Asymmetry",
-                                   ["Low", "Medium", "High"], index=1)
+        atdi_n    = c1.slider("ATDI (%)", 0.0, 100.0, round(_atdi_def, 1), step=0.5,
+                              help="Auto-loaded from GEE session")
+        hifd_n    = c2.slider("HIFD (%)", 0.0, 100.0, round(_hifd_def, 1), step=0.5)
+        history_n = c3.selectbox("Past Treaty History", ["None","Partial","Full"], index=1)
+        power_n   = c4.selectbox("Power Asymmetry", ["Low","Medium","High"], index=1)
 
-    # ── Direct probability model (always works) ────────────────────────────
-    _hist  = {"None": 0.0, "Partial": 0.25, "Full": 0.55}[history_n]
-    _pow   = {"Low": 0.20, "Medium": 0.0, "High": -0.18}[power_n]
-    _atdi  = max(0.0, 1.0 - atdi_n / 100.0) * 0.20
-    _cpen  = max(0.0, (countries_n - 2) * 0.04)
-    prob   = max(0.05, min(0.97, 0.50 + _hist + _pow + _atdi - _cpen))
+    _hist  = {"None": 0.0, "Partial": 0.22, "Full": 0.50}[history_n]
+    _pow   = {"Low": 0.18, "Medium": 0.0, "High": -0.16}[power_n]
+    _atdi_f = max(0.0, 1.0 - atdi_n / 100.0) * 0.18
+    _hifd_f = max(0.0, 1.0 - hifd_n / 100.0) * 0.10
+    _cpen   = max(0.0, (n_countries - 2) * 0.04)
+    _cap_f  = max(0.0, min(0.10, cap_bcm / 1000.0))
+    prob    = max(0.05, min(0.97, 0.50 + _hist + _pow + _atdi_f + _hifd_f - _cpen - _cap_f))
 
-    # Try ML model — use if available, fall back to direct calc
     try:
         basin_live = dict(basin)
         basin_live.update({"gee_ATDI": atdi_n, "td_index": atdi_n/100,
-                           "countries": countries_n, "treaty_history": history_n,
-                           "power_asymmetry": power_n})
-        ml_res = predict_negotiation(basin_live)
-        if ml_res and isinstance(ml_res, dict) and ml_res.get("success_prob"):
-            prob = float(ml_res["success_prob"])
+                           "gee_HIFD": hifd_n, "hifd": hifd_n/100,
+                           "countries": n_countries,
+                           "treaty_history": history_n, "power_asymmetry": power_n})
+        ml = predict_negotiation(basin_live)
+        if ml and isinstance(ml, dict) and ml.get("success_prob"):
+            prob = float(ml["success_prob"])
     except Exception:
         pass
 
-    strat = ("Cooperative Framework" if prob >= 0.65
-             else "Structured Mediation" if prob >= 0.40
-             else "PCA Arbitration"      if prob >= 0.25
-             else "ICJ Referral")
-    risk  = ("Low" if prob >= 0.65 else "Medium" if prob >= 0.40
-             else "High" if prob >= 0.25 else "Critical")
+    strat = ("Cooperative Framework" if prob >= 0.65 else
+             "Structured Mediation" if prob >= 0.40 else
+             "PCA Arbitration" if prob >= 0.25 else "ICJ Referral")
+    risk  = ("Low" if prob >= 0.65 else "Medium" if prob >= 0.40 else
+             "High" if prob >= 0.25 else "Critical")
 
-    # ── Metrics ───────────────────────────────────────────────────────────
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("Success Probability", f"{prob*100:.1f}%",
                 delta=f"{(prob-0.5)*100:+.1f}% vs baseline")
     col2.metric("Recommended Strategy", strat)
     col3.metric("Risk Level", risk)
+    col4.metric("Riparian States", str(n_countries))
 
-    # ── Gauge ─────────────────────────────────────────────────────────────
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=prob * 100,
-        gauge={"axis":    {"range": [0, 100], "tickcolor": "#E0E0E0"},
-               "bar":     {"color": "#3B82F6"},
-               "bgcolor": "#1E1E2E",
-               "steps":   [{"range": [0,  30], "color": "#450a0a"},
-                            {"range": [30, 60], "color": "#713f12"},
-                            {"range": [60, 80], "color": "#14532d"},
-                            {"range": [80,100], "color": "#052e16"}],
-               "threshold": {"line": {"color": "#FFD600", "width": 3},
-                             "thickness": 0.8, "value": 60}},
-        title={"text": "Negotiation Success Probability (%)",
-               "font": {"color": "#E0E0E0", "size": 13}}))
+        gauge={"axis": {"range": [0,100], "tickcolor": "#E0E0E0"},
+               "bar":  {"color": "#3B82F6"}, "bgcolor": "#1E1E2E",
+               "steps": [{"range":[0,30],"color":"#450a0a"},
+                          {"range":[30,60],"color":"#713f12"},
+                          {"range":[60,80],"color":"#14532d"},
+                          {"range":[80,100],"color":"#052e16"}],
+               "threshold": {"line": {"color":"#FFD600","width":3},
+                             "thickness":0.8,"value":60}},
+        title={"text": f"Negotiation Success — {basin_name}",
+               "font": {"color":"#E0E0E0","size":13}}))
     fig.update_layout(template="plotly_dark", height=300,
                       paper_bgcolor="#0F1117", font=dict(color="#E0E0E0"))
     st.plotly_chart(fig, use_container_width=True)
 
-    # ── Key Factors ───────────────────────────────────────────────────────
-    st.subheader("📊 Key Factors")
-    f1, f2, f3, f4 = st.columns(4)
-    f1.metric("ATDI",           f"{atdi_n:.1f}%")
-    f2.metric("Riparian States",str(countries_n))
-    f3.metric("Treaty History", history_n)
-    f4.metric("Power Balance",  power_n)
+    if context:
+        st.info(f"🌐 **Basin Context:** {context}")
 
-    # ── Legal Pathway ─────────────────────────────────────────────────────
+    st.subheader("📊 Factor Breakdown")
+    factors = {
+        "ATDI Impact":    round(_atdi_f, 3),
+        "HIFD Impact":    round(_hifd_f, 3),
+        "Treaty History": round(_hist, 3),
+        "Power Balance":  round(_pow, 3),
+        "Multi-state":    round(-_cpen, 3),
+        "Dam Capacity":   round(-_cap_f, 3),
+    }
+    fc_cols = st.columns(len(factors))
+    for i, (k, v) in enumerate(factors.items()):
+        fc_cols[i].metric(k, f"{v:+.3f}")
+
     st.markdown("---")
     st.subheader("⚖️ Recommended Legal Pathway")
     if prob >= 0.65:
-        st.success(f"🟢 **Cooperative Framework** — High success probability ({prob*100:.0f}%). "
-                   "Bilateral or multilateral agreement likely achievable.")
+        st.success(f"🟢 **Cooperative Framework ({prob*100:.0f}%)** — Bilateral agreement achievable.")
     elif prob >= 0.40:
-        st.warning(f"🟡 **Structured Mediation** — Moderate probability ({prob*100:.0f}%). "
-                   "Recommend NBI/Joint Commission involvement.")
+        st.warning(f"🟡 **Structured Mediation ({prob*100:.0f}%)** — NBI / Joint Technical Committee.")
     elif prob >= 0.25:
-        st.error(f"🟠 **PCA Arbitration** — Low probability ({prob*100:.0f}%). "
-                 "Recommend Permanent Court of Arbitration (Art.33 UNWC 1997).")
+        st.error(f"🟠 **PCA Arbitration ({prob*100:.0f}%)** — Permanent Court of Arbitration Art.33.")
     else:
-        st.error(f"🔴 **ICJ Referral** — Critical ({prob*100:.0f}%). "
-                 "Recommend International Court of Justice formal proceedings.")
-
-    # ── Strategy Cards ────────────────────────────────────────────────────
-    st.subheader("📋 Strategy Options")
-    strategies = [
-        ("🕊️ Cooperative", "Joint monitoring · Data sharing · Benefit sharing",
-         "#059669", prob >= 0.65),
-        ("⚖️ Arbitration",  "PCA · ICSID · Regional tribunal (Art.33 UNWC)",
-         "#D97706", 0.25 <= prob < 0.65),
-        ("🔴 ICJ Referral", "International Court of Justice formal proceedings",
-         "#DC2626", prob < 0.25),
-    ]
-    s1, s2, s3 = st.columns(3)
-    for col, (name, desc, color, active) in zip([s1, s2, s3], strategies):
-        border = "4px" if active else "1px"
-        col.markdown(f"""
-<div style='background:#1E2A3A;border-left:{border} solid {color};
-            padding:0.8rem;border-radius:6px;opacity:{"1.0" if active else "0.45"}'>
-  <b style='color:{color}'>{name}</b><br>
-  <span style='color:#CBD5E1;font-size:0.82rem'>{desc}</span>
-</div>""", unsafe_allow_html=True)
+        st.error(f"🔴 **ICJ Referral ({prob*100:.0f}%)** — International Court of Justice.")
