@@ -1208,9 +1208,10 @@ def _basin_defaults(basin: dict) -> dict:
 
 def render_negotiation_page(basin: dict) -> None:
     import streamlit as st, plotly.graph_objects as go
-    st.markdown("## 🤝 Negotiation AI — Success Prediction")
-    st.caption("ML model trained on 478 historical negotiations · Updates with basin selection")
+    st.markdown("## \U0001f91d Negotiation AI \u2014 Success Prediction")
+    st.caption("GBM model trained on 478 historical water treaty negotiations (TFDD \u00b7 ICOW \u00b7 ICJ archives)")
 
+    # ── Extract basin values ────────────────────────────────────────────────
     basin_name  = basin.get("name", "Unknown Basin")
     countries   = basin.get("country", ["Unknown"])
     n_countries = len(countries) if isinstance(countries, list) else 1
@@ -1218,109 +1219,164 @@ def render_negotiation_page(basin: dict) -> None:
     context     = basin.get("context", "")
     cap_bcm     = float(basin.get("cap", 10.0))
 
-    _bd        = _basin_defaults(basin)
-    _atdi_def  = _bd["atdi"]
-    _hifd_def  = _bd["hifd"]
+    # Basin-specific defaults
+    _bd       = _basin_defaults(basin)
+    _atdi_def = _bd["atdi"]
+    _hifd_def = _bd["hifd"]
 
     countries_str = ", ".join(countries) if isinstance(countries, list) else str(countries)
-    st.info(f"🌍 **{basin_name}** · {countries_str} · {n_countries} riparian state(s) · Treaty: {treaty}")
+    st.info(f"\U0001f30d **{basin_name}** \u00b7 {countries_str} \u00b7 {n_countries} riparian state(s) \u00b7 Treaty: {treaty}")
 
-    # Reset sliders when basin changes
-    _bid = basin.get("id", basin.get("name", "default"))
+    # ── Basin-specific slider keys (reset on basin change) ─────────────────
+    _bid      = basin.get("id", basin.get("name", "default"))
     _prev_bid = st.session_state.get("_neg_basin_id", "")
     if _prev_bid != _bid:
         st.session_state[f"neg_atdi_{_bid}"] = _atdi_def
         st.session_state[f"neg_hifd_{_bid}"] = _hifd_def
-        st.session_state["_neg_basin_id"] = _bid
+        st.session_state["_neg_basin_id"]    = _bid
 
-    with st.expander("⚙️ Adjust Parameters", expanded=True):
+    with st.expander("\u2699\ufe0f Adjust Parameters", expanded=True):
         c1, c2, c3, c4 = st.columns(4)
         atdi_n    = c1.slider("ATDI (%)", 0.0, 100.0,
                               st.session_state.get(f"neg_atdi_{_bid}", _atdi_def),
                               step=0.5, key=f"neg_atdi_{_bid}",
-                              help=f"Basin: {basin_name} · Auto from physical params")
+                              help=f"Basin: {basin_name}")
         hifd_n    = c2.slider("HIFD (%)", 0.0, 100.0,
                               st.session_state.get(f"neg_hifd_{_bid}", _hifd_def),
-                              step=0.5, key=f"neg_hifd_{_bid}",
-                              help="Human-Induced Flow Deficit")
+                              step=0.5, key=f"neg_hifd_{_bid}")
         history_n = c3.selectbox("Past Treaty History", ["None","Partial","Full"],
                                  index=1, key=f"neg_hist_{_bid}")
         power_n   = c4.selectbox("Power Asymmetry", ["Low","Medium","High"],
                                  index=1, key=f"neg_pow_{_bid}")
 
-    _hist  = {"None": 0.0, "Partial": 0.22, "Full": 0.50}[history_n]
-    _pow   = {"Low": 0.18, "Medium": 0.0, "High": -0.16}[power_n]
-    _atdi_f = max(0.0, 1.0 - atdi_n / 100.0) * 0.18
-    _hifd_f = max(0.0, 1.0 - hifd_n / 100.0) * 0.10
-    _cpen   = max(0.0, (n_countries - 2) * 0.04)
-    _cap_f  = max(0.0, min(0.10, cap_bcm / 1000.0))
-    prob    = max(0.05, min(0.97, 0.50 + _hist + _pow + _atdi_f + _hifd_f - _cpen - _cap_f))
+    # ── Build basin_live with all ML-required fields ───────────────────────
+    _hist_map = {"None": 0, "Partial": 30, "Full": 70}
+    _pow_map  = {"Low": 1, "Medium": 2, "High": 4}
+    basin_live = dict(basin)
+    basin_live.update({
+        "gee_ATDI":         atdi_n,
+        "td_index":         atdi_n / 100.0,
+        "tdi":              atdi_n / 100.0,
+        "gee_HIFD":         hifd_n,
+        "hifd":             hifd_n / 100.0,
+        "countries":        n_countries,
+        "shared_history_yrs": _hist_map[history_n],
+        "power_asymmetry":  power_n,
+        "gdp_disparity":    _pow_map[power_n],
+        "treaty_history":   history_n,
+    })
 
+    # ── Run ML model ──────────────────────────────────────────────────────
+    ml_ok = False
+    ml_result = {}
+    ml_error  = ""
     try:
-        basin_live = dict(basin)
-        basin_live.update({"gee_ATDI": atdi_n, "td_index": atdi_n/100,
-                           "gee_HIFD": hifd_n, "hifd": hifd_n/100,
-                           "countries": n_countries,
-                           "treaty_history": history_n, "power_asymmetry": power_n})
-        ml = predict_negotiation(basin_live)
-        if ml and isinstance(ml, dict) and ml.get("success_prob"):
-            prob = float(ml["success_prob"])
-    except Exception:
-        pass
+        ml_result = predict_negotiation(basin_live)
+        if ml_result and isinstance(ml_result, dict) and "P_success" in ml_result:
+            ml_ok  = True
+            prob   = float(ml_result["P_success"])
+            strat  = ml_result.get("recommended_strategy", "")
+            timeline = ml_result.get("timeline", "")
+            path   = ml_result.get("negotiation_path", "")
+            note   = ml_result.get("note", "")
+            factors = ml_result.get("key_factors", [])
+    except Exception as e:
+        ml_error = str(e)
 
-    strat = ("Cooperative Framework" if prob >= 0.65 else
-             "Structured Mediation" if prob >= 0.40 else
-             "PCA Arbitration" if prob >= 0.25 else "ICJ Referral")
-    risk  = ("Low" if prob >= 0.65 else "Medium" if prob >= 0.40 else
-             "High" if prob >= 0.25 else "Critical")
+    # Fallback if ML fails
+    if not ml_ok:
+        _hist_f = {"None":0.0,"Partial":0.22,"Full":0.50}[history_n]
+        _pow_f  = {"Low":0.18,"Medium":0.0,"High":-0.16}[power_n]
+        _atdi_f = max(0.0, 1.0 - atdi_n/100.0) * 0.18
+        _hifd_f = max(0.0, 1.0 - hifd_n/100.0) * 0.10
+        _cpen   = max(0.0, (n_countries - 2) * 0.04)
+        prob    = max(0.05, min(0.97, 0.50+_hist_f+_pow_f+_atdi_f+_hifd_f-_cpen))
+        strat   = ("Cooperative Framework" if prob>=0.65 else
+                   "Structured Mediation" if prob>=0.40 else
+                   "PCA Arbitration" if prob>=0.25 else "ICJ Referral")
+        timeline = "24-36 months"
+        path = note = ""
+        factors = []
+        if ml_error:
+            st.warning(f"\u26a0\ufe0f ML model fallback: {ml_error[:100]}")
 
+    risk = ("Low" if prob>=0.65 else "Medium" if prob>=0.40 else
+            "High" if prob>=0.25 else "Critical")
+
+    # ── Source indicator ───────────────────────────────────────────────────
+    if ml_ok:
+        st.success("\U0001f916 GBM ML model active \u2014 478 historical cases")
+    else:
+        st.info("\U0001f4ca Statistical model active")
+
+    # ── Metrics ───────────────────────────────────────────────────────────
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Success Probability", f"{prob*100:.1f}%",
-                delta=f"{(prob-0.5)*100:+.1f}% vs baseline")
-    col2.metric("Recommended Strategy", strat)
+                delta=f"{(prob-0.5)*100:+.1f}% vs 50% baseline")
+    col2.metric("Recommended Strategy", strat[:30] if strat else "—")
     col3.metric("Risk Level", risk)
-    col4.metric("Riparian States", str(n_countries))
+    col4.metric("Timeline", timeline if timeline else "—")
 
+    # ── Gauge ─────────────────────────────────────────────────────────────
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=prob * 100,
-        gauge={"axis": {"range": [0,100], "tickcolor": "#E0E0E0"},
-               "bar":  {"color": "#3B82F6"}, "bgcolor": "#1E1E2E",
-               "steps": [{"range":[0,30],"color":"#450a0a"},
-                          {"range":[30,60],"color":"#713f12"},
-                          {"range":[60,80],"color":"#14532d"},
-                          {"range":[80,100],"color":"#052e16"}],
-               "threshold": {"line": {"color":"#FFD600","width":3},
-                             "thickness":0.8,"value":60}},
-        title={"text": f"Negotiation Success — {basin_name}",
-               "font": {"color":"#E0E0E0","size":13}}))
+        gauge={"axis":{"range":[0,100],"tickcolor":"#E0E0E0"},
+               "bar":{"color":"#3B82F6"}, "bgcolor":"#1E1E2E",
+               "steps":[{"range":[0,30],"color":"#450a0a"},
+                         {"range":[30,60],"color":"#713f12"},
+                         {"range":[60,80],"color":"#14532d"},
+                         {"range":[80,100],"color":"#052e16"}],
+               "threshold":{"line":{"color":"#FFD600","width":3},
+                            "thickness":0.8,"value":60}},
+        title={"text":f"Negotiation Success \u2014 {basin_name}",
+               "font":{"color":"#E0E0E0","size":13}}))
     fig.update_layout(template="plotly_dark", height=300,
                       paper_bgcolor="#0F1117", font=dict(color="#E0E0E0"))
     st.plotly_chart(fig, use_container_width=True)
 
-    if context:
-        st.info(f"🌐 **Basin Context:** {context}")
-
-    st.subheader("📊 Factor Breakdown")
-    factors = {
-        "ATDI Impact":    round(_atdi_f, 3),
-        "HIFD Impact":    round(_hifd_f, 3),
-        "Treaty History": round(_hist, 3),
-        "Power Balance":  round(_pow, 3),
-        "Multi-state":    round(-_cpen, 3),
-        "Dam Capacity":   round(-_cap_f, 3),
-    }
-    fc_cols = st.columns(len(factors))
-    for i, (k, v) in enumerate(factors.items()):
-        fc_cols[i].metric(k, f"{v:+.3f}")
-
-    st.markdown("---")
-    st.subheader("⚖️ Recommended Legal Pathway")
-    if prob >= 0.65:
-        st.success(f"🟢 **Cooperative Framework ({prob*100:.0f}%)** — Bilateral agreement achievable.")
-    elif prob >= 0.40:
-        st.warning(f"🟡 **Structured Mediation ({prob*100:.0f}%)** — NBI / Joint Technical Committee.")
-    elif prob >= 0.25:
-        st.error(f"🟠 **PCA Arbitration ({prob*100:.0f}%)** — Permanent Court of Arbitration Art.33.")
+    # ── Key Factors (real ML feature importances) ─────────────────────────
+    if factors:
+        st.subheader("\U0001f4ca Key Factors (GBM Feature Importances)")
+        f_cols = st.columns(min(len(factors), 5))
+        for i, f in enumerate(factors[:5]):
+            f_cols[i].metric(
+                f.get("feature", f"F{i}"),
+                f.get("label", f"{f.get('value',0):.2f}"),
+                delta=f"imp={f.get('importance',0)*100:.1f}%"
+            )
     else:
-        st.error(f"🔴 **ICJ Referral ({prob*100:.0f}%)** — International Court of Justice.")
+        st.subheader("\U0001f4ca Input Summary")
+        f1, f2, f3, f4 = st.columns(4)
+        f1.metric("ATDI", f"{atdi_n:.1f}%")
+        f2.metric("HIFD", f"{hifd_n:.1f}%")
+        f3.metric("Treaty History", history_n)
+        f4.metric("States", str(n_countries))
+
+    # ── Strategy Detail ────────────────────────────────────────────────────
+    if path or note:
+        st.subheader("\U0001f5fa\ufe0f Negotiation Pathway")
+        if path:
+            st.info(f"**Path:** {path}")
+        if note:
+            st.caption(note)
+
+    # ── Context ────────────────────────────────────────────────────────────
+    if context:
+        st.info(f"\U0001f310 **Basin Context:** {context}")
+
+    # ── Legal Pathway ──────────────────────────────────────────────────────
+    st.markdown("---")
+    st.subheader("\u2696\ufe0f Recommended Legal Pathway")
+    if prob >= 0.65:
+        st.success(f"\U0001f7e2 **Cooperative Framework ({prob*100:.0f}%)** \u2014 "
+                   "Bilateral agreement achievable. Recommend joint monitoring committee.")
+    elif prob >= 0.40:
+        st.warning(f"\U0001f7e1 **Structured Mediation ({prob*100:.0f}%)** \u2014 "
+                   "NBI / Joint Technical Committee recommended.")
+    elif prob >= 0.25:
+        st.error(f"\U0001f7e0 **PCA Arbitration ({prob*100:.0f}%)** \u2014 "
+                 "Permanent Court of Arbitration (Art.33 UNWC 1997).")
+    else:
+        st.error(f"\U0001f534 **ICJ Referral ({prob*100:.0f}%)** \u2014 "
+                 "International Court of Justice formal proceedings.")
