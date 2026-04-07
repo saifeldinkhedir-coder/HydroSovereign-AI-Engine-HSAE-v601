@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "computed_at": "2026-04-07T20:51:42.408221",
+  "computed_at": "2026-04-07T21:27:42.059389",
   "date_range": {
     "start": "2025-04-07",
     "end": "2026-04-07"
@@ -9,7 +9,7 @@
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-07T20:51:42.408600",
+      "fetched_at": "2026-04-07T21:27:42.059685",
       "gpm": {
         "months": [
           "2025-01",
@@ -51,7 +51,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -63,15 +63,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:51:57.460114"
+      "computed_at": "2026-04-07T21:27:44.088244"
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-07T20:51:57.460349",
+      "fetched_at": "2026-04-07T21:27:44.088391",
       "gpm": {
         "months": [
           "2025-01",
@@ -113,7 +130,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -125,15 +142,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:00.868317"
+      "computed_at": "2026-04-07T21:27:45.809883"
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-07T20:52:00.868512",
+      "fetched_at": "2026-04-07T21:27:45.810012",
       "gpm": {
         "months": [
           "2025-01",
@@ -175,7 +209,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -187,15 +221,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:08.127898"
+      "computed_at": "2026-04-07T21:27:47.601600"
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-07T20:52:08.128087",
+      "fetched_at": "2026-04-07T21:27:47.601727",
       "gpm": {
         "months": [
           "2025-01",
@@ -237,7 +288,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -249,15 +300,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:11.965986"
+      "computed_at": "2026-04-07T21:27:49.174716"
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-07T20:52:11.966178",
+      "fetched_at": "2026-04-07T21:27:49.174815",
       "gpm": {
         "months": [
           "2025-01",
@@ -299,7 +367,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -315,11 +383,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-07T20:52:32.253831"
+      "computed_at": "2026-04-07T21:28:05.454804"
     },
     "amu_darya": {
       "basin_id": "amu_darya",
-      "fetched_at": "2026-04-07T20:52:32.254033",
+      "fetched_at": "2026-04-07T21:28:05.455004",
       "gpm": {
         "months": [
           "2025-01",
@@ -361,7 +429,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -373,15 +441,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:38.643459"
+      "computed_at": "2026-04-07T21:28:07.440900"
     },
     "jordan_river": {
       "basin_id": "jordan_river",
-      "fetched_at": "2026-04-07T20:52:38.643688",
+      "fetched_at": "2026-04-07T21:28:07.441086",
       "gpm": {
         "months": [
           "2025-01",
@@ -423,7 +508,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -435,15 +520,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:46.463376"
+      "computed_at": "2026-04-07T21:28:08.957005"
     },
     "senegal_river": {
       "basin_id": "senegal_river",
-      "fetched_at": "2026-04-07T20:52:46.463570",
+      "fetched_at": "2026-04-07T21:28:08.957145",
       "gpm": {
         "months": [
           "2025-01",
@@ -485,7 +587,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -501,11 +603,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-07T20:52:49.054950"
+      "computed_at": "2026-04-07T21:28:09.775894"
     },
     "danube_iron_gates": {
       "basin_id": "danube_iron_gates",
-      "fetched_at": "2026-04-07T20:52:49.055107",
+      "fetched_at": "2026-04-07T21:28:09.776014",
       "gpm": {
         "months": [
           "2025-01",
@@ -547,7 +649,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -559,15 +661,32 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:53.772738"
+      "computed_at": "2026-04-07T21:28:11.373672"
     },
     "brahmaputra": {
       "basin_id": "brahmaputra",
-      "fetched_at": "2026-04-07T20:52:53.772930",
+      "fetched_at": "2026-04-07T21:28:11.373770",
       "gpm": {
         "months": [
           "2025-01",
@@ -609,7 +728,7 @@
         "n_months": 0
       },
       "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS/V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/DAILY' not found (does not exist or caller does not have access).",
         "Q_m3s": [],
         "mean_Q": 0
       },
@@ -621,11 +740,28 @@
         "n_obs": 0
       },
       "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04"
+        ],
+        "T_C": [
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0,
+          20.0
+        ],
+        "mean_T": 20.0,
+        "source": "Open-Meteo ERA5",
+        "n_months": 12
       },
-      "computed_at": "2026-04-07T20:52:58.007674"
+      "computed_at": "2026-04-07T21:28:12.883832"
     }
   }
 }
