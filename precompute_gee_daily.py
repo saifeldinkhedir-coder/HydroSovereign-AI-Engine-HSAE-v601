@@ -111,7 +111,7 @@ def fetch_basin(basin_id, cfg):
     # ── 2. GRACE-FO TWS ───────────────────────────────────────────────────────
     try:
         grace = (ee.ImageCollection("NASA/GRACE/MASS_GRIDS_V04/LAND")
-                 .filterDate(start_date, end_date)
+                 .filterDate("2020-01-01", end_date)
                  .filterBounds(region)
                  .select("lwe_thickness_csr"))
 
@@ -143,7 +143,7 @@ def fetch_basin(basin_id, cfg):
 
     # ── 3. GloFAS ERA5 v4 — Monthly Discharge ─────────────────────────────────
     try:
-        glofas = (ee.ImageCollection("ECMWF/CEMS_GLOFAS/V4/MONTHLY")
+        glofas = (ee.ImageCollection("ECMWF/CEMS_GLOFAS_V4/DAILY")
                   .filterDate(start_date, end_date)
                   .filterBounds(region))
 
@@ -165,7 +165,7 @@ def fetch_basin(basin_id, cfg):
             "months": [d[0] for d in q_data],
             "Q_m3s": [d[1] for d in q_data],
             "mean_Q": round(sum(d[1] for d in q_data)/len(q_data), 1) if q_data else 0,
-            "source": "ECMWF/CEMS_GLOFAS/V4/MONTHLY",
+            "source": "ECMWF/CEMS_GLOFAS_V4/DAILY",
             "n_months": len(q_data)
         }
         print(f"  ✅ GloFAS: {len(q_data)} months, mean={result['glofas']['mean_Q']} m3/s")
@@ -178,7 +178,7 @@ def fetch_basin(basin_id, cfg):
         smap = (ee.ImageCollection("NASA_USDA/HSL/SMAP10KM_soil_moisture")
                 .filterDate(start_date, end_date)
                 .filterBounds(region)
-                .select("ssm"))
+                .select(["ssm"]))
 
         def extract_sm(img):
             val = img.reduceRegion(
@@ -220,7 +220,7 @@ def fetch_basin(basin_id, cfg):
         _monthly = met.get("monthly", met.get("hourly", {}))
         T_vals = [t or 20.0 for t in _monthly.get("temperature_2m_mean",
                   _monthly.get("temperature_2m", [20.0]*12))]
-        T_months = met["monthly"]["time"]
+        T_months = _monthly.get("time", [start_date[:7]])
         result["temperature"] = {
             "months": T_months,
             "T_C": T_vals,
