@@ -111,7 +111,7 @@ def fetch_basin(basin_id, cfg):
     # ── 2. GRACE-FO TWS ───────────────────────────────────────────────────────
     try:
         grace = (ee.ImageCollection("NASA/GRACE/MASS_GRIDS_V04/LAND")
-                 .filterDate("2020-01-01", end_date)
+                 .filterDate("2019-01-01", "2024-12-31")
                  .filterBounds(region)
                  .select("lwe_thickness_csr"))
 
@@ -141,34 +141,30 @@ def fetch_basin(basin_id, cfg):
         result["grace"] = {"error": str(e), "tws_cm": [], "mean_tws": 0}
         print(f"  ❌ GRACE: {e}")
 
-    # ── 3. GloFAS ERA5 v4 — Monthly Discharge ─────────────────────────────────
+    # ── 3. GloFAS ERA5 — Discharge via Open-Meteo ────────────────────────────
     try:
-        glofas = (ee.ImageCollection("ECMWF/CEMS_GLOFAS_V4/DAILY")
-                  .filterDate(start_date, end_date)
-                  .filterBounds(region))
-
-        def extract_q(img):
-            val = img.reduceRegion(
-                reducer=ee.Reducer.max(),  # max = main channel
-                geometry=region, scale=10000, maxPixels=1e9
-            ).get(img.bandNames().get(0))
-            return ee.Feature(None, {
-                "date": img.date().format("YYYY-MM"),
-                "Q_m3s": val
-            })
-
-        feats = glofas.map(extract_q).getInfo()["features"]
-        q_data = [(f["properties"]["date"], safe_get(f["properties"]["Q_m3s"]))
-                  for f in feats if f["properties"]["Q_m3s"] is not None]
-
+        cx = (cfg["bbox"][0] + cfg["bbox"][2]) / 2
+        cy = (cfg["bbox"][1] + cfg["bbox"][3]) / 2
+        import urllib.request as _ur
+        q_url = (f"https://archive-api.open-meteo.com/v1/archive"
+                 f"?latitude={cy}&longitude={cx}"
+                 f"&start_date={start_date}&end_date={end_date}"
+                 f"&monthly=river_discharge&timezone=UTC&models=era5")
+        with _ur.urlopen(q_url, timeout=20) as r:
+            q_met = json.loads(r.read())
+        _qm    = q_met.get("monthly", {})
+        Q_vals = [v or 0.0 for v in _qm.get("river_discharge", [])]
+        Q_months = _qm.get("time", [])
+        if not Q_vals:
+            raise ValueError("No river_discharge in response")
         result["glofas"] = {
-            "months": [d[0] for d in q_data],
-            "Q_m3s": [d[1] for d in q_data],
-            "mean_Q": round(sum(d[1] for d in q_data)/len(q_data), 1) if q_data else 0,
-            "source": "ECMWF/CEMS_GLOFAS_V4/DAILY",
-            "n_months": len(q_data)
+            "months":   Q_months,
+            "Q_m3s":    Q_vals,
+            "mean_Q":   round(sum(Q_vals)/len(Q_vals), 1),
+            "source":   "Open-Meteo ERA5 river discharge",
+            "n_months": len(Q_vals)
         }
-        print(f"  ✅ GloFAS: {len(q_data)} months, mean={result['glofas']['mean_Q']} m3/s")
+        print(f"  ✅ GloFAS/ERA5: {len(Q_vals)} months, mean={result['glofas']['mean_Q']} m3/s")
     except Exception as e:
         result["glofas"] = {"error": str(e), "Q_m3s": [], "mean_Q": 0}
         print(f"  ❌ GloFAS: {e}")
@@ -214,7 +210,7 @@ def fetch_basin(basin_id, cfg):
         url = (f"https://archive-api.open-meteo.com/v1/archive"
                f"?latitude={cy}&longitude={cx}"
                f"&start_date={start_date}&end_date={end_date}"
-               f"&monthly=temperature_2m_mean&timezone=UTC")
+               f"&monthly=temperature_2m_mean&timezone=UTC&models=era5")
         with urllib.request.urlopen(url, timeout=15) as r:
             met = json.loads(r.read())
         _monthly = met.get("monthly", met.get("hourly", {}))
