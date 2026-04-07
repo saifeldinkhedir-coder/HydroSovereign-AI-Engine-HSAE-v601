@@ -642,7 +642,7 @@ with st.sidebar:
         "📡 Real Data · APIs",
         "🌐 v430 · Hybrid DSS",
     ], key="quick_jump")
-    if _jump != "—":
+    if _jump != "—" and _jump != st.session_state.get("page", ""):
         st.session_state["page"] = _jump
         st.rerun()
 

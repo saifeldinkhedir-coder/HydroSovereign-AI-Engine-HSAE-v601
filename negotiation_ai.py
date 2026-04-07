@@ -709,10 +709,21 @@ _MODEL: Optional[_GBMClassifier] = None
 def _get_model() -> _GBMClassifier:
     global _MODEL
     if _MODEL is None:
-        X = [c["feat"] for c in _TRAINING_CASES]
-        y = [c["out"]  for c in _TRAINING_CASES]
-        _MODEL = _GBMClassifier(n_estimators=100, lr=0.12, seed=42)
-        _MODEL.fit(X, y)
+        try:
+            import streamlit as st
+            @st.cache_resource(show_spinner=False)
+            def _cached_model():
+                X = [c["feat"] for c in _TRAINING_CASES]
+                y = [c["out"]  for c in _TRAINING_CASES]
+                m = _GBMClassifier(n_estimators=100, lr=0.12, seed=42)
+                m.fit(X, y)
+                return m
+            _MODEL = _cached_model()
+        except Exception:
+            X = [c["feat"] for c in _TRAINING_CASES]
+            y = [c["out"]  for c in _TRAINING_CASES]
+            _MODEL = _GBMClassifier(n_estimators=100, lr=0.12, seed=42)
+            _MODEL.fit(X, y)
     return _MODEL
 
 
@@ -1195,11 +1206,9 @@ def _basin_defaults(basin: dict) -> dict:
     country = basin.get("country", [])
     n       = len(country) if isinstance(country, list) else 2
     runoff  = float(basin.get("runoff_c", 0.30))
-    # ATDI: dispute level + dam size + multi-state + low runoff
     atdi = min(95.0, max(5.0,
         15.0 + disp * 12.0 + min(cap / 2.0, 20.0) + (n - 2) * 8.0 + (1 - runoff) * 10.0
     ))
-    # HIFD: dam size + low runoff + dispute
     hifd = min(80.0, max(5.0,
         8.0 + min(cap / 3.0, 15.0) + (1 - runoff) * 12.0 + disp * 5.0
     ))

@@ -418,11 +418,9 @@ def _basin_defaults(basin: dict) -> dict:
     country = basin.get("country", [])
     n       = len(country) if isinstance(country, list) else 2
     runoff  = float(basin.get("runoff_c", 0.30))
-    # ATDI: dispute level + dam size + multi-state + low runoff
     atdi = min(95.0, max(5.0,
         15.0 + disp * 12.0 + min(cap / 2.0, 20.0) + (n - 2) * 8.0 + (1 - runoff) * 10.0
     ))
-    # HIFD: dam size + low runoff + dispute
     hifd = min(80.0, max(5.0,
         8.0 + min(cap / 3.0, 15.0) + (1 - runoff) * 12.0 + disp * 5.0
     ))
