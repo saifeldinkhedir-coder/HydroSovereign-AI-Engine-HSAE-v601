@@ -415,24 +415,62 @@ def render_conflict_page(basin: dict) -> None:
     import streamlit as st, plotly.graph_objects as go
     st.markdown("## ⚡ Conflict Index — Risk Assessment")
     st.caption("Composite conflict likelihood · ATDI + Political + Hydrological factors")
+
+    with st.expander("⚙️ Input Parameters", expanded=True):
+        c1, c2, c3 = st.columns(3)
+        atdi_in    = c1.slider("ATDI (%)", 0.0, 100.0,
+                               float(basin.get("gee_ATDI", basin.get("td_index", 43.5))),
+                               step=0.5)
+        hifd_in    = c2.slider("HIFD (%)", 0.0, 100.0,
+                               float(basin.get("gee_HIFD", basin.get("hifd", 20.0)) * (100 if basin.get("gee_HIFD",0) <= 1 else 1)),
+                               step=0.5)
+        dispute_in = c3.selectbox("Dispute Level", ["LOW","MEDIUM","HIGH","CRITICAL"], index=1)
+        basin_live = dict(basin)
+        basin_live["td_index"]      = atdi_in / 100
+        basin_live["gee_ATDI"]      = atdi_in
+        basin_live["hifd"]          = hifd_in / 100
+        basin_live["dispute_level"] = dispute_in
+
     try:
-        ci = compute_conflict_index(basin)
-        col1,col2,col3,col4 = st.columns(4)
-        col1.metric("Conflict Index", f"{ci.get('conflict_index',0):.3f}")
+        ci = compute_conflict_index(basin_live)
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Conflict Index", f"{ci.get('conflict_index',0)*100:.1f}%")
         col2.metric("Risk Level",     ci.get('risk_level','—'))
         col3.metric("Political Score",f"{ci.get('political_score',0):.2f}")
         col4.metric("Hydro Score",    f"{ci.get('hydro_score',0):.2f}")
+
         fig = go.Figure(go.Indicator(
-            mode="gauge+number",
+            mode="gauge+number+delta",
             value=ci.get('conflict_index',0)*100,
-            gauge={"axis":{"range":[0,100]},
-                   "bar":{"color":"#ef4444"},
-                   "steps":[{"range":[0,25],"color":"#22c55e"},
-                             {"range":[25,50],"color":"#eab308"},
-                             {"range":[50,75],"color":"#f97316"},
-                             {"range":[75,100],"color":"#7f1d1d"}]},
-            title={"text":"Conflict Risk %"}))
-        fig.update_layout(template="plotly_dark", height=300)
+            delta={'reference': 50, 'relative': False,
+                   'increasing': {'color': '#ef4444'},
+                   'decreasing': {'color': '#22c55e'}},
+            gauge={"axis":{"range":[0,100],"tickcolor":"#E0E0E0"},
+                   "bar":{"color":"#ef4444"},"bgcolor":"#1E1E2E",
+                   "steps":[{"range":[0,25],"color":"#14532d"},
+                             {"range":[25,50],"color":"#713f12"},
+                             {"range":[50,75],"color":"#7c2d12"},
+                             {"range":[75,100],"color":"#450a0a"}],
+                   "threshold":{"line":{"color":"#FFD600","width":3},
+                                "thickness":0.8,"value":50}},
+            title={"text":"Conflict Risk Index (%)","font":{"color":"#E0E0E0","size":14}}))
+        fig.update_layout(template="plotly_dark", height=320,
+                          paper_bgcolor="#0F1117", font=dict(color="#E0E0E0"))
         st.plotly_chart(fig, use_container_width=True)
+
+        cases = ci.get("relevant_cases", [])
+        if cases:
+            st.subheader("⚖️ Relevant ICJ/PCA Precedents")
+            for c in cases[:3]:
+                st.markdown(f"""
+<div style='background:#1E2A3A;border-left:4px solid #3B82F6;
+            padding:0.7rem 1rem;border-radius:6px;margin:0.4rem 0'>
+  <b style='color:#60A5FA'>{c.get('case','—')}</b>
+  <span style='color:#94A3B8;font-size:0.8rem;float:right'>{c.get('year','—')}</span><br>
+  <span style='color:#CBD5E1;font-size:0.85rem'>{c.get('relevance','—')}</span>
+</div>""", unsafe_allow_html=True)
+        legal = ci.get("legal_summary","")
+        if legal:
+            st.info(f"⚖️ **Legal Assessment:** {legal}")
     except Exception as e:
         st.warning(f"Conflict Index: {e}")

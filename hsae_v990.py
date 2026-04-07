@@ -355,10 +355,49 @@ body {background: #020617;}
                 )
 
             st.markdown("#### 📊 Digital Transparency Index (Time Series)")
-            st.line_chart(df.set_index('Date')['Transparency'])
+            _fig_tr = go.Figure()
+            _fig_tr.add_trace(go.Scatter(
+                x=df['Date'], y=df['Transparency'],
+                mode='lines', name='Transparency Index',
+                line=dict(color='#00E5FF', width=2.5),
+                fill='tozeroy', fillcolor='rgba(0,229,255,0.12)'
+            ))
+            _fig_tr.add_hline(y=df['Transparency'].mean(), line_dash='dash',
+                              line_color='#FFD600', line_width=1.5,
+                              annotation_text=f"Mean={df['Transparency'].mean():.1f}",
+                              annotation_position='top right')
+            _fig_tr.update_layout(
+                template='plotly_dark', height=280,
+                xaxis_title='Date', yaxis_title='Transparency Index (%)',
+                plot_bgcolor='#0F1117', paper_bgcolor='#0F1117',
+                font=dict(color='#E0E0E0'),
+                margin=dict(l=40, r=20, t=30, b=40),
+            )
+            st.plotly_chart(_fig_tr, use_container_width=True)
 
             st.markdown("#### ⚖️ Equity Index (Source-to-Sea Fairness)")
-            st.line_chart(df.set_index('Date')['Equity'])
+            _fig_eq = go.Figure()
+            _fig_eq.add_trace(go.Scatter(
+                x=df['Date'], y=df['Equity'],
+                mode='lines', name='Equity Index',
+                line=dict(color='#69FF47', width=2.5),
+                fill='tozeroy', fillcolor='rgba(105,255,71,0.10)'
+            ))
+            _fig_eq.add_hline(y=50, line_dash='dot', line_color='#FFD600',
+                              line_width=1.5, annotation_text='50% threshold',
+                              annotation_position='top left')
+            _fig_eq.add_hline(y=df['Equity'].mean(), line_dash='dash',
+                              line_color='#FF6B6B', line_width=1.5,
+                              annotation_text=f"Mean={df['Equity'].mean():.1f}%",
+                              annotation_position='top right')
+            _fig_eq.update_layout(
+                template='plotly_dark', height=280,
+                xaxis_title='Date', yaxis_title='Equity Index (%)',
+                plot_bgcolor='#0F1117', paper_bgcolor='#0F1117',
+                font=dict(color='#E0E0E0'),
+                margin=dict(l=40, r=20, t=30, b=40),
+            )
+            st.plotly_chart(_fig_eq, use_container_width=True)
 
             st.markdown("#### 🏛️ Legal Reference Notes")
             st.markdown("""

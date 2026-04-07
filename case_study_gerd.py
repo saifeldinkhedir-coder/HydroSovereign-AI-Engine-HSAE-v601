@@ -416,30 +416,30 @@ def generate_case_study_html() -> str:
 <meta charset='UTF-8'>
 <title>GERD Case Study — HSAE v8.0</title>
 <style>
-  body{{font-family:Segoe UI,sans-serif;margin:0;background:#0d1117;color:#e6edf3}}
+  body{{font-family:Segoe UI,sans-serif;margin:0;background:#0F1117;color:#e6edf3}}
   .header{{background:linear-gradient(135deg,#1e3a5f,#0d1117);padding:40px;border-bottom:3px solid #1f6feb}}
   h1{{color:#58a6ff;margin:0}}
   h2{{color:#79c0ff;border-bottom:1px solid #30363d;padding-bottom:8px}}
-  .metric{{display:inline-block;background:#161b22;border:1px solid #30363d;
+  .metric{{display:inline-block;background:#1E2A3A;border:1px solid #30363d;
            border-radius:8px;padding:16px 24px;margin:8px;text-align:center}}
   .metric .val{{font-size:2em;font-weight:bold;color:#f85149}}
-  .metric .lbl{{font-size:0.85em;color:#8b949e}}
+  .metric .lbl{{font-size:0.85em;color:#94A3B8}}
   .section{{max-width:1200px;margin:30px auto;padding:0 20px}}
-  table{{width:100%;border-collapse:collapse;background:#161b22;border-radius:8px;overflow:hidden}}
+  table{{width:100%;border-collapse:collapse;background:#1E2A3A;border-radius:8px;overflow:hidden}}
   th{{background:#21262d;color:#79c0ff;padding:10px;text-align:left}}
   td{{padding:8px 10px;border-bottom:1px solid #21262d;font-size:0.9em}}
   tr:hover{{background:#1c2128}}
   .warn{{color:#f85149;font-weight:bold}}
   .ok{{color:#3fb950}}
-  .footer{{text-align:center;color:#8b949e;padding:30px;font-size:0.85em}}
+  .footer{{text-align:center;color:#94A3B8;padding:30px;font-size:0.85em}}
 </style>
 </head>
 <body>
 <div class='header'>
   <h1>🌊 GERD / Blue Nile Case Study</h1>
-  <p style='color:#8b949e'>HydroSovereign AI Engine (HSAE) v8.0 · GRDC Station 1763100 (El Diem)</p>
-  <p style='color:#8b949e'>Period: 2010–2026 · Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
-  <p style='color:#8b949e'>Generated: {date_str}</p>
+  <p style='color:#94A3B8'>HydroSovereign AI Engine (HSAE) v8.0 · GRDC Station 1763100 (El Diem)</p>
+  <p style='color:#94A3B8'>Period: 2010–2026 · Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+  <p style='color:#94A3B8'>Generated: {date_str}</p>
 </div>
 
 <div class='section'>
@@ -532,10 +532,26 @@ if __name__ == "__main__":
 def render_case_study_page(basin: dict) -> None:
     import streamlit as st
     st.markdown("## 🔬 GERD Case Study — Blue Nile Dispute")
-    st.caption("Grand Ethiopian Renaissance Dam · Phase I–III filling · 2020–2023")
+    st.caption("Grand Ethiopian Renaissance Dam · Phase I–III filling · 2020–2026")
     try:
         html = generate_case_study_html()
-        st.components.v1.html(html, height=600, scrolling=True)
+        # Inject CSS fix for dark-theme text visibility
+        css_fix = """
+        <style>
+          body,p,td,th,span,div,h1,h2,h3,h4,li {color:#E0E0E0 !important;}
+          .metric,.val {color:#60A5FA !important;}
+          .lbl {color:#94A3B8 !important;}
+          table {border-collapse:collapse;width:100%;}
+          td,th {padding:8px;border:1px solid #374151;color:#E0E0E0 !important;}
+          th {background:#1E3A5F;color:#93C5FD !important;}
+          tr:nth-child(even) {background:#1E2A3A;}
+          .warn {color:#FCD34D !important;}
+          .crit {color:#F87171 !important;}
+          .ok   {color:#6EE7B7 !important;}
+        </style>
+        """
+        html = css_fix + html
+        st.components.v1.html(html, height=650, scrolling=True)
     except Exception as e:
         st.warning(f"Case study HTML: {e}")
         tdi_data = compute_gerd_tdi_evolution()

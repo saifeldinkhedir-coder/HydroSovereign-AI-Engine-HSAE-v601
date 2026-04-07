@@ -74,6 +74,9 @@ except Exception: _HAS_GLOFAS=False
 try:
     from treaty_diff import render_treaty_diff_page; _HAS_TDIFF=True
 except Exception: _HAS_TDIFF=False
+try:
+    from tdi_page import render_tdi_page; _HAS_TDI_PAGE=True
+except Exception: _HAS_TDI_PAGE=False
 
 try:
     from negotiation_ai import render_negotiation_page; _HAS_NEG=True
@@ -570,6 +573,7 @@ with st.sidebar:
         "🎲 Uncertainty Analysis",
         "🧪 Sensitivity Analysis",
         "📉 Sediment Transport",
+        "📐 TDI · ATDI · AFSF Engine",
         "─── v6.01 SATELLITE ───",
         "🌌 GRACE-FO · Water Storage",
         "💧 SMAP · Soil Moisture",
@@ -1018,49 +1022,86 @@ elif page == "🌌 GRACE-FO · Water Storage":
         import numpy as _np_g
         tws_cm   = st.session_state.get("tws_cm", [])
         tws_mean = st.session_state.get("gee_tws_mean", 0)
-        gee_year = st.session_state.get("gee_year", "2024")
+        gee_year = st.session_state.get("gee_year", "2025")
         data_mode_now = st.session_state.get("data_mode","Simulation")
+        basin_name = basin.get("name","Basin") if isinstance(basin,dict) else "Basin"
 
-        if tws_cm and data_mode_now == "Direct GEE":
-            months = _pd_g.date_range(f"{gee_year}-01-01", periods=len(tws_cm), freq="MS")
-            fig_tws = go.Figure()
-            fig_tws.add_trace(go.Bar(
-                x=months, y=tws_cm,
-                name="TWS Anomaly (cm)",
-                marker_color=["#3b82f6" if v >= 0 else "#ef4444" for v in tws_cm]
-            ))
-            fig_tws.add_hline(y=0, line_color="#94a3b8", line_width=1)
-            fig_tws.update_layout(
-                template="plotly_dark", height=400,
-                title=f"GRACE-FO TWS Anomaly — {basin.get('name','Basin')} ({gee_year})",
-                yaxis_title="LWE Thickness (cm)",
-                xaxis_title="Month"
-            )
-            st.plotly_chart(fig_tws, use_container_width=True)
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Mean TWS", f"{tws_mean:.2f} cm")
-            col2.metric("Max TWS", f"{max(tws_cm):.2f} cm")
-            col3.metric("Min TWS", f"{min(tws_cm):.2f} cm")
-            st.success(f"✅ GRACE-FO MASCON — {len(tws_cm)} months · Source: NASA JPL")
+        # ── Mode selector ─────────────────────────────────────────────────
+        _g_mode = st.radio("Data Source", ["🛰️ GEE Session","✏️ Manual Input","📊 Simulation"],
+                           horizontal=True, key="grace_mode")
+
+        if _g_mode == "🛰️ GEE Session" and tws_cm and data_mode_now == "Direct GEE":
+            _tws_plot = tws_cm
+            _tws_label = f"GRACE-FO Real — {basin_name} ({gee_year})"
+            _tws_src = f"✅ GRACE-FO MASCON RL06v4 — {len(tws_cm)} months · Source: NASA JPL"
+
+        elif _g_mode == "✏️ Manual Input":
+            st.markdown("**Enter monthly TWS anomaly values (cm):**")
+            months_names = ["Jan","Feb","Mar","Apr","May","Jun",
+                            "Jul","Aug","Sep","Oct","Nov","Dec"]
+            _cols = st.columns(6)
+            _tws_plot = []
+            for i, mn in enumerate(months_names):
+                default = [2.1,1.8,0.5,-1.2,-3.5,-5.8,
+                           -4.2,-1.0,3.5,7.8,9.2,5.6][i]
+                val = _cols[i%6].number_input(mn, value=default,
+                                              format="%.1f", key=f"tws_{i}")
+                _tws_plot.append(val)
+            _tws_label = f"GRACE-FO Manual Input — {basin_name}"
+            _tws_src = "📝 Manual entry — user-provided TWS anomaly values"
+
         else:
-            # Simulation mode — generate synthetic TWS
-            n = 12
+            # Simulation
             _bid_g  = basin.get('id','X') if isinstance(basin,dict) else 'X'
             rng_tws = _np_g.random.default_rng(abs(hash(_bid_g)) % 2**31)
-            tws_syn = list(rng_tws.normal(2.5, 8.0, n))
-            months  = _pd_g.date_range("2024-01-01", periods=n, freq="MS")
-            fig_tws = go.Figure()
-            fig_tws.add_trace(go.Bar(
-                x=months, y=tws_syn,
-                name="TWS Anomaly (cm)",
-                marker_color=["#3b82f6" if v >= 0 else "#ef4444" for v in tws_syn]
-            ))
-            fig_tws.add_hline(y=0, line_color="#94a3b8", line_width=1)
-            fig_tws.update_layout(template="plotly_dark", height=400,
-                title=f"GRACE-FO TWS (Simulation) — {basin.get('name','Basin')}",
-                yaxis_title="LWE Thickness (cm)")
-            st.plotly_chart(fig_tws, use_container_width=True)
-            st.info("📊 Simulation mode — select **Direct GEE** for real GRACE-FO data")
+            _tws_plot = list(rng_tws.normal(2.5, 8.0, 12))
+            _tws_label = f"GRACE-FO Simulation — {basin_name}"
+            _tws_src = "📊 Synthetic data — run **Direct GEE** for real GRACE-FO"
+
+        # ── Plot ──────────────────────────────────────────────────────────
+        months_dt = _pd_g.date_range(f"{gee_year}-01-01", periods=len(_tws_plot), freq="MS")
+        fig_tws = go.Figure()
+        fig_tws.add_trace(go.Bar(
+            x=months_dt, y=_tws_plot,
+            name="TWS Anomaly (cm)",
+            marker_color=["#3b82f6" if v >= 0 else "#ef4444" for v in _tws_plot],
+            text=[f"{v:+.1f}" for v in _tws_plot], textposition="outside"
+        ))
+        fig_tws.add_hline(y=0, line_color="#94a3b8", line_width=1.5)
+        _tws_mean_v = float(_np_g.mean(_tws_plot)) if _tws_plot else 0
+        fig_tws.add_hline(y=_tws_mean_v, line_dash="dash",
+                          line_color="#FFD600", line_width=1.5,
+                          annotation_text=f"Mean={_tws_mean_v:+.2f} cm",
+                          annotation_position="top right")
+        fig_tws.update_layout(
+            template="plotly_dark", height=420,
+            title=_tws_label,
+            yaxis_title="LWE Thickness Anomaly (cm)",
+            xaxis_title="Month",
+            paper_bgcolor="#0F1117", plot_bgcolor="#0F1117",
+            font=dict(color="#E0E0E0"),
+        )
+        st.plotly_chart(fig_tws, use_container_width=True)
+
+        # ── Metrics ───────────────────────────────────────────────────────
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Mean TWS", f"{_tws_mean_v:+.2f} cm")
+        col2.metric("Max TWS",  f"{max(_tws_plot):+.2f} cm")
+        col3.metric("Min TWS",  f"{min(_tws_plot):+.2f} cm")
+        col4.metric("Trend",
+                    "📈 Gaining" if _tws_plot[-1] > _tws_plot[0] else "📉 Losing",
+                    delta=f"{_tws_plot[-1]-_tws_plot[0]:+.1f} cm (Dec-Jan)")
+
+        st.caption(_tws_src)
+
+        # ── Interpretation ─────────────────────────────────────────────
+        if _tws_mean_v < -5:
+            st.error("🔴 Severe water storage depletion — potential Art.7 UNWC violation")
+        elif _tws_mean_v < 0:
+            st.warning("🟡 Negative TWS anomaly — monitor storage trends")
+        else:
+            st.success("🟢 Positive TWS anomaly — storage above reference baseline")
+
     except Exception as _e_grace:
         st.error(f"GRACE-FO error: {_e_grace}")
 
@@ -1159,6 +1200,12 @@ elif page == "🔬 GERD Case Study":
             basin["gee_df"] = _df_gerd
         render_case_study_page(basin)
     else: st.warning("GERD Case Study unavailable.")
+
+elif page == "📐 TDI · ATDI · AFSF Engine":
+    if _HAS_TDI_PAGE:
+        render_tdi_page(basin)
+    else:
+        st.error("tdi_page.py not found in repository.")
 
 elif page == "🔄 Digital Twin · EnKF":
     df = _get_df(basin)

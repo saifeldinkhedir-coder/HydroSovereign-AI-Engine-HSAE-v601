@@ -640,7 +640,7 @@ def render_alerts_page(df: pd.DataFrame | None, basin: dict) -> None:
                 st.error("Enter Bot Token and Chat ID first.")
             else:
                 test_msg = (
-                    f"✅ <b>HSAE v500 — Connection Test</b>\n"
+                    f"✅ <b>HSAE v6.01 — Connection Test</b>\n"
                     f"Basin: <code>{basin_name}</code>\n"
                     f"System: HydroSovereign AI Engine\n"
                     f"Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n"
@@ -654,16 +654,39 @@ def render_alerts_page(df: pd.DataFrame | None, basin: dict) -> None:
                     st.error(f"❌ Delivery failed: {result.get('error', result)}")
 
         alerts_ready = st.session_state.get("current_alerts", [])
+
+        # Auto-generate alerts from current basin data if none exist
+        if not alerts_ready:
+            import datetime as _dt_tg
+            _atdi_tg = float(basin.get("gee_ATDI", basin.get("td_index", 0.435)))
+            _atdi_tg = _atdi_tg if _atdi_tg > 1 else _atdi_tg * 100
+            _level = ("CRITICAL" if _atdi_tg >= 55 else
+                      "WARNING"  if _atdi_tg >= 40 else
+                      "ALERT"    if _atdi_tg >= 25 else "INFO")
+            alerts_ready = [{
+                "level": _level,
+                "basin": basin_name,
+                "atdi":  round(_atdi_tg, 1),
+                "hifd":  round(float(basin.get("gee_HIFD", 20.0)), 1),
+                "p_mean": round(float(basin.get("gee_P_mean", 1.29)), 2),
+                "tws":   round(float(basin.get("gee_tws_mean", 21.9)), 1),
+                "timestamp": _dt_tg.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+                "articles": ["Art.7", "Art.9"] if _atdi_tg >= 55 else ["Art.7"] if _atdi_tg >= 40 else ["Art.5"],
+            }]
+            st.session_state["current_alerts"] = alerts_ready
+            st.caption(f"⚡ Auto-generated {_level} alert from current basin data (ATDI={_atdi_tg:.1f}%)")
+
+        n_alerts = len(alerts_ready)
         if c_dispatch.button(
-            f"🚀 Dispatch {len(alerts_ready)} Alert(s)",
-            disabled=not alerts_ready,
+            f"🚀 Dispatch {n_alerts} Alert(s)",
             use_container_width=True,
+            type="primary",
         ):
             if not bot_token or not chat_id:
-                st.error("Enter Bot Token and Chat ID first.")
+                st.error("❌ Enter Bot Token and Chat ID first.")
             else:
                 sent, failed = 0, 0
-                with st.spinner(f"Dispatching {len(alerts_ready)} alert(s)…"):
+                with st.spinner(f"Dispatching {n_alerts} alert(s) via Telegram…"):
                     for a in alerts_ready:
                         msg = _format_telegram_message(a, basin_name)
                         res = send_telegram(bot_token, chat_id, msg)
@@ -672,14 +695,15 @@ def render_alerts_page(df: pd.DataFrame | None, basin: dict) -> None:
                         else:
                             failed += 1
                 if failed == 0:
-                    st.success(f"✅ All {sent} alert(s) delivered to Telegram.")
+                    st.success(f"✅ All {sent} alert(s) delivered successfully to Telegram.")
                 else:
                     st.warning(f"Sent: {sent} | Failed: {failed}")
 
         # Preview
         if alerts_ready:
-            st.markdown("#### 📋 Preview (first alert)")
+            st.markdown("#### 📋 Alert Preview")
             st.code(_format_telegram_message(alerts_ready[0], basin_name), language="")
+            st.caption(f"{n_alerts} alert(s) ready · Level: {alerts_ready[0].get('level','—')}")
 
     # ── Tab 3: Auto-Protest ────────────────────────────────────────────────────
     with tabs[2]:
