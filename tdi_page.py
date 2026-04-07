@@ -292,25 +292,32 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
 
         # ── Monthly ATDI Bar ───────────────────────────────────────────
         try:
-            _dates_idx = pd.to_datetime(dates) if not hasattr(dates, 'month') else dates
-            df_result["Month"] = _dates_idx.month
+            # Build monthly data directly from tdi_arr and dates
+            import calendar
+            _dates_list = list(pd.to_datetime(dates))
+            _monthly_dict = {}
+            for _d, _v in zip(_dates_list, tdi_arr * 100):
+                _m = _d.month
+                _monthly_dict.setdefault(_m, []).append(_v)
+            _months_out = sorted(_monthly_dict.keys())
+            _month_names = {1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",
+                            7:"Jul",8:"Aug",9:"Sep",10:"Oct",11:"Nov",12:"Dec"}
+            _mean_vals = [float(pd.Series(_monthly_dict[m]).mean()) for m in _months_out]
+            _labels = [_month_names.get(m, str(m)) for m in _months_out]
+            _colors = ["#ef4444" if v >= TDI_ART9_THR*100
+                       else "#f97316" if v >= TDI_ART7_THR*100
+                       else "#eab308" if v >= TDI_ART5_THR*100
+                       else "#22c55e" for v in _mean_vals]
         except Exception:
-            df_result["Month"] = list(range(1, len(df_result)+1))
-        monthly = df_result.groupby("Month")["ATDI_pct"].mean().reset_index()
-        monthly["Month_Name"] = monthly["Month"].map({
-            1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",
-            7:"Jul",8:"Aug",9:"Sep",10:"Oct",11:"Nov",12:"Dec"
-        })
-        monthly["Color"] = monthly["ATDI_pct"].apply(
-            lambda v: "#ef4444" if v >= TDI_ART9_THR*100
-                      else "#f97316" if v >= TDI_ART7_THR*100
-                      else "#eab308" if v >= TDI_ART5_THR*100
-                      else "#22c55e"
-        )
+            _labels = ["Jan","Feb","Mar","Apr","May","Jun",
+                       "Jul","Aug","Sep","Oct","Nov","Dec"]
+            _mean_vals = [atdi_val] * 12
+            _colors = ["#f97316"] * 12
+
         fig3 = go.Figure(go.Bar(
-            x=monthly["Month_Name"], y=monthly["ATDI_pct"],
-            marker_color=monthly["Color"],
-            text=[f"{v:.1f}%" for v in monthly["ATDI_pct"]],
+            x=_labels, y=_mean_vals,
+            marker_color=_colors,
+            text=[f"{v:.1f}%" for v in _mean_vals],
             textposition="outside",
         ))
         fig3.add_hline(y=TDI_ART7_THR*100, line_dash="dash",
