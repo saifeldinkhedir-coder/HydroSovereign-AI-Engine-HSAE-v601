@@ -76,18 +76,24 @@ def fetch_basin(basin_id, cfg):
             m   = ee.Number(m).add(1)
             d0  = ee.Date.fromYMD(year, m, 1)
             d1  = d0.advance(1, "month")
-            img = gpm.filterDate(d0, d1).mean()
+            col = gpm.filterDate(d0, d1)
+            img = ee.Image(ee.Algorithms.If(
+                col.size().gt(0), col.mean(),
+                ee.Image.constant(0)
+            ))
             val = img.reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=region, scale=11132, maxPixels=1e9
-            ).get("precipitation")
+            )
+            p_val = ee.Number(val.get("precipitation", 0))
             return ee.Feature(None, {
                 "month": d0.format("YYYY-MM"),
-                "P_mm_day": ee.Number(val).multiply(24)
+                "P_mm_day": p_val.multiply(24)
             })
 
         feats = ee.FeatureCollection(months.map(monthly_gpm)).getInfo()["features"]
-        months_data = [f["properties"] for f in feats if f["properties"]["P_mm_day"] is not None]
+        months_data = [f["properties"] for f in feats
+                       if f["properties"].get("P_mm_day") is not None]
         p_vals = [safe_get(d["P_mm_day"]) for d in months_data]
 
         result["gpm"] = {
@@ -137,7 +143,7 @@ def fetch_basin(basin_id, cfg):
 
     # ── 3. GloFAS ERA5 v4 — Monthly Discharge ─────────────────────────────────
     try:
-        glofas = (ee.ImageCollection("ECMWF/CEMS_GLOFAS_V4/MONTHLY")
+        glofas = (ee.ImageCollection("ECMWF/CEMS_GLOFAS/V4/MONTHLY")
                   .filterDate(start_date, end_date)
                   .filterBounds(region))
 
@@ -159,7 +165,7 @@ def fetch_basin(basin_id, cfg):
             "months": [d[0] for d in q_data],
             "Q_m3s": [d[1] for d in q_data],
             "mean_Q": round(sum(d[1] for d in q_data)/len(q_data), 1) if q_data else 0,
-            "source": "ECMWF/CEMS_GLOFAS_V4/MONTHLY",
+            "source": "ECMWF/CEMS_GLOFAS/V4/MONTHLY",
             "n_months": len(q_data)
         }
         print(f"  ✅ GloFAS: {len(q_data)} months, mean={result['glofas']['mean_Q']} m3/s")
@@ -211,7 +217,9 @@ def fetch_basin(basin_id, cfg):
                f"&monthly=temperature_2m_mean&timezone=UTC")
         with urllib.request.urlopen(url, timeout=15) as r:
             met = json.loads(r.read())
-        T_vals = [t or 20.0 for t in met["monthly"]["temperature_2m_mean"]]
+        _monthly = met.get("monthly", met.get("hourly", {}))
+        T_vals = [t or 20.0 for t in _monthly.get("temperature_2m_mean",
+                  _monthly.get("temperature_2m", [20.0]*12))]
         T_months = met["monthly"]["time"]
         result["temperature"] = {
             "months": T_months,
