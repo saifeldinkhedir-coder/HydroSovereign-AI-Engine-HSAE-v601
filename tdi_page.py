@@ -215,7 +215,7 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
         """, unsafe_allow_html=True)
 
         # ── Chart 1: Daily TDI Time Series ───────────────────────────────
-        dates = df_result.get("Date", pd.date_range("2025-01-01", periods=len(tdi_arr)))
+        dates = df_result["Date"] if "Date" in df_result.columns else pd.date_range("2025-01-01", periods=len(tdi_arr), freq="D")
         fig1 = go.Figure()
 
         # Article zone shading
@@ -291,7 +291,11 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
         st.plotly_chart(fig2, use_container_width=True)
 
         # ── Monthly ATDI Bar ───────────────────────────────────────────
-        df_result["Month"] = pd.to_datetime(dates).month
+        try:
+            _dates_idx = pd.to_datetime(dates) if not hasattr(dates, 'month') else dates
+            df_result["Month"] = _dates_idx.month
+        except Exception:
+            df_result["Month"] = list(range(1, len(df_result)+1))
         monthly = df_result.groupby("Month")["ATDI_pct"].mean().reset_index()
         monthly["Month_Name"] = monthly["Month"].map({
             1:"Jan",2:"Feb",3:"Mar",4:"Apr",5:"May",6:"Jun",

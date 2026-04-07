@@ -630,6 +630,22 @@ with st.sidebar:
   </span>
 </div>""", unsafe_allow_html=True)
 
+    # ── Quick page jump ────────────────────────────────────────────────
+    _jump = st.selectbox("⚡ Jump to page", ["—",
+        "📐 TDI · ATDI · AFSF Engine",
+        "🌌 GRACE-FO · Water Storage",
+        "⚡ Conflict Index",
+        "🤝 Negotiation AI",
+        "🚨 Alerts · Telegram",
+        "🔬 GERD Case Study",
+        "🏔️  HBV Calibration",
+        "📡 Real Data · APIs",
+        "🌐 v430 · Hybrid DSS",
+    ], key="quick_jump")
+    if _jump != "—":
+        st.session_state["page"] = _jump
+        st.rerun()
+
     st.markdown("---")
     import datetime as _dt
     st.markdown("### 📅 Date Range")
@@ -713,7 +729,7 @@ with st.sidebar:
                     unsafe_allow_html=True)
 
     st.markdown("---")
-    st.caption("HSAE v6.01 · Dr. Seifeldin M.G. Alkedir · University of Khartoum")
+    st.caption("HSAE v6.01 · Mr. Seifeldin M.G. Alkedir · University of Khartoum")
 
 # ── Use real data if available and mode selected ──────────────────────────────
 # Required columns for all pages — if missing, fill with zeros
