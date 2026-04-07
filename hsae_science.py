@@ -556,7 +556,7 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
             )
 
     # ── Tab S2: Sentinel-2 Water Mask ─────────────────────────────────────
-    with s5:
+    with s2:
         st.subheader("Sentinel-2 NDWI Water Mask — Interactive Map")
         st.info(
             "Water pixels (NDWI > 0.2) are shown as a semi-transparent blue "
@@ -586,7 +586,7 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
                  r"{B_{Green} + B_{NIR}}")
 
     # ── Tab S2: Full Water Balance ─────────────────────────────────────────
-    with s5:
+    with s3:
         st.subheader("Full 100% Water Balance — Penman-Monteith")
 
         c1, c2, c3, c4 = st.columns(4)
@@ -642,7 +642,7 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
         )
 
     # ── Tab S3: Power Generation ───────────────────────────────────────────
-    with s5:
+    with s4:
         st.subheader("Hydropower Generation  —  P = ρ·g·Q·H·η")
         eta_s = st.slider("Plant efficiency η", 0.70, 0.95, 0.88, 0.01,
                           key="eta_slider")
