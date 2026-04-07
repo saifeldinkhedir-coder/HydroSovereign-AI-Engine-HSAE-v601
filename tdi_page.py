@@ -326,7 +326,7 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
         fig3.update_layout(
             title="Monthly Mean ATDI (%) — UNWC Zone Classification",
             xaxis_title="Month", yaxis_title="ATDI (%)",
-            yaxis=dict(range=[0, max(100, monthly["ATDI_pct"].max()*1.15)]),
+            yaxis=dict(range=[0, max(100, max(_mean_vals)*1.15) if _mean_vals else 100]),
             height=320, plot_bgcolor="#F8FAFC",
         )
         st.plotly_chart(fig3, use_container_width=True)
