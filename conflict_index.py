@@ -426,16 +426,6 @@ def _basin_defaults(basin: dict) -> dict:
     hifd = min(80.0, max(5.0,
         8.0 + min(cap / 3.0, 15.0) + (1 - runoff) * 12.0 + disp * 5.0
     ))
-    # Override with real GEE session values if available
-    import streamlit as st
-    _atdi_s = st.session_state.get("gee_ATDI", None)
-    _hifd_s = st.session_state.get("gee_HIFD", None)
-    if _atdi_s is not None:
-        _v = float(_atdi_s)
-        atdi = _v if _v > 1 else _v * 100
-    if _hifd_s is not None:
-        _v = float(_hifd_s)
-        hifd = _v if _v > 1 else _v * 100
     return {"atdi": round(atdi, 1), "hifd": round(hifd, 1)}
 
 
@@ -465,14 +455,27 @@ def render_conflict_page(basin: dict) -> None:
     # ── Input Controls ────────────────────────────────────────────────────
     st.info(f"🌍 **{basin_name}** · {', '.join(countries) if isinstance(countries,list) else countries} · Treaty: {treaty}")
 
+    # Reset sliders when basin changes
+    _bid = basin.get("id", basin.get("name", "default"))
+    _prev_bid = st.session_state.get("_conf_basin_id", "")
+    if _prev_bid != _bid:
+        st.session_state[f"conf_atdi_{_bid}"] = _atdi_def
+        st.session_state[f"conf_hifd_{_bid}"] = _hifd_def
+        st.session_state["_conf_basin_id"] = _bid
+
     with st.expander("⚙️ Adjust Parameters", expanded=True):
         c1, c2, c3 = st.columns(3)
-        atdi_in    = c1.slider("ATDI (%)", 0.0, 100.0, round(_atdi_def, 1), step=0.5,
-                               help="Alkedir Transparency Deficit Index — auto-loaded from GEE if available")
-        hifd_in    = c2.slider("HIFD (%)", 0.0, 100.0, round(_hifd_def, 1), step=0.5,
-                               help="Human-Induced Flow Deficit — auto-loaded from GEE if available")
+        atdi_in    = c1.slider("ATDI (%)", 0.0, 100.0,
+                               st.session_state.get(f"conf_atdi_{_bid}", _atdi_def),
+                               step=0.5, key=f"conf_atdi_{_bid}",
+                               help=f"Basin: {basin_name} · Auto from physical params")
+        hifd_in    = c2.slider("HIFD (%)", 0.0, 100.0,
+                               st.session_state.get(f"conf_hifd_{_bid}", _hifd_def),
+                               step=0.5, key=f"conf_hifd_{_bid}",
+                               help="Human-Induced Flow Deficit")
         dispute_in = c3.selectbox("Dispute Level", ["LOW","MEDIUM","HIGH","CRITICAL"],
                                   index=_disp_idx,
+                                  key=f"conf_disp_{_bid}",
                                   help="Political dispute intensity — pre-set from basin data")
 
     # ── Compute Conflict Index ─────────────────────────────────────────────

@@ -1203,16 +1203,6 @@ def _basin_defaults(basin: dict) -> dict:
     hifd = min(80.0, max(5.0,
         8.0 + min(cap / 3.0, 15.0) + (1 - runoff) * 12.0 + disp * 5.0
     ))
-    # Override with real GEE session values if available
-    import streamlit as st
-    _atdi_s = st.session_state.get("gee_ATDI", None)
-    _hifd_s = st.session_state.get("gee_HIFD", None)
-    if _atdi_s is not None:
-        _v = float(_atdi_s)
-        atdi = _v if _v > 1 else _v * 100
-    if _hifd_s is not None:
-        _v = float(_hifd_s)
-        hifd = _v if _v > 1 else _v * 100
     return {"atdi": round(atdi, 1), "hifd": round(hifd, 1)}
 
 
@@ -1235,13 +1225,28 @@ def render_negotiation_page(basin: dict) -> None:
     countries_str = ", ".join(countries) if isinstance(countries, list) else str(countries)
     st.info(f"🌍 **{basin_name}** · {countries_str} · {n_countries} riparian state(s) · Treaty: {treaty}")
 
+    # Reset sliders when basin changes
+    _bid = basin.get("id", basin.get("name", "default"))
+    _prev_bid = st.session_state.get("_neg_basin_id", "")
+    if _prev_bid != _bid:
+        st.session_state[f"neg_atdi_{_bid}"] = _atdi_def
+        st.session_state[f"neg_hifd_{_bid}"] = _hifd_def
+        st.session_state["_neg_basin_id"] = _bid
+
     with st.expander("⚙️ Adjust Parameters", expanded=True):
         c1, c2, c3, c4 = st.columns(4)
-        atdi_n    = c1.slider("ATDI (%)", 0.0, 100.0, round(_atdi_def, 1), step=0.5,
-                              help="Auto-loaded from GEE session")
-        hifd_n    = c2.slider("HIFD (%)", 0.0, 100.0, round(_hifd_def, 1), step=0.5)
-        history_n = c3.selectbox("Past Treaty History", ["None","Partial","Full"], index=1)
-        power_n   = c4.selectbox("Power Asymmetry", ["Low","Medium","High"], index=1)
+        atdi_n    = c1.slider("ATDI (%)", 0.0, 100.0,
+                              st.session_state.get(f"neg_atdi_{_bid}", _atdi_def),
+                              step=0.5, key=f"neg_atdi_{_bid}",
+                              help=f"Basin: {basin_name} · Auto from physical params")
+        hifd_n    = c2.slider("HIFD (%)", 0.0, 100.0,
+                              st.session_state.get(f"neg_hifd_{_bid}", _hifd_def),
+                              step=0.5, key=f"neg_hifd_{_bid}",
+                              help="Human-Induced Flow Deficit")
+        history_n = c3.selectbox("Past Treaty History", ["None","Partial","Full"],
+                                 index=1, key=f"neg_hist_{_bid}")
+        power_n   = c4.selectbox("Power Asymmetry", ["Low","Medium","High"],
+                                 index=1, key=f"neg_pow_{_bid}")
 
     _hist  = {"None": 0.0, "Partial": 0.22, "Full": 0.50}[history_n]
     _pow   = {"Low": 0.18, "Medium": 0.0, "High": -0.16}[power_n]
