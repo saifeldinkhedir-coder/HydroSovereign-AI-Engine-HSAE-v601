@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "computed_at": "2026-04-06T07:16:09.996807",
+  "computed_at": "2026-04-07T07:02:51.730481",
   "date_range": {
-    "start": "2025-04-06",
-    "end": "2026-04-06"
+    "start": "2025-04-07",
+    "end": "2026-04-07"
   },
   "n_basins": 10,
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-06T07:16:09.997098",
+      "fetched_at": "2026-04-07T07:02:51.730813",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -39,11 +39,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:11.456643"
+      "computed_at": "2026-04-07T07:02:53.206349"
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-06T07:16:11.456840",
+      "fetched_at": "2026-04-07T07:02:53.206570",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -73,11 +73,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:12.565310"
+      "computed_at": "2026-04-07T07:02:54.620613"
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-06T07:16:12.565452",
+      "fetched_at": "2026-04-07T07:02:54.620792",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -107,11 +107,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:13.610814"
+      "computed_at": "2026-04-07T07:02:55.837175"
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-06T07:16:13.610988",
+      "fetched_at": "2026-04-07T07:02:55.837354",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -141,11 +141,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:14.808482"
+      "computed_at": "2026-04-07T07:02:57.457293"
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-06T07:16:14.808614",
+      "fetched_at": "2026-04-07T07:02:57.457453",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -175,45 +175,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:16.109270"
+      "computed_at": "2026-04-07T07:02:59.385600"
     },
     "amu_darya": {
       "basin_id": "amu_darya",
-      "fetched_at": "2026-04-06T07:16:16.109451",
-      "gpm": {
-        "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
-        "P_mm_day": [],
-        "mean_P": 0
-      },
-      "grace": {
-        "months": [],
-        "tws_cm": [],
-        "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0
-      },
-      "glofas": {
-        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/MONTHLY' not found (does not exist or caller does not have access).",
-        "Q_m3s": [],
-        "mean_Q": 0
-      },
-      "smap": {
-        "dates": [],
-        "sm_m3m3": [],
-        "mean_sm": 0,
-        "source": "NASA_USDA/HSL/SMAP10KM_soil_moisture",
-        "n_obs": 0
-      },
-      "temperature": {
-        "error": "'monthly'",
-        "T_C": [],
-        "mean_T": 0
-      },
-      "computed_at": "2026-04-06T07:16:17.370009"
-    },
-    "jordan_river": {
-      "basin_id": "jordan_river",
-      "fetched_at": "2026-04-06T07:16:17.370149",
+      "fetched_at": "2026-04-07T07:02:59.385782",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -243,11 +209,45 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:33.282538"
+      "computed_at": "2026-04-07T07:03:15.494855"
+    },
+    "jordan_river": {
+      "basin_id": "jordan_river",
+      "fetched_at": "2026-04-07T07:03:15.495080",
+      "gpm": {
+        "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
+        "P_mm_day": [],
+        "mean_P": 0
+      },
+      "grace": {
+        "months": [],
+        "tws_cm": [],
+        "mean_tws": 0,
+        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
+        "n_months": 0
+      },
+      "glofas": {
+        "error": "ImageCollection.load: ImageCollection asset 'ECMWF/CEMS_GLOFAS_V4/MONTHLY' not found (does not exist or caller does not have access).",
+        "Q_m3s": [],
+        "mean_Q": 0
+      },
+      "smap": {
+        "dates": [],
+        "sm_m3m3": [],
+        "mean_sm": 0,
+        "source": "NASA_USDA/HSL/SMAP10KM_soil_moisture",
+        "n_obs": 0
+      },
+      "temperature": {
+        "error": "'monthly'",
+        "T_C": [],
+        "mean_T": 0
+      },
+      "computed_at": "2026-04-07T07:03:16.944253"
     },
     "senegal_river": {
       "basin_id": "senegal_river",
-      "fetched_at": "2026-04-06T07:16:33.282721",
+      "fetched_at": "2026-04-07T07:03:16.944434",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -277,11 +277,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:34.180709"
+      "computed_at": "2026-04-07T07:03:17.545497"
     },
     "danube_iron_gates": {
       "basin_id": "danube_iron_gates",
-      "fetched_at": "2026-04-06T07:16:34.180816",
+      "fetched_at": "2026-04-07T07:03:17.545630",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -311,11 +311,11 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:35.420194"
+      "computed_at": "2026-04-07T07:03:18.972816"
     },
     "brahmaputra": {
       "basin_id": "brahmaputra",
-      "fetched_at": "2026-04-06T07:16:35.420378",
+      "fetched_at": "2026-04-07T07:03:18.972975",
       "gpm": {
         "error": "Dictionary.get: Dictionary does not contain key: 'precipitation'.",
         "P_mm_day": [],
@@ -345,7 +345,7 @@
         "T_C": [],
         "mean_T": 0
       },
-      "computed_at": "2026-04-06T07:16:36.621336"
+      "computed_at": "2026-04-07T07:03:20.319161"
     }
   }
 }
