@@ -622,14 +622,18 @@ def render_alerts_page(df: pd.DataFrame | None, basin: dict) -> None:
         )
 
         col_t1, col_t2 = st.columns(2)
+        # Pre-filled with HSAE bot credentials
+        _def_tok = st.session_state.get("tg_token",
+                   "8794000019:AAGfprSoK52_ml6u2DG3krQJ5GVPxN0dLPM")
+        _def_cid = st.session_state.get("tg_chat", "6228243890")
         bot_token = col_t1.text_input(
             "🤖 Bot Token", type="password",
-            placeholder="123456789:AAFxxxx...",
+            value=_def_tok,
             key="tg_token",
         )
         chat_id = col_t2.text_input(
             "💬 Chat ID",
-            placeholder="-1001234567890 or @yourchannel",
+            value=_def_cid,
             key="tg_chat",
         )
 
@@ -806,8 +810,10 @@ while True:
             st.slider("Volume Critical %", 0, 100, 20, key="cfg_vol_c")
         with c2:
             st.markdown("#### Telegram Bot")
-            tok = st.text_input("Bot Token", type="password", key="cfg_tok")
-            cid = st.text_input("Chat ID", key="cfg_cid")
+            tok = st.text_input("Bot Token", type="password",
+                              value="8794000019:AAGfprSoK52_ml6u2DG3krQJ5GVPxN0dLPM",
+                              key="cfg_tok")
+            cid = st.text_input("Chat ID", value="6228243890", key="cfg_cid")
             if st.button("Send Test", key="cfg_tst"):
                 if tok and cid:
                     import urllib.request as ur, urllib.parse as up
