@@ -444,7 +444,18 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
         _gT      = float(st.session_state.get("gee_T_mean", 0))
         _gTWS    = float(st.session_state.get("gee_tws_mean", 0))
         _ATDI_v  = float(st.session_state.get("gee_ATDI", 0))
-        _HIFD_v  = float(st.session_state.get("gee_HIFD", 0))
+        # HIFD — basin-specific (resets with basin like ATDI)
+        _gee_hifd = float(st.session_state.get("gee_HIFD", 0))
+        if _gee_hifd > 1:
+            _HIFD_v = _gee_hifd
+        elif _gee_hifd > 0:
+            _HIFD_v = _gee_hifd * 100
+        else:
+            # Derive from basin params: dam size + low runoff + dispute
+            _HIFD_v = min(80.0, max(5.0,
+                8.0 + min(_cap/3.0, 15.0) + (1-_rc)*12.0 +
+                float(basin.get("dispute_level",0))*5.0 + (_n_c-2)*3.0
+            ))
         # ── Basin-specific NSE/KGE (derived from physical params) ──────────
         _rc_b    = float(basin.get("runoff_c", 0.3))
         _area_b  = float(basin.get("eff_cat_km2", 100000))
