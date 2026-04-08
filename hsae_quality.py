@@ -530,13 +530,23 @@ def render_quality_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
         st.plotly_chart(fig_do, use_container_width=True)
 
         # Scatter: DO vs Flow (dilution effect)
-        fig_dof = px.scatter(
-            df_wq.sample(min(500, len(df_wq))),
-            x="Flow_BCM", y="DO_mg_L", color="BOD_mg_L",
-            color_continuous_scale="RdYlGn_r",
+        _samp_do = df_wq.sample(min(500, len(df_wq)))
+        fig_dof = go.Figure(go.Scatter(
+            x=_samp_do["Flow_BCM"], y=_samp_do["DO_mg_L"],
+            mode="markers",
+            marker=dict(
+                color=_samp_do["BOD_mg_L"],
+                colorscale="RdYlGn_r",
+                showscale=True,
+                colorbar=dict(title="BOD"),
+                size=5, opacity=0.7
+            ),
+            name="DO vs Flow"
+        ))
+        fig_dof.update_layout(
             template="plotly_dark", height=360,
             title="DO vs Flow — Dilution Effect",
-            labels={"Flow_BCM":"Flow (BCM/d)", "DO_mg_L":"DO (mg/L)"}
+            xaxis_title="Flow (BCM/d)", yaxis_title="DO (mg/L)"
         )
         st.plotly_chart(fig_dof, use_container_width=True)
 
@@ -567,12 +577,16 @@ def render_quality_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
         _df_ecf = df_wq[["Flow_BCM","EC_uS_cm"]].replace([np.inf,-np.inf], np.nan).dropna()
         _df_ecf = _df_ecf[_df_ecf["Flow_BCM"] > 0]
         _df_ecf = _df_ecf.sample(min(500, len(_df_ecf))) if len(_df_ecf) > 0 else _df_ecf
-        fig_ecf = px.scatter(
-            _df_ecf,
-            x="Flow_BCM", y="EC_uS_cm",
+        fig_ecf = go.Figure(go.Scatter(
+            x=_df_ecf["Flow_BCM"], y=_df_ecf["EC_uS_cm"],
+            mode="markers",
+            marker=dict(color="#a78bfa", size=4, opacity=0.6),
+            name="EC vs Flow"
+        ))
+        fig_ecf.update_layout(
             template="plotly_dark", height=320,
             title="EC vs Flow — Concentration-Dilution Relationship",
-            color_discrete_sequence=["#a78bfa"]
+            xaxis_title="Flow (BCM/d)", yaxis_title="EC (µS/cm)"
         )
         st.plotly_chart(fig_ecf, use_container_width=True)
         st.caption("EC rises when flow drops — classic concentration effect due to "
