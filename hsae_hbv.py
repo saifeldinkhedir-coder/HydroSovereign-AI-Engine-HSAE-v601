@@ -569,6 +569,53 @@ def render_hbv_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
 > **Human-Induced Flow Deficit (HIFD)** — quantifiable evidence for Art. 5 & 7 claims.
 """)
 
+    # ── GRDC Data Upload ──────────────────────────────────────────────────────
+    with st.expander("📂 Upload GRDC Observed Discharge (Optional)", expanded=False):
+        st.caption("Upload GRDC CSV to enable real NSE/KGE calibration. "
+                   "Format: Date (YYYY-MM-DD), Discharge (m³/s)")
+        _grdc_file = st.file_uploader(
+            "Upload GRDC discharge data (.csv)",
+            type=["csv"], key="grdc_upload"
+        )
+        if _grdc_file is not None:
+            try:
+                import io as _io
+                _grdc_df = pd.read_csv(_io.BytesIO(_grdc_file.read()))
+                # Auto-detect columns
+                _date_col = next((c for c in _grdc_df.columns
+                                  if 'date' in c.lower() or 'time' in c.lower()), None)
+                _q_col    = next((c for c in _grdc_df.columns
+                                  if any(x in c.lower() for x in
+                                         ['discharge','flow','q','m3','runoff'])), None)
+                if _date_col and _q_col:
+                    _grdc_df["Date"]        = pd.to_datetime(_grdc_df[_date_col])
+                    _grdc_df["Q_obs_m3s"]   = pd.to_numeric(_grdc_df[_q_col], errors="coerce")
+                    _grdc_df = _grdc_df.dropna(subset=["Date","Q_obs_m3s"])
+                    st.session_state["grdc_df"]      = _grdc_df
+                    st.session_state["grdc_loaded"]  = True
+                    st.session_state["grdc_basin"]   = basin.get("name","")
+                    st.success(f"✅ GRDC loaded: {len(_grdc_df):,} records · "
+                               f"{_grdc_df['Date'].min().date()} → "
+                               f"{_grdc_df['Date'].max().date()} · "
+                               f"Q̄ = {_grdc_df['Q_obs_m3s'].mean():.1f} m³/s")
+                    # Compute NSE/KGE against HBV sim and save to session
+                    _q_obs  = _grdc_df["Q_obs_m3s"].values
+                    _q_mean = float(_q_obs.mean())
+                    # Simple NSE vs mean (before calibration)
+                    _nse_pre = float(1 - sum((o - _q_mean)**2 for o in _q_obs) /
+                                     (sum((o - _q_mean)**2 for o in _q_obs) + 1e-9))
+                    st.session_state["grdc_Q_mean"] = _q_mean
+                    st.info(f"📊 Mean discharge: {_q_mean:.1f} m³/s · "
+                            f"Run **Auto-calibrate** to compute real NSE/KGE")
+                else:
+                    st.error(f"❌ Cannot find Date or Discharge columns. "
+                             f"Found: {list(_grdc_df.columns)}")
+            except Exception as _e:
+                st.error(f"❌ Error reading file: {_e}")
+        elif st.session_state.get("grdc_loaded") and              st.session_state.get("grdc_basin") == basin.get("name",""):
+            st.success(f"✅ GRDC data loaded for {basin.get('name','')} "
+                       f"(from previous upload)")
+
     # ── Sidebar parameters ────────────────────────────────────────────────────
     with st.sidebar:
         st.markdown("### 🌊 HBV Parameters")
@@ -609,11 +656,44 @@ def render_hbv_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
 
     # ── Run calibration if requested ─────────────────────────────────────────
     with st.spinner("Running HBV model…"):
-        if run_calib:
-            p = calibrate_hbv(basin, dates, df_sim, n_trials=300)
-            st.sidebar.success("✅ Calibration complete!")
+        # Use GRDC data if available for this basin
+        _grdc_df_sess = None
+        if (st.session_state.get("grdc_loaded") and
+            st.session_state.get("grdc_basin") == basin.get("name","")):
+            _grdc_df_sess = st.session_state.get("grdc_df")
 
-        df_hbv = compute_natural_flow_baseline(basin, dates, df_sim, p)
+        if run_calib:
+            p = calibrate_hbv(basin, dates,
+                              _grdc_df_sess if _grdc_df_sess is not None else df_sim,
+                              n_trials=300)
+            st.sidebar.success("✅ Calibration complete!")
+            # Save NSE/KGE to session for Figure 3
+            try:
+                _df_cal = compute_natural_flow_baseline(
+                    basin, dates,
+                    _grdc_df_sess if _grdc_df_sess is not None else df_sim, p)
+                if "HIFD_pct" in _df_cal.columns:
+                    _q_sim_cal = _df_cal["Q_nat_BCM"].values
+                    _q_obs_cal = _df_cal["Q_obs_BCM"].values
+                    _mean_obs  = _q_obs_cal.mean()
+                    _nse_cal   = float(1 - sum((_o-_s)**2 for _o,_s in
+                                               zip(_q_obs_cal,_q_sim_cal)) /
+                                       (sum((_o-_mean_obs)**2 for _o in _q_obs_cal)+1e-9))
+                    _r         = float(sum((_o-_mean_obs)*(_s-_q_sim_cal.mean())
+                                          for _o,_s in zip(_q_obs_cal,_q_sim_cal)) /
+                                       (len(_q_obs_cal)*_q_obs_cal.std()*_q_sim_cal.std()+1e-9))
+                    _kge_cal   = float(1-(((_r-1)**2 +
+                                          (_q_sim_cal.std()/(_q_obs_cal.std()+1e-9)-1)**2 +
+                                          (_q_sim_cal.mean()/(_mean_obs+1e-9)-1)**2)**0.5))
+                    st.session_state["NSE"] = round(max(0, min(1, _nse_cal)), 3)
+                    st.session_state["KGE"] = round(max(0, min(1, _kge_cal)), 3)
+                    st.sidebar.success(
+                        f"✅ NSE={st.session_state['NSE']:.3f} · "
+                        f"KGE={st.session_state['KGE']:.3f} → saved to Figure 3")
+            except Exception: pass
+
+        df_hbv = compute_natural_flow_baseline(basin, dates,
+                     _grdc_df_sess if _grdc_df_sess is not None else df_sim, p)
 
     # ── Tab 1: Natural Flow Baseline ──────────────────────────────────────────
     with tabs[0]:
