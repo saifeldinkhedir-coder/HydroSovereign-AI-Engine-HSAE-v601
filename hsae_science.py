@@ -647,24 +647,57 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
             template="plotly_white",
             paper_bgcolor="white",
             plot_bgcolor="#F8FAFC",
-            font=dict(family="Arial", size=10, color="#2C3E50"),
+            font=dict(family="Arial", size=11, color="#1A1A2E"),
             legend=dict(
                 orientation="h", y=-0.08, x=0.5, xanchor="center",
-                bgcolor="rgba(255,255,255,0.9)",
-                bordercolor="#E0E0E0", borderwidth=1,
+                bgcolor="rgba(255,255,255,0.95)",
+                bordercolor="#BDBDBD", borderwidth=1,
+                font=dict(size=10, color="#1A1A2E"),
             ),
-            margin=dict(t=55, b=55, l=65, r=30),
+            margin=dict(t=60, b=65, l=70, r=30),
             title=dict(
                 text=(f"<b>Figure 3.</b> HSAE v6.01 · {_bname} · {_yr} · {_src_lbl}"),
                 x=0.5, xanchor="center",
                 font=dict(size=13, color="#1A237E"),
             ),
         )
-        _fig3.update_yaxes(title_text="P (mm day⁻¹)", gridcolor="#E8ECF0", row=1, col=1)
-        _fig3.update_yaxes(title_text="Q (m³ s⁻¹)", gridcolor="#E8ECF0", row=1, col=2)
-        _fig3.update_yaxes(title_text="ATDI (%)", range=[0, 90], gridcolor="#E8ECF0", row=2, col=1)
-        _fig3.update_yaxes(title_text="TWS (cm)", gridcolor="#E8ECF0", row=2, col=2)
-        _fig3.update_xaxes(tickangle=30, tickformat="%b %Y", gridcolor="#E8ECF0")
+        # Y axes — bold labels, clear ticks
+        _fig3.update_yaxes(
+            title_text="P (mm day⁻¹)",
+            title_font=dict(size=11, color="#1A1A2E", family="Arial"),
+            tickfont=dict(size=10, color="#1A1A2E"),
+            gridcolor="#D0D7E0", gridwidth=1,
+            linecolor="#888", linewidth=1.5, mirror=True,
+            row=1, col=1)
+        _fig3.update_yaxes(
+            title_text="Q (m³ s⁻¹)",
+            title_font=dict(size=11, color="#1A1A2E", family="Arial"),
+            tickfont=dict(size=10, color="#1A1A2E"),
+            gridcolor="#D0D7E0", gridwidth=1,
+            linecolor="#888", linewidth=1.5, mirror=True,
+            row=1, col=2)
+        _fig3.update_yaxes(
+            title_text="ATDI (%)", range=[0, 90],
+            title_font=dict(size=11, color="#1A1A2E", family="Arial"),
+            tickfont=dict(size=10, color="#1A1A2E"),
+            gridcolor="#D0D7E0", gridwidth=1,
+            linecolor="#888", linewidth=1.5, mirror=True,
+            row=2, col=1)
+        _fig3.update_yaxes(
+            title_text="TWS (cm)",
+            title_font=dict(size=11, color="#1A1A2E", family="Arial"),
+            tickfont=dict(size=10, color="#1A1A2E"),
+            gridcolor="#D0D7E0", gridwidth=1,
+            linecolor="#888", linewidth=1.5, mirror=True,
+            row=2, col=2)
+        # X axes — bold month labels
+        _fig3.update_xaxes(
+            tickangle=30,
+            tickformat="%b",
+            tickfont=dict(size=10, color="#1A1A2E", family="Arial"),
+            gridcolor="#D0D7E0", gridwidth=1,
+            linecolor="#888", linewidth=1.5, mirror=True,
+        )
 
         st.plotly_chart(_fig3, use_container_width=True)
 
