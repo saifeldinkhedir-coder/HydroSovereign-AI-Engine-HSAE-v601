@@ -570,7 +570,6 @@ def render_quality_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
         fig_ecf = px.scatter(
             _df_ecf,
             x="Flow_BCM", y="EC_uS_cm",
-            trendline="lowess" if len(_df_ecf) >= 10 else None,
             template="plotly_dark", height=320,
             title="EC vs Flow — Concentration-Dilution Relationship",
             color_discrete_sequence=["#a78bfa"]
