@@ -170,13 +170,22 @@ def simulate_water_quality(
 
     # ── Turbidity ────────────────────────────────────────────────────────────
     # Turbidity peaks during high-flow events (sediment mobilization)
-    rain  = df_sim.get("GPM_Rain_mm", pd.Series(np.zeros(n))).values
+    if "GPM_Rain_mm" in df_sim.columns:
+        rain = df_sim["GPM_Rain_mm"].values[:n]
+    elif "Inflow_BCM" in df_sim.columns:
+        # Derive rain proxy from inflow
+        _inflow = df_sim["Inflow_BCM"].values[:n]
+        rain = _inflow / (_inflow.mean() + 1e-9) * 3.0
+    else:
+        rain = np.zeros(n)
+    rain = np.resize(rain, n)  # ensure correct length
     Turb  = 2 + 8 * Q_norm**0.7 * (1 + 0.5 * rain / (rain.mean()+1)) + rng.gamma(1,2,n)
     Turb  = np.clip(Turb, 0.5, 500.0)
 
     # ── Nitrates ─────────────────────────────────────────────────────────────
     # NO3 peaks after rainfall events (agricultural leaching)
-    NO3   = (1.5 + 8 * irr_ha / 1_000_000) * (1 + np.roll(rain,3) / (rain.mean()+1)) / Q_norm
+    _rain_roll3 = np.roll(rain[:n], 3)
+    NO3   = (1.5 + 8 * irr_ha / 1_000_000) * (1 + _rain_roll3 / (rain[:n].mean()+1)) / Q_norm
     NO3  += rng.gamma(1.2, 0.5, n)
     NO3   = np.clip(NO3, 0.1, 80.0)
 
@@ -397,6 +406,19 @@ def render_quality_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
         irr_ha  = st.number_input("Irrigated Area (ha)",  0, 5_000_000, 300_000, 50_000, key="wq_ha")
         pop     = st.number_input("Downstream Population",0, 200_000_000, 8_000_000, 500_000, key="wq_pop")
         mining  = st.slider("Mining Activity Index", 0.0, 1.0, 0.15, 0.05, key="wq_mine")
+
+    # Ensure df_sim has required columns
+    import numpy as _np_fix, pandas as _pd_fix
+    if "Date" not in df_sim.columns:
+        _n_fix = len(df_sim)
+        df_sim["Date"] = _pd_fix.date_range(
+            f"{_wq_yr}-01-01", periods=_n_fix, freq="D")
+    if "Outflow_BCM" not in df_sim.columns and "Inflow_BCM" in df_sim.columns:
+        df_sim["Outflow_BCM"] = df_sim["Inflow_BCM"] * 0.85
+    if "Outflow_BCM" not in df_sim.columns:
+        _n_fix = len(df_sim)
+        df_sim["Outflow_BCM"] = _np_fix.maximum(0.001,
+            _np_fix.ones(_n_fix) * _wq_rc * _wq_area / 86.4 * 86400 / 1e9)
 
     with st.spinner("Simulating water quality parameters…"):
         df_wq = simulate_water_quality(basin, df_sim, irr_ha, pop, mining)

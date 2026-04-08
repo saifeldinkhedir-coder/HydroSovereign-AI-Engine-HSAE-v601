@@ -392,6 +392,24 @@ def render_groundwater_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
         musk_K    = st.slider("K (travel time, days)", 0.5, 5.0, 2.0, 0.5, key="gw_K")
         musk_X    = st.slider("X (attenuation)",       0.0, 0.5, 0.2, 0.05, key="gw_X")
 
+    # Ensure df_sim has required columns
+    import numpy as _np_fix2, pandas as _pd_fix2
+    if "Date" not in df_sim.columns:
+        df_sim["Date"] = _pd_fix2.date_range(
+            f"{_gw_yr}-01-01", periods=len(df_sim), freq="D")
+    if "Outflow_BCM" not in df_sim.columns and "Inflow_BCM" in df_sim.columns:
+        df_sim["Outflow_BCM"] = df_sim["Inflow_BCM"] * 0.85
+    if "Outflow_BCM" not in df_sim.columns:
+        _n2 = len(df_sim)
+        df_sim["Outflow_BCM"] = _np_fix2.maximum(0.001,
+            _np_fix2.ones(_n2) * _gw_rc * _gw_area / 86.4 * 86400 / 1e9)
+    if "Storage_BCM" not in df_sim.columns:
+        _n2 = len(df_sim)
+        df_sim["Storage_BCM"] = [_gw_cap*(0.4+0.3*_np_fix2.sin(
+            2*_np_fix2.pi*i/_n2)) for i in range(_n2)]
+    if "Inflow_BCM" not in df_sim.columns:
+        df_sim["Inflow_BCM"] = df_sim["Outflow_BCM"] / 0.85
+
     with st.spinner("Computing demand-supply balance…"):
         df_gw = compute_full_demand(basin, df_sim, irr_ha, population, crop, irr_eff)
 
