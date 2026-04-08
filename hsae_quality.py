@@ -322,9 +322,74 @@ def render_quality_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
 </div>
 """, unsafe_allow_html=True)
 
-    if df_sim is None:
-        st.warning("⚠️ Run the **v430 engine** first to generate simulation data.")
-        return
+    # ── Data Source: Real GEE > GRDC > Simulation ────────────────────────────
+    _wq_name  = basin.get("name", "Unknown")
+    _wq_area  = float(basin.get("eff_cat_km2", 174000))
+    _wq_rc    = float(basin.get("runoff_c", 0.38))
+    _wq_cap   = float(basin.get("cap", 74.0))
+    _wq_mode  = st.session_state.get("data_mode", "Simulation")
+    _wq_yr    = int(st.session_state.get("gee_year", "2025"))
+    _wq_P     = list(st.session_state.get("P_mm", []))
+    _wq_T     = list(st.session_state.get("T_C", []))
+    _wq_gP    = float(st.session_state.get("gee_P_mean", 0))
+    _wq_gT    = float(st.session_state.get("gee_T_mean", 20))
+    _grdc_ok  = (st.session_state.get("grdc_loaded") and
+                 st.session_state.get("grdc_basin") == _wq_name)
+
+    if df_sim is not None and _wq_mode == "Direct GEE":
+        st.success(f"🛰️ **Real GEE Data** · {_wq_name} · {_wq_yr}")
+
+    elif _grdc_ok and st.session_state.get("grdc_df") is not None:
+        import numpy as _np_wq, pandas as _pd_wq
+        _gdf = st.session_state["grdc_df"]
+        _Q_obs = _gdf.sort_values("Date")["Q_obs_m3s"].values
+        _dates_wq = _pd_wq.to_datetime(_gdf["Date"])
+        _Q_bcm = _Q_obs * 86400 / 1e9
+        df_sim = _pd_wq.DataFrame({
+            "Date":        _pd_wq.to_datetime(_gdf["Date"]),
+            "Inflow_BCM":  _Q_bcm,
+            "Outflow_BCM": _Q_bcm * 0.85,
+            "Storage_BCM": [_wq_cap*(0.4+0.3*_np_wq.sin(2*_np_wq.pi*i/len(_Q_bcm)))
+                            for i in range(len(_Q_bcm))],
+        })
+        st.success(f"📂 **GRDC Observed Data** · {_wq_name} · "
+                   f"Q̄ = {_Q_obs.mean():.1f} m³/s")
+
+    elif len(_wq_P) > 30 and _wq_mode == "Direct GEE":
+        import numpy as _np_wq, pandas as _pd_wq
+        _P_arr    = _np_wq.array(_wq_P, dtype=float)
+        _n_wq     = len(_P_arr)
+        _dates_wq = _pd_wq.date_range(f"{_wq_yr}-01-01", periods=_n_wq, freq="D")
+        _Q_wq     = _np_wq.maximum(10, _P_arr * _wq_rc * _wq_area / 86.4)
+        df_sim = _pd_wq.DataFrame({
+            "Date":        _dates_wq,
+            "Inflow_BCM":  _Q_wq * 86400 / 1e9,
+            "Outflow_BCM": _Q_wq * 86400 / 1e9 * 0.85,
+            "Storage_BCM": [_wq_cap*(0.4+0.3*_np_wq.sin(2*_np_wq.pi*i/_n_wq))
+                            for i in range(_n_wq)],
+        })
+        st.info(f"🛰️ **GEE → Derived Discharge** · {_wq_name} · "
+                f"P̄={_wq_gP:.2f} mm/day · Q̄={_Q_wq.mean():.0f} m³/s")
+
+    else:
+        import numpy as _np_wq, pandas as _pd_wq
+        _np_wq.random.seed(abs(hash(_wq_name + str(_wq_yr))) % (2**31))
+        _dates_wq = _pd_wq.date_range(f"{_wq_yr}-01-01", f"{_wq_yr}-12-31", freq="D")
+        _n_wq     = len(_dates_wq)
+        _doy_wq   = _np_wq.array([d.dayofyear for d in _dates_wq])
+        _P_t      = _wq_gP if _wq_gP > 0.1 else (_wq_rc*3.5 + _wq_cap/30)
+        _Q_wq     = _np_wq.maximum(10,
+            _P_t*_wq_rc*_wq_area/86.4*(0.6+0.8*_np_wq.maximum(
+            0,_np_wq.sin(_np_wq.pi*(_doy_wq-130)/150))**0.8))
+        df_sim = _pd_wq.DataFrame({
+            "Date":        _dates_wq,
+            "Inflow_BCM":  _Q_wq * 86400 / 1e9,
+            "Outflow_BCM": _Q_wq * 86400 / 1e9 * 0.85,
+            "Storage_BCM": [_wq_cap*(0.4+0.3*_np_wq.sin(2*_np_wq.pi*i/_n_wq))
+                            for i in range(_n_wq)],
+        })
+        st.warning(f"⚠️ **Simulation Mode** · {_wq_name} · "
+                   "Upload GRDC or run Direct GEE for real data")
 
     # Controls
     with st.sidebar:

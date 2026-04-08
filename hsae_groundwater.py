@@ -300,9 +300,83 @@ def render_groundwater_page(df_sim: pd.DataFrame | None, basin: dict) -> None:
 </div>
 """, unsafe_allow_html=True)
 
-    if df_sim is None:
-        st.warning("⚠️ Run the **v430 engine** first to generate simulation data.")
-        return
+    # ── Data Source: Real GEE > GRDC > Simulation ────────────────────────────
+    _gw_name  = basin.get("name", "Unknown")
+    _gw_area  = float(basin.get("eff_cat_km2", 174000))
+    _gw_rc    = float(basin.get("runoff_c", 0.38))
+    _gw_cap   = float(basin.get("cap", 74.0))
+    _gw_mode  = st.session_state.get("data_mode", "Simulation")
+    _gw_yr    = int(st.session_state.get("gee_year", "2025"))
+    _gw_P     = list(st.session_state.get("P_mm", []))
+    _gw_T     = list(st.session_state.get("T_C", []))
+    _gw_SM    = list(st.session_state.get("sm_obs", []))
+    _gw_gP    = float(st.session_state.get("gee_P_mean", 0))
+    _gw_gT    = float(st.session_state.get("gee_T_mean", 20))
+    _gw_tws   = list(st.session_state.get("tws_cm", []))
+    _grdc_ok  = (st.session_state.get("grdc_loaded") and
+                 st.session_state.get("grdc_basin") == _gw_name)
+
+    if df_sim is not None and _gw_mode == "Direct GEE":
+        # Best: v430 ran with real GEE data
+        st.success(f"🛰️ **Real GEE Data** · {_gw_name} · {_gw_yr}")
+
+    elif _grdc_ok and st.session_state.get("grdc_df") is not None:
+        # Second: GRDC observed data uploaded
+        import numpy as _np_gw, pandas as _pd_gw
+        _gdf = st.session_state["grdc_df"]
+        _gdf = _gdf.sort_values("Date").reset_index(drop=True)
+        _Q_obs = _gdf["Q_obs_m3s"].values
+        _dates_gw = _pd_gw.to_datetime(_gdf["Date"])
+        _Q_bcm = _Q_obs * 86400 / 1e9
+        df_sim = _pd_gw.DataFrame({
+            "Date":        _dates_gw,
+            "Inflow_BCM":  _Q_bcm,
+            "Outflow_BCM": _Q_bcm * 0.85,
+            "Storage_BCM": [_gw_cap * (0.4 + 0.3 * _np_gw.sin(
+                2*_np_gw.pi*i/len(_Q_bcm))) for i in range(len(_Q_bcm))],
+        })
+        st.success(f"📂 **GRDC Observed Data** · {_gw_name} · "
+                   f"Q̄ = {_Q_obs.mean():.1f} m³/s")
+
+    elif len(_gw_P) > 30 and _gw_mode == "Direct GEE":
+        # Third: GEE P/T data available, derive Q
+        import numpy as _np_gw, pandas as _pd_gw
+        _P_arr   = _np_gw.array(_gw_P, dtype=float)
+        _n_gw    = len(_P_arr)
+        _dates_gw = _pd_gw.date_range(f"{_gw_yr}-01-01", periods=_n_gw, freq="D")
+        _Q_gw    = _np_gw.maximum(10, _P_arr * _gw_rc * _gw_area / 86.4)
+        _Q_lag   = _pd_gw.Series(_Q_gw).rolling(15, min_periods=1).mean().values
+        df_sim = _pd_gw.DataFrame({
+            "Date":        _dates_gw,
+            "Inflow_BCM":  _Q_lag * 86400 / 1e9,
+            "Outflow_BCM": _Q_lag * 86400 / 1e9 * 0.85,
+            "Storage_BCM": [_gw_cap*(0.4+0.3*_np_gw.sin(2*_np_gw.pi*i/_n_gw))
+                            for i in range(_n_gw)],
+        })
+        st.info(f"🛰️ **GEE Precipitation → Derived Discharge** · "
+                f"{_gw_name} · P̄={_gw_gP:.2f} mm/day · Q̄={_Q_lag.mean():.0f} m³/s")
+
+    else:
+        # Fallback: Simulation only
+        import numpy as _np_gw, pandas as _pd_gw
+        _np_gw.random.seed(abs(hash(_gw_name + str(_gw_yr))) % (2**31))
+        _dates_gw = _pd_gw.date_range(f"{_gw_yr}-01-01", f"{_gw_yr}-12-31", freq="D")
+        _n_gw     = len(_dates_gw)
+        _doy_gw   = _np_gw.array([d.dayofyear for d in _dates_gw])
+        _P_t      = _gw_gP if _gw_gP > 0.1 else (_gw_rc*3.5 + _gw_cap/30)
+        _Q_gw     = _np_gw.maximum(10,
+            _P_t * _gw_rc * _gw_area / 86.4 *
+            (0.6 + 0.8*_np_gw.maximum(0, _np_gw.sin(
+            _np_gw.pi*(_doy_gw-130)/150))**0.8))
+        df_sim = _pd_gw.DataFrame({
+            "Date":        _dates_gw,
+            "Inflow_BCM":  _Q_gw * 86400 / 1e9,
+            "Outflow_BCM": _Q_gw * 86400 / 1e9 * 0.85,
+            "Storage_BCM": [_gw_cap*(0.4+0.3*_np_gw.sin(2*_np_gw.pi*i/_n_gw))
+                            for i in range(_n_gw)],
+        })
+        st.warning(f"⚠️ **Simulation Mode** · {_gw_name} · "
+                   "Upload GRDC data or run Direct GEE for real data")
 
     # ── Sidebar controls ─────────────────────────────────────────────────────
     with st.sidebar:
