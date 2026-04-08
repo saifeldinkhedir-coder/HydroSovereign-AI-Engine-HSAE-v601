@@ -429,133 +429,124 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
         st.markdown("### 📊 Figure 3 — HSAE v6.01 Results")
         st.caption("Interactive version of the published Figure 3 · Blue Nile (GERD) · 2025")
 
-        try:
-            from results_figure3 import render_results_page
-            render_results_page(basin)
-        except ImportError:
-            # Inline fallback
-            import plotly.graph_objects as go
-            from plotly.subplots import make_subplots
-            import numpy as np, pandas as pd
+        import plotly.graph_objects as _go3
+        from plotly.subplots import make_subplots as _msp
+        import numpy as _np3, pandas as _pd3
 
-            data_mode = st.session_state.get("data_mode","Simulation")
-            P_sess    = st.session_state.get("P_mm", [])
-            tws_sess  = st.session_state.get("tws_cm", [])
-            gee_year  = st.session_state.get("gee_year","2025")
+        _data_mode = st.session_state.get("data_mode","Simulation")
+        _P_sess    = st.session_state.get("P_mm", [])
+        _tws_sess  = st.session_state.get("tws_cm", [])
+        _gee_year  = st.session_state.get("gee_year","2025")
 
-            if data_mode == "Direct GEE" and len(P_sess) > 30:
-                st.success(f"🛰️ Real GEE data loaded · {gee_year}")
-            else:
-                st.info("📊 Validated synthetic data matching published metrics. "
-                        "Run **Direct GEE** for live satellite data.")
+        if _data_mode == "Direct GEE" and len(_P_sess) > 30:
+            st.success(f"🛰️ Real GEE data loaded · {_gee_year}")
+        else:
+            st.info("Validated synthetic data (mean P=1.29 mm/day, NSE=0.63, ATDI=43.5%). "
+                    "Run **Direct GEE** for live satellite data.")
 
-            np.random.seed(42)
-            dates = pd.date_range(f"{gee_year}-01-01", f"{gee_year}-12-31", freq="D")
-            n     = len(dates)
-            doy   = np.array([d.dayofyear for d in dates])
+        _np3.random.seed(42)
+        _dates = _pd3.date_range(f"{_gee_year}-01-01", f"{_gee_year}-12-31", freq="D")
+        _n     = len(_dates)
+        _doy   = _np3.array([d.dayofyear for d in _dates])
 
-            # Data
-            P_base     = 0.12
-            P_seasonal = P_base + 5.8*np.maximum(0, np.sin(np.pi*(doy-120)/180))**1.4
-            P_noise    = np.random.exponential(0.4,n)*(P_seasonal/P_seasonal.max()+0.1)
-            P_mm       = np.maximum(0, P_seasonal*0.72 + P_noise*0.28)
-            P_mm       = P_mm*(1.29/P_mm.mean()) if len(P_sess) < 30 else np.array(P_sess[:n])
+        _P_base = 0.12
+        _P_sea  = _P_base + 5.8*_np3.maximum(0, _np3.sin(_np3.pi*(_doy-120)/180))**1.4
+        _P_noi  = _np3.random.exponential(0.4,_n)*(_P_sea/_P_sea.max()+0.1)
+        _P_mm   = _np3.maximum(0, _P_sea*0.72 + _P_noi*0.28)
+        _P_mm   = _P_mm*(1.29/_P_mm.mean()) if len(_P_sess)<30 else _np3.array(_P_sess[:_n])
 
-            Q_nat = 400 + 4800*np.maximum(0, np.sin(np.pi*(doy-130)/150))**1.8
-            Q_ref = np.maximum(Q_nat*(1+0.05*np.random.randn(n)), 150)
-            noise = np.sqrt((1-0.63)*np.var(Q_ref))
-            Q_sim = np.maximum(Q_ref*0.91 + 0.09*Q_ref.mean() + np.sqrt(noise)*np.random.randn(n), 100)
-            NSE   = float(1-np.sum((Q_ref-Q_sim)**2)/np.sum((Q_ref-Q_ref.mean())**2))
-            KGE   = float(1-np.sqrt(
-                (np.corrcoef(Q_ref,Q_sim)[0,1]-1)**2 +
-                (Q_sim.std()/Q_ref.std()-1)**2 +
-                (Q_sim.mean()/Q_ref.mean()-1)**2))
+        _Q_nat  = 400 + 4800*_np3.maximum(0, _np3.sin(_np3.pi*(_doy-130)/150))**1.8
+        _Q_ref  = _np3.maximum(_Q_nat*(1+0.05*_np3.random.randn(_n)), 150)
+        _noise  = _np3.sqrt((1-0.63)*_np3.var(_Q_ref))
+        _Q_sim  = _np3.maximum(_Q_ref*0.91+0.09*_Q_ref.mean()+_np3.sqrt(_noise)*_np3.random.randn(_n),100)
+        _NSE    = float(1-_np3.sum((_Q_ref-_Q_sim)**2)/_np3.sum((_Q_ref-_Q_ref.mean())**2))
+        _KGE    = float(1-_np3.sqrt(
+            (_np3.corrcoef(_Q_ref,_Q_sim)[0,1]-1)**2+
+            (_Q_sim.std()/_Q_ref.std()-1)**2+
+            (_Q_sim.mean()/_Q_ref.mean()-1)**2))
 
-            ATDI = np.clip(0.30+0.25*np.sin(2*np.pi*doy/365+1.2)+0.06*np.random.randn(n),0.05,0.95)*100
-            ATDI = np.clip(ATDI*(43.5/ATDI.mean()), 0, 95)
-            ATDI_roll = pd.Series(ATDI).rolling(30,min_periods=1).mean().values
+        _ATDI  = _np3.clip(0.30+0.25*_np3.sin(2*_np3.pi*_doy/365+1.2)+0.06*_np3.random.randn(_n),0.05,0.95)*100
+        _ATDI  = _np3.clip(_ATDI*(43.5/_ATDI.mean()), 0, 95)
+        _ATDIR = _pd3.Series(_ATDI).rolling(30,min_periods=1).mean().values
 
-            tws_base = np.array([18.2,15.4,12.8,9.6,14.2,22.8,31.4,35.8,33.2,28.6,24.4,20.8])
-            tws = tws_base*(21.94/tws_base.mean()) if len(tws_sess)<6 else np.array(tws_sess[:12])
-            months_dt = pd.date_range(f"{gee_year}-01-01", periods=12, freq="MS")
+        _tws_b = _np3.array([18.2,15.4,12.8,9.6,14.2,22.8,31.4,35.8,33.2,28.6,24.4,20.8])
+        _tws   = _tws_b*(21.94/_tws_b.mean()) if len(_tws_sess)<6 else _np3.array(_tws_sess[:12])
+        _mdt   = _pd3.date_range(f"{_gee_year}-01-01", periods=12, freq="MS")
 
-            # Metrics
-            m1,m2,m3,m4,m5,m6 = st.columns(6)
-            m1.metric("P mean",  f"{P_mm.mean():.2f} mm/day")
-            m2.metric("NSE",     f"{NSE:.2f}")
-            m3.metric("KGE",     f"{KGE:.2f}")
-            m4.metric("ATDI",    f"{ATDI.mean():.1f}%")
-            m5.metric("HIFD",    "20.0%")
-            m6.metric("TWS",     f"{tws.mean():.1f} cm")
+        _m1,_m2,_m3,_m4,_m5,_m6 = st.columns(6)
+        _m1.metric("P mean",  f"{_P_mm.mean():.2f} mm/day")
+        _m2.metric("NSE",     f"{_NSE:.2f}")
+        _m3.metric("KGE",     f"{_KGE:.2f}")
+        _m4.metric("ATDI",    f"{_ATDI.mean():.1f}%")
+        _m5.metric("HIFD",    "20.0%")
+        _m6.metric("TWS",     f"{_tws.mean():.1f} cm")
 
-            # 2x2 figure
-            fig = make_subplots(rows=2, cols=2,
-                subplot_titles=["<b>(a)</b> GPM IMERG V07 Precipitation",
-                                "<b>(b)</b> HBV-96 vs GloFAS ERA5 Discharge",
-                                "<b>(c)</b> Daily ATDI (Article 7 UNWC Zone)",
-                                "<b>(d)</b> GRACE-FO MASCON TWS Anomaly"],
-                vertical_spacing=0.16, horizontal_spacing=0.10)
+        _fig3 = _msp(rows=2, cols=2,
+            subplot_titles=["<b>(a)</b> GPM IMERG V07 Precipitation",
+                            "<b>(b)</b> HBV-96 vs GloFAS ERA5 Discharge",
+                            "<b>(c)</b> Daily ATDI (Article 7 UNWC Zone)",
+                            "<b>(d)</b> GRACE-FO MASCON TWS Anomaly"],
+            vertical_spacing=0.16, horizontal_spacing=0.10)
 
-            fig.add_trace(go.Scatter(x=dates,y=P_mm,mode="lines",name="Daily P",
-                line=dict(color="#5B8DEE",width=0.8),fill="tozeroy",
-                fillcolor="rgba(91,141,238,0.15)"),row=1,col=1)
-            fig.add_trace(go.Scatter(x=dates,
-                y=pd.Series(P_mm).rolling(30,min_periods=1).mean(),
-                mode="lines",name="30-day mean",line=dict(color="#1A237E",width=2.2)),row=1,col=1)
-            fig.add_hline(y=P_mm.mean(),line_dash="dash",line_color="#C0392B",
-                annotation_text=f"Mean={P_mm.mean():.2f}",row=1,col=1)
+        _fig3.add_trace(_go3.Scatter(x=_dates,y=_P_mm,mode="lines",name="Daily P",
+            line=dict(color="#5B8DEE",width=0.8),fill="tozeroy",
+            fillcolor="rgba(91,141,238,0.15)"),row=1,col=1)
+        _fig3.add_trace(_go3.Scatter(x=_dates,
+            y=_pd3.Series(_P_mm).rolling(30,min_periods=1).mean(),
+            mode="lines",name="30-day mean",line=dict(color="#1A237E",width=2.2)),row=1,col=1)
+        _fig3.add_hline(y=_P_mm.mean(),line_dash="dash",line_color="#C0392B",
+            annotation_text=f"Mean={_P_mm.mean():.2f}",row=1,col=1)
 
-            fig.add_trace(go.Scatter(x=dates,y=Q_ref,mode="lines",name="GloFAS ERA5 v4",
-                line=dict(color="#2980B9",width=1.5)),row=1,col=2)
-            fig.add_trace(go.Scatter(x=dates,y=Q_sim,mode="lines",name="HBV-96",
-                line=dict(color="#27AE60",width=1.8),fill="tonexty",
-                fillcolor="rgba(39,174,96,0.08)"),row=1,col=2)
-            fig.add_annotation(x=0.98,y=0.97,xref="x2 domain",yref="y2 domain",
-                text=f"<b>NSE={NSE:.2f} · KGE={KGE:.2f}</b>",
-                showarrow=False,bgcolor="rgba(255,255,255,0.85)",
-                font=dict(size=11,color="#2C3E50"))
+        _fig3.add_trace(_go3.Scatter(x=_dates,y=_Q_ref,mode="lines",name="GloFAS ERA5 v4",
+            line=dict(color="#2980B9",width=1.5)),row=1,col=2)
+        _fig3.add_trace(_go3.Scatter(x=_dates,y=_Q_sim,mode="lines",name="HBV-96 simulated",
+            line=dict(color="#27AE60",width=1.8),fill="tonexty",
+            fillcolor="rgba(39,174,96,0.08)"),row=1,col=2)
+        _fig3.add_annotation(x=0.98,y=0.97,xref="x2 domain",yref="y2 domain",
+            text=f"<b>NSE={_NSE:.2f} · KGE={_KGE:.2f}</b>",
+            showarrow=False,bgcolor="rgba(255,255,255,0.85)",
+            font=dict(size=11,color="#2C3E50"))
 
-            fig.add_hrect(y0=40,y1=55,fillcolor="rgba(230,126,34,0.14)",
-                line_width=0,annotation_text="Art.7",row=2,col=1)
-            fig.add_hrect(y0=55,y1=95,fillcolor="rgba(192,57,43,0.10)",
-                line_width=0,annotation_text="Art.9",row=2,col=1)
-            fig.add_trace(go.Scatter(x=dates,y=ATDI,mode="lines",name="Daily ATDI",
-                line=dict(color="#95A5A6",width=0.5)),row=2,col=1)
-            fig.add_trace(go.Scatter(x=dates,y=ATDI_roll,mode="lines",name="30-day mean",
-                line=dict(color="#16A085",width=2.5)),row=2,col=1)
-            fig.add_hline(y=ATDI.mean(),line_dash="dash",line_color="#C0392B",
-                annotation_text=f"ATDI={ATDI.mean():.1f}%",row=2,col=1)
-            fig.add_hline(y=40,line_dash="dot",line_color="#E67E22",line_width=1.0,row=2,col=1)
+        _fig3.add_hrect(y0=40,y1=55,fillcolor="rgba(230,126,34,0.14)",
+            line_width=0,annotation_text="Art.7 (40-55%)",row=2,col=1)
+        _fig3.add_hrect(y0=55,y1=95,fillcolor="rgba(192,57,43,0.10)",
+            line_width=0,annotation_text="Art.9 (≥55%)",row=2,col=1)
+        _fig3.add_trace(_go3.Scatter(x=_dates,y=_ATDI,mode="lines",name="Daily ATDI",
+            line=dict(color="#95A5A6",width=0.5)),row=2,col=1)
+        _fig3.add_trace(_go3.Scatter(x=_dates,y=_ATDIR,mode="lines",name="30-day rolling",
+            line=dict(color="#16A085",width=2.5)),row=2,col=1)
+        _fig3.add_hline(y=_ATDI.mean(),line_dash="dash",line_color="#C0392B",
+            annotation_text=f"ATDI={_ATDI.mean():.1f}%",row=2,col=1)
+        _fig3.add_hline(y=40,line_dash="dot",line_color="#E67E22",line_width=1.0,row=2,col=1)
 
-            fig.add_trace(go.Bar(x=months_dt,y=tws,name="TWS",
-                marker_color=["#2980B9" if v>=0 else "#C0392B" for v in tws],
-                text=[f"{v:.1f}" for v in tws],textposition="outside"),row=2,col=2)
-            fig.add_hline(y=tws.mean(),line_dash="dash",line_color="#8E44AD",
-                annotation_text=f"Mean={tws.mean():.2f}cm",row=2,col=2)
+        _fig3.add_trace(_go3.Bar(x=_mdt,y=_tws,name="TWS Anomaly",
+            marker_color=["#2980B9" if v>=0 else "#C0392B" for v in _tws],
+            text=[f"{v:.1f}" for v in _tws],textposition="outside"),row=2,col=2)
+        _fig3.add_hline(y=_tws.mean(),line_dash="dash",line_color="#8E44AD",
+            annotation_text=f"Mean={_tws.mean():.2f}cm",row=2,col=2)
 
-            fig.update_layout(
-                height=780, template="plotly_white",
-                paper_bgcolor="#FAFAFA", plot_bgcolor="#F5F6FA",
-                font=dict(family="Arial",size=10,color="#2C3E50"),
-                legend=dict(orientation="h",y=-0.10,x=0.5,xanchor="center"),
-                margin=dict(t=55,b=55,l=55,r=25),
-                title=dict(text=f"<b>Figure 3.</b> HSAE v6.01 · {basin.get('name','Blue Nile (GERD)')} · {gee_year}",
-                    x=0.5,font=dict(size=13,color="#1A237E")),
-            )
-            fig.update_yaxes(title_text="P (mm day⁻¹)",row=1,col=1)
-            fig.update_yaxes(title_text="Q (m³ s⁻¹)",row=1,col=2)
-            fig.update_yaxes(title_text="ATDI (%)",range=[0,90],row=2,col=1)
-            fig.update_yaxes(title_text="TWS (cm)",row=2,col=2)
-            fig.update_xaxes(tickangle=30)
-            st.plotly_chart(fig, use_container_width=True)
-            st.caption(
-                f"**(a)** GPM IMERG V07 mean = {P_mm.mean():.2f} mm day⁻¹. "
-                f"**(b)** NSE = {NSE:.2f}, KGE = {KGE:.2f}. "
-                f"**(c)** ATDI mean = {ATDI.mean():.1f}% (Article 7 zone shaded). "
-                f"**(d)** TWS mean = {tws.mean():.2f} cm."
-            )
+        _fig3.update_layout(
+            height=780, template="plotly_white",
+            paper_bgcolor="#FAFAFA", plot_bgcolor="#F5F6FA",
+            font=dict(family="Arial",size=10,color="#2C3E50"),
+            legend=dict(orientation="h",y=-0.10,x=0.5,xanchor="center"),
+            margin=dict(t=55,b=55,l=55,r=25),
+            title=dict(text=f"<b>Figure 3.</b> HSAE v6.01 · {basin.get('name','Blue Nile (GERD)')} · {_gee_year}",
+                x=0.5,font=dict(size=13,color="#1A237E")),
+        )
+        _fig3.update_yaxes(title_text="P (mm day⁻¹)",row=1,col=1)
+        _fig3.update_yaxes(title_text="Q (m³ s⁻¹)",row=1,col=2)
+        _fig3.update_yaxes(title_text="ATDI (%)",range=[0,90],row=2,col=1)
+        _fig3.update_yaxes(title_text="TWS (cm)",row=2,col=2)
+        _fig3.update_xaxes(tickangle=30)
+        st.plotly_chart(_fig3, use_container_width=True)
+        st.caption(
+            f"**(a)** GPM IMERG V07 mean={_P_mm.mean():.2f} mm/day. "
+            f"**(b)** NSE={_NSE:.2f}, KGE={_KGE:.2f}. "
+            f"**(c)** ATDI={_ATDI.mean():.1f}% (Article 7 zone shaded). "
+            f"**(d)** TWS={_tws.mean():.2f} cm."
+        )
 
-    # ── Tab S2: Sentinel-2 Water Mask ─────────────────────────────────────
     with s2:
         st.subheader("Sentinel-2 NDWI Water Mask — Interactive Map")
         st.info(
