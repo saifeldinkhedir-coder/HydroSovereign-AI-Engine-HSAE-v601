@@ -298,6 +298,12 @@ def send_telegram(bot_token: str, chat_id: str, text: str) -> dict:
     Send message via Telegram Bot API.
     Returns dict with 'ok', 'status_code', and optional 'error'.
     """
+    # Clean inputs
+    bot_token = str(bot_token).strip()
+    chat_id   = str(chat_id).strip()
+    # Limit text to 4096 chars (Telegram limit)
+    text = text[:4096]
+
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     payload = json.dumps({
         "chat_id":    chat_id,
@@ -311,11 +317,17 @@ def send_telegram(bot_token: str, chat_id: str, text: str) -> dict:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=15) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             return {"ok": data.get("ok", False), "status_code": resp.status}
     except urllib.error.HTTPError as e:
-        return {"ok": False, "status_code": e.code, "error": str(e)}
+        err_body = e.read().decode("utf-8") if hasattr(e, "read") else str(e)
+        try:
+            err_json = json.loads(err_body)
+            err_desc = err_json.get("description", str(e))
+        except Exception:
+            err_desc = err_body or str(e)
+        return {"ok": False, "status_code": e.code, "error": err_desc}
     except Exception as e:
         return {"ok": False, "status_code": 0, "error": str(e)}
 
@@ -622,18 +634,17 @@ def render_alerts_page(df: pd.DataFrame | None, basin: dict) -> None:
         )
 
         col_t1, col_t2 = st.columns(2)
-        # Pre-filled with HSAE bot credentials
-        _def_tok = st.session_state.get("tg_token",
-                   "8794000019:AAGfprSoK52_ml6u2DG3krQJ5GVPxN0dLPM")
-        _def_cid = st.session_state.get("tg_chat", "6228243890")
+        # Pre-fill if not already set
+        if "tg_token" not in st.session_state:
+            st.session_state["tg_token"] = "8794000019:AAGfprSoK52_ml6u2DG3krQJ5GVPxN0dLPM"
+        if "tg_chat" not in st.session_state:
+            st.session_state["tg_chat"] = "6228243890"
         bot_token = col_t1.text_input(
             "🤖 Bot Token", type="password",
-            value=_def_tok,
             key="tg_token",
         )
         chat_id = col_t2.text_input(
             "💬 Chat ID",
-            value=_def_cid,
             key="tg_chat",
         )
 
