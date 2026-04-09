@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hydrosovereign"
+version = "6.0.1"
+description = "HydroSovereign AI Engine (HSAE) — Transboundary Water Analysis: ATDI, HIFD, HBV-96, GEE, UN Watercourses Convention 1997"
+readme = "README_PYPI.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Seifeldin M.G. Alkedir", email = "saifeldinkhedir@gmail.com"}
+]
+keywords = [
+    "hydrology", "transboundary water", "ATDI", "HIFD",
+    "HBV-96", "Google Earth Engine", "UNWC", "water governance",
+    "remote sensing", "water quality", "negotiation AI",
+    "conflict index", "river basins"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Hydrology",
+    "Topic :: Scientific/Engineering :: GIS",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+]
+
+[project.optional-dependencies]
+gee = ["earthengine-api>=0.1.390"]
+viz = ["plotly>=5.18.0", "matplotlib>=3.7.0"]
+full = [
+    "streamlit>=1.35.0",
+    "earthengine-api>=0.1.390",
+    "plotly>=5.18.0",
+    "matplotlib>=3.7.0",
+    "requests>=2.31.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
+Documentation = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/docs"
+Repository = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
+"Bug Tracker" = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues"
+"Live App" = "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"
+Zenodo = "https://doi.org/10.5281/zenodo.19180160"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hydrosovereign*"]
+
+[tool.setuptools.package-data]
+hydrosovereign = ["data/*.json", "data/*.csv"]
