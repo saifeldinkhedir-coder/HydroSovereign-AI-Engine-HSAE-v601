@@ -29,7 +29,17 @@
       "ethiopia",
       "abay",
       "blue nile"
-    ]
+    ],
+    "cap": 74.0,
+    "eff_cat_km2": 174000,
+    "runoff_c": 0.38,
+    "country": [
+      "Ethiopia",
+      "Sudan",
+      "Egypt"
+    ],
+    "context": "Largest dam in Africa; GERD dispute Ethiopia/Egypt/Sudan",
+    "legal_arts": "Arts. 5, 7, 12, 20"
   },
   {
     "id": "ROS_SDN",
@@ -61,7 +71,16 @@
       "الروصيرص",
       "السودان",
       "blue nile"
-    ]
+    ],
+    "cap": 3.0,
+    "eff_cat_km2": 160000,
+    "runoff_c": 0.35,
+    "country": [
+      "Sudan",
+      "Ethiopia"
+    ],
+    "context": "Second major dam on Blue Nile; Sudan/Ethiopia",
+    "legal_arts": "Arts. 5, 6"
   },
   {
     "id": "ASWAN_EGY",
@@ -93,7 +112,16 @@
       "nasser",
       "مصر",
       "أسوان"
-    ]
+    ],
+    "cap": 162.0,
+    "eff_cat_km2": 2900000,
+    "runoff_c": 0.1,
+    "country": [
+      "Egypt",
+      "Sudan"
+    ],
+    "context": "Controls entire Nile flow; 1959 Egypt-Sudan agreement",
+    "legal_arts": "Arts. 5, 6, 7"
   },
   {
     "id": "KARIBA_ZAM",
@@ -125,7 +153,16 @@
       "zambia",
       "zimbabwe",
       "africa"
-    ]
+    ],
+    "cap": 180.0,
+    "eff_cat_km2": 663000,
+    "runoff_c": 0.15,
+    "country": [
+      "Zambia",
+      "Zimbabwe"
+    ],
+    "context": "Largest reservoir by volume; Zambia-Zimbabwe cooperation",
+    "legal_arts": "Arts. 5, 8"
   },
   {
     "id": "INGA_COD",
@@ -157,7 +194,17 @@
       "drc",
       "kinshasa",
       "africa"
-    ]
+    ],
+    "cap": 0.5,
+    "eff_cat_km2": 3730000,
+    "runoff_c": 0.35,
+    "country": [
+      "DRC",
+      "Congo",
+      "Angola"
+    ],
+    "context": "World largest hydropower potential; DRC dominates",
+    "legal_arts": "Arts. 5, 9"
   },
   {
     "id": "KAINJI_NGA",
@@ -188,7 +235,18 @@
       "kainji",
       "nigeria",
       "west africa"
-    ]
+    ],
+    "cap": 15.0,
+    "eff_cat_km2": 2200000,
+    "runoff_c": 0.2,
+    "country": [
+      "Nigeria",
+      "Niger",
+      "Mali",
+      "Guinea"
+    ],
+    "context": "Niger Basin Authority established 1980; multi-state",
+    "legal_arts": "Arts. 5, 7"
   },
   {
     "id": "ATATURK_TUR",
@@ -220,7 +278,17 @@
       "turkey",
       "syria",
       "iraq"
-    ]
+    ],
+    "cap": 48.7,
+    "eff_cat_km2": 444000,
+    "runoff_c": 0.18,
+    "country": [
+      "Turkey",
+      "Syria",
+      "Iraq"
+    ],
+    "context": "Turkey controls headwaters; major dispute Syria/Iraq",
+    "legal_arts": "Arts. 5, 7, 33"
   },
   {
     "id": "MOSUL_IRQ",
@@ -252,7 +320,16 @@
       "iraq",
       "دجلة",
       "العراق"
-    ]
+    ],
+    "cap": 11.1,
+    "eff_cat_km2": 375000,
+    "runoff_c": 0.22,
+    "country": [
+      "Iraq",
+      "Turkey"
+    ],
+    "context": "Mosul Dam risk; Iraq/Turkey tension",
+    "legal_arts": "Arts. 5, 7"
   },
   {
     "id": "NUREK_TJK",
@@ -284,7 +361,18 @@
       "amu darya",
       "aral sea",
       "uzbekistan"
-    ]
+    ],
+    "cap": 10.5,
+    "eff_cat_km2": 309000,
+    "runoff_c": 0.25,
+    "country": [
+      "Tajikistan",
+      "Uzbekistan",
+      "Turkmenistan",
+      "Afghanistan"
+    ],
+    "context": "Central Asia water crisis; Aral Sea desiccation",
+    "legal_arts": "Arts. 5, 7, 20"
   },
   {
     "id": "XAYA_LAO",
@@ -316,7 +404,20 @@
       "laos",
       "cambodia",
       "vietnam"
-    ]
+    ],
+    "cap": 7.4,
+    "eff_cat_km2": 795000,
+    "runoff_c": 0.42,
+    "country": [
+      "China",
+      "Myanmar",
+      "Laos",
+      "Thailand",
+      "Cambodia",
+      "Vietnam"
+    ],
+    "context": "Chinese dams block sediment; MRC manages lower basin",
+    "legal_arts": "Arts. 5, 7, 9"
   },
   {
     "id": "3GORGES_CHN",
@@ -348,7 +449,15 @@
       "china",
       "sanxia",
       "yangzi"
-    ]
+    ],
+    "cap": 39.3,
+    "eff_cat_km2": 1000000,
+    "runoff_c": 0.5,
+    "country": [
+      "China"
+    ],
+    "context": "World largest hydroelectric dam; domestic China",
+    "legal_arts": "N/A"
   },
   {
     "id": "TARB_PAK",
@@ -380,7 +489,16 @@
       "pakistan",
       "india",
       "sindh"
-    ]
+    ],
+    "cap": 13.7,
+    "eff_cat_km2": 363000,
+    "runoff_c": 0.32,
+    "country": [
+      "Pakistan",
+      "India"
+    ],
+    "context": "World largest earth-filled dam; Indus Waters Treaty 1960",
+    "legal_arts": "Arts. I–VIII IWT"
   },
   {
     "id": "SUBANS_IND",
@@ -412,7 +530,17 @@
       "india",
       "china",
       "assam"
-    ]
+    ],
+    "cap": 1.37,
+    "eff_cat_km2": 651000,
+    "runoff_c": 0.55,
+    "country": [
+      "China",
+      "India",
+      "Bangladesh"
+    ],
+    "context": "China-India tension; China dams on upper Yarlung Tsangpo",
+    "legal_arts": "Arts. 5, 7"
   },
   {
     "id": "FARAKKA_IND",
@@ -444,7 +572,16 @@
       "ganga",
       "india",
       "bangladesh"
-    ]
+    ],
+    "cap": 0.26,
+    "eff_cat_km2": 1000000,
+    "runoff_c": 0.45,
+    "country": [
+      "India",
+      "Bangladesh"
+    ],
+    "context": "Bangladesh affected by dry season diversions; 1996 Treaty",
+    "legal_arts": "Ganges Treaty 1996"
   },
   {
     "id": "AMZ_BRA",
@@ -476,7 +613,15 @@
       "brazil",
       "xingu",
       "para"
-    ]
+    ],
+    "cap": 11.2,
+    "eff_cat_km2": 4600000,
+    "runoff_c": 0.65,
+    "country": [
+      "Brazil"
+    ],
+    "context": "World 3rd largest dam; impacts indigenous communities",
+    "legal_arts": "Arts. 5, 20"
   },
   {
     "id": "ITAIPU_BR_PY",
@@ -508,7 +653,16 @@
       "brazil",
       "paraguay",
       "binational"
-    ]
+    ],
+    "cap": 29.0,
+    "eff_cat_km2": 820000,
+    "runoff_c": 0.55,
+    "country": [
+      "Brazil",
+      "Paraguay"
+    ],
+    "context": "World 2nd largest hydropower; Brazil-Paraguay treaty 1973",
+    "legal_arts": "Itaipu Treaty 1973"
   },
   {
     "id": "GURI_VEN",
@@ -539,7 +693,16 @@
       "venezuela",
       "caroní",
       "orinoco"
-    ]
+    ],
+    "cap": 135.0,
+    "eff_cat_km2": 640000,
+    "runoff_c": 0.6,
+    "country": [
+      "Venezuela",
+      "Colombia"
+    ],
+    "context": "Venezuela national power; Guri reservoir critical",
+    "legal_arts": "Arts. 5, 9"
   },
   {
     "id": "HOOVER_USA",
@@ -571,7 +734,16 @@
       "usa",
       "nevada",
       "arizona"
-    ]
+    ],
+    "cap": 35.2,
+    "eff_cat_km2": 629000,
+    "runoff_c": 0.12,
+    "country": [
+      "USA",
+      "Mexico"
+    ],
+    "context": "Over-allocated river; US-Mexico 1944 treaty deficit",
+    "legal_arts": "Colorado Compact 1922; Treaty 1944"
   },
   {
     "id": "COULEE_USA",
@@ -603,7 +775,16 @@
       "usa",
       "canada",
       "washington"
-    ]
+    ],
+    "cap": 11.8,
+    "eff_cat_km2": 668000,
+    "runoff_c": 0.42,
+    "country": [
+      "USA",
+      "Canada"
+    ],
+    "context": "Columbia River Treaty 1964; US-Canada cooperation",
+    "legal_arts": "Columbia River Treaty 1964"
   },
   {
     "id": "AMISTAD_MEX",
@@ -635,7 +816,16 @@
       "rio bravo",
       "usa",
       "mexico"
-    ]
+    ],
+    "cap": 7.5,
+    "eff_cat_km2": 470000,
+    "runoff_c": 0.08,
+    "country": [
+      "USA",
+      "Mexico"
+    ],
+    "context": "US-Mexico 1944 water treaty; deficit under climate",
+    "legal_arts": "Treaty 1944"
   },
   {
     "id": "IRONGATE_EU",
@@ -667,7 +857,23 @@
       "romania",
       "serbia",
       "donau"
-    ]
+    ],
+    "cap": 2.4,
+    "eff_cat_km2": 817000,
+    "runoff_c": 0.38,
+    "country": [
+      "Germany",
+      "Austria",
+      "Slovakia",
+      "Hungary",
+      "Croatia",
+      "Serbia",
+      "Romania",
+      "Bulgaria",
+      "Ukraine"
+    ],
+    "context": "EU-managed; ICPDR coordinates 19 countries",
+    "legal_arts": "Danube Convention 1994"
   },
   {
     "id": "RHINE_EU",
@@ -699,7 +905,18 @@
       "germany",
       "france",
       "netherlands"
-    ]
+    ],
+    "cap": 0.5,
+    "eff_cat_km2": 185000,
+    "runoff_c": 0.42,
+    "country": [
+      "Switzerland",
+      "Germany",
+      "France",
+      "Netherlands"
+    ],
+    "context": "Model multi-state governance; Rhine Convention 1999",
+    "legal_arts": "Rhine Convention 1999"
   },
   {
     "id": "KAKHOVKA_UKR",
@@ -731,7 +948,17 @@
       "ukraine",
       "russia",
       "kherson"
-    ]
+    ],
+    "cap": 18.2,
+    "eff_cat_km2": 504000,
+    "runoff_c": 0.28,
+    "country": [
+      "Russia",
+      "Belarus",
+      "Ukraine"
+    ],
+    "context": "Kakhovka Dam destroyed June 2023 (war); Ukraine/Russia",
+    "legal_arts": "Arts. 5, 7, 33, 35"
   },
   {
     "id": "HUME_AUS",
@@ -763,7 +990,15 @@
       "hume",
       "australia",
       "new south wales"
-    ]
+    ],
+    "cap": 3.0,
+    "eff_cat_km2": 1061000,
+    "runoff_c": 0.12,
+    "country": [
+      "Australia"
+    ],
+    "context": "Australia national water reform; Murray-Darling Basin Plan",
+    "legal_arts": "Water Act 2007"
   },
   {
     "id": "TOKTO_KGZ",
@@ -795,7 +1030,18 @@
       "kyrgyzstan",
       "uzbekistan",
       "aral sea"
-    ]
+    ],
+    "cap": 19.5,
+    "eff_cat_km2": 219000,
+    "runoff_c": 0.15,
+    "country": [
+      "Kyrgyzstan",
+      "Uzbekistan",
+      "Kazakhstan",
+      "Tajikistan"
+    ],
+    "context": "Energy vs irrigation conflict; Kyrgyzstan upstream/Kazakhstan downstream",
+    "legal_arts": "Arts. 5, 7, 20"
   },
   {
     "id": "MYIN_MMR",
@@ -827,6 +1073,16 @@
       "myanmar",
       "china",
       "thailand"
-    ]
+    ],
+    "cap": 3.7,
+    "eff_cat_km2": 324000,
+    "runoff_c": 0.38,
+    "country": [
+      "China",
+      "Myanmar",
+      "Thailand"
+    ],
+    "context": "Myanmar dam suspended 2011; China investment dispute",
+    "legal_arts": "Arts. 5, 7"
   }
 ]
