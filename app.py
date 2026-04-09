@@ -1188,20 +1188,33 @@ elif page == "🗺️  WebGIS · Global Map":
     st.markdown("## 🗺️ WebGIS — Global Basin Network")
     if _HAS_WEBGIS:
         try:
-            basins_list = list(GLOBAL_BASINS.values())
-            # Annotate active basin with GEE real data
-            if st.session_state.get("data_mode") == "Direct GEE":
-                for b in basins_list:
-                    if b.get("id") == basin.get("id"):
-                        b["gee_ATDI"]   = st.session_state.get("gee_ATDI", 0)
+            import copy as _copy_wg
+            basins_list = [_copy_wg.deepcopy(b) for b in GLOBAL_BASINS.values()]
+            # Add required keys for WebGIS
+            for b in basins_list:
+                # tdi key (WebGIS uses 'tdi', basins use 'td_index')
+                b["tdi"] = float(b.get("td_index", b.get("gee_ATDI", 0.3)))
+                # Derive ATDI percentage
+                _tdi_v = b["tdi"]
+                b["atdi_pct"] = _tdi_v * 100 if _tdi_v <= 1 else _tdi_v
+                # Annotate active basin with GEE real data
+                if b.get("id") == basin.get("id"):
+                    if st.session_state.get("data_mode") == "Direct GEE":
+                        _atdi_s = st.session_state.get("gee_ATDI", 0)
+                        b["tdi"] = _atdi_s / 100 if _atdi_s > 1 else _atdi_s
+                        b["gee_ATDI"]   = _atdi_s
                         b["gee_P_mean"] = st.session_state.get("gee_P_mean", 0)
                         b["gee_TWS"]    = st.session_state.get("gee_TWS", 0)
                         b["live_data"]  = True
             html = generate_webgis_html(basins_list)
-            st.components.v1.html(html, height=600, scrolling=True)
+            st.components.v1.html(html, height=680, scrolling=False)
         except Exception as e:
             st.error(f"WebGIS error: {e}")
-    else: st.warning("WebGIS unavailable.")
+            import traceback
+            st.code(traceback.format_exc())
+    else:
+        st.warning("WebGIS module loading failed.")
+        st.info("Check that webgis_app.py is present in the repository.")
 
 elif page == "⚡ Conflict Index":
     if _HAS_CONF:
