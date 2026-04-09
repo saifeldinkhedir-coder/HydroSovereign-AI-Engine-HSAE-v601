@@ -8,17 +8,19 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Seifeldin%20Alkedir-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/seifelden-alkhedir-6b730985/)
 [![Zenodo](https://img.shields.io/badge/Zenodo-DOI%20Records-1682D4?style=flat&logo=zenodo&logoColor=white)](https://zenodo.org/search?q=0000-0003-0821-2991)
 [![YouTube](https://img.shields.io/badge/YouTube-Channel-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
-[![Website](https://img.shields.io/badge/Website-Portfolio-10b981?style=flat&logo=google-chrome&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601)
-[![QGIS](https://img.shields.io/badge/QGIS-Plugin-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
-[![Download QGIS Plugin](https://img.shields.io/badge/⬇️_Download-QGIS_Plugin_v6.01-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis_v601.zip)
+[![QGIS](https://img.shields.io/badge/QGIS-Plugin%20v6.01-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
+[![Download QGIS Plugin](https://img.shields.io/badge/⬇️_Download-QGIS_Plugin_FINAL-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/HSAE_v601_QGIS_Plugin_FINAL.zip)
 [![CV](https://img.shields.io/badge/CV-Download-6366F1?style=flat&logo=read-the-docs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf)
 [![Live App](https://img.shields.io/badge/Live_App-HSAE_v6.01-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.38-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
-[![GEE](https://img.shields.io/badge/Google%20Earth%20Engine-ready-4285F4?style=flat&logo=google&logoColor=white)](https://earthengine.google.com)
+[![GEE](https://img.shields.io/badge/Google%20Earth%20Engine-7%20Sensors-4285F4?style=flat&logo=google&logoColor=white)](https://earthengine.google.com)
+[![Tests](https://img.shields.io/badge/Tests-37%20passing-brightgreen?style=flat&logo=pytest&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/tests)
+[![Docs](https://img.shields.io/badge/Docs-6%20files-blue?style=flat&logo=readthedocs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/docs)
+[![Release](https://img.shields.io/badge/Release-v6.0.1-orange?style=flat&logo=github&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/releases)
 
-**26 basins · 7 geographic regions · 31,273 lines · 49 Python modules · 33 Streamlit pages · 0 syntax errors**
+**26 basins · 7 geographic regions · 49 Python modules · 33 Streamlit pages · 0 syntax errors**
 
 *"Satellites can now see what declarations hide — and climate change will make the gap worse."*
 
@@ -30,13 +32,13 @@
 
 Transboundary water resources management poses one of the most complex challenges of the 21st century, requiring the integration of hydrological monitoring, legal frameworks, and predictive modelling within a unified decision-support environment. This study presents the **HydroSovereign AI Engine (HSAE) v6.01**, an open-source, multi-sensor integrated decision-support platform developed for the analysis and governance of **26 transboundary river basins** across **7 geographic regions** — Africa, the Middle East, Central Asia, Asia, the Americas, Europe, and Oceania.
 
-The system integrates **eight Google Earth Engine (GEE) satellite sensors** — including Sentinel-1 SAR, Sentinel-2 NDWI, GPM IMERG precipitation, MODIS ET/NDVI/LST, VIIRS Nighttime Lights, and Landsat Water Quality — with **five AI/ML models** (Random Forest, MLP, Gradient Boosting, Isolation Forest, and Ensemble Kalman Filter Digital Twin) and **Shared Socioeconomic Pathway (SSP1/2/3/5) climate scenarios** to produce basin-scale hydrological forecasts, anomaly detection, and water balance simulations through to 2100.
+The system integrates **seven Google Earth Engine (GEE) satellite sensors** — including GPM IMERG V07, GRACE-FO MASCON, SMAP soil moisture, Sentinel-1 SAR flood mapping, Sentinel-2 NDWI/NDVI, GloFAS ERA5 v4 discharge, and Open-Meteo — fetched in parallel via `concurrent.futures.ThreadPoolExecutor` with 24-hour caching, alongside **five AI/ML models** (Random Forest, MLP, Gradient Boosting, Isolation Forest, and Ensemble Kalman Filter Digital Twin) and **Shared Socioeconomic Pathway (SSP1/2/3/5) climate scenarios** to produce basin-scale hydrological forecasts, anomaly detection, and water balance simulations through to 2100.
 
-Legal analysis is embedded through automated cross-referencing of **33 articles of the UN Watercourses Convention 1997**, enabling treaty compliance scoring, negotiation outcome prediction, ICJ/PCA/ITLOS dossier generation, and auto-generated diplomatic protest notes at the basin level. The platform incorporates a physics-based **HBV catchment model** with SCE-UA calibration, Monte Carlo uncertainty quantification, Sobol sensitivity analysis, MODFLOW groundwater module, Penman-Monteith ET₀, Muskingum routing, MUSLE sediment transport, water quality indicators (WQI), and a **Telegram-based real-time alert system** with four severity levels.
+Legal analysis is embedded through automated cross-referencing of **33 articles of the UN Watercourses Convention 1997**, enabling treaty compliance scoring, negotiation outcome prediction, ICJ/PCA/ITLOS dossier generation, and auto-generated diplomatic protest notes at the basin level. The platform incorporates a physics-based **HBV-96 catchment model** with SCE-UA calibration (NSE=0.63, KGE=0.74 pre-calibration), Monte Carlo uncertainty quantification, Sobol sensitivity analysis, MODFLOW groundwater module, Penman-Monteith ET₀, Muskingum routing, MUSLE sediment transport, water quality indicators (WQI), and a **Telegram-based real-time alert system** with four severity levels.
 
 Ten original scientific contributions are introduced — including the **Alkedir Transparency Deficit Index (ATDI)**, the **Alkedir Human-Induced Flow Deficit (AHIFD)**, and the **Alkedir Water Sovereignty Risk Matrix (AWSRM)** — all documented in this repository as a timestamped scientific priority record pending peer-reviewed publication.
 
-Implemented as a **49-module Python application** (31,273 lines · 33 pages · zero syntax errors), with a companion **QGIS Desktop Plugin** (9 tools + 3 Processing algorithms), HSAE v6.01 represents a novel contribution to the fields of hydro-diplomacy, satellite hydrology, and AI-driven water governance.
+Implemented as a **49-module Python application** (31,273 lines · 33 pages · zero syntax errors), with a companion **QGIS Desktop Plugin** (13 tools + 5 Processing algorithms), HSAE v6.01 represents a novel contribution to the fields of hydro-diplomacy, satellite hydrology, and AI-driven water governance.
 
 **Keywords:** transboundary water management · remote sensing · Google Earth Engine · machine learning · UN Watercourses Convention · decision support system · hydro-diplomacy · SSP climate scenarios · Digital Twin · Streamlit · QGIS · open-source hydrology
 
@@ -68,26 +70,26 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 | 💼 **LinkedIn** | [seifelden-alkhedir](https://www.linkedin.com/in/seifelden-alkhedir-6b730985/) |
 | 📦 **Zenodo** | [DOI Records & Datasets](https://zenodo.org/search?q=0000-0003-0821-2991) |
 | 🎬 **YouTube** | [HSAE Video Channel](https://www.youtube.com/@seifeldinalkedir) |
-| 🌐 **Website** | [Portfolio](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601) |
 | 📄 **CV** | [Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf) |
 
 ---
 
 ## 🌊 What is HSAE?
 
-**HSAE** is the first open-source platform that unifies **multi-source satellite remote sensing**, **conceptual rainfall-runoff modelling**, **machine learning**, **Digital Twin real-time assimilation**, and **international water law automation** into a single integrated decision-support platform for transboundary reservoir monitoring.
+HSAE v6.01 is a **transboundary water governance platform** that unifies:
 
-Five pillars:
-
-| Pillar | Components |
-|--------|-----------|
-| 🛰️ **Satellite RS** | Sentinel-1 SAR · Sentinel-2 NDWI · GPM IMERG · MODIS ET/NDVI/LST · VIIRS NTL · Landsat WQ · GRACE-FO TWS · SMAP Soil Moisture |
-| 💧 **Hydrology** | HBV-96 + SCE-UA calibration · Monte Carlo uncertainty · Sobol sensitivity · MUSLE sediment · Muskingum routing · MODFLOW groundwater · Penman-Monteith ET₀ |
-| 🧠 **AI / ML** | RF + MLP + GBM Ensemble · Isolation Forest · Multi-step Forecast · Digital Twin EnKF · Negotiation AI (47 TFDD/ICJ cases) · Conflict Index |
-| ⚖️ **Water Law** | UN 1997 Convention (33 articles) · ICJ/PCA/ITLOS dossier · Treaty Diff ATCI · Negotiation prediction · Auto-protest notes · IPCC AR6 SSP1–5 to 2100 |
-| 🗺️ **GIS** | QGIS Plugin (9 tools + 3 algorithms) · GeoJSON/Shapefile export · WebGIS · 5-layer QGIS export |
-
-Applied to **26 globally contested transboundary basins** across **7 geographic regions**.
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Earth Observation** | GEE · 7 satellite sensors | Real-time basin monitoring |
+| **Hydrology** | HBV-96 · SCE-UA · MODFLOW | Discharge simulation & calibration |
+| **AI/ML** | RF · GBM · MLP · EnKF | Forecasting & anomaly detection |
+| **Legal** | UNWC 1997 · 33 articles | Treaty compliance & ICJ dossiers |
+| **Diplomacy** | Negotiation AI · 478 cases | P(success) prediction |
+| **Alert** | Telegram Bot | 4-level real-time alerts |
+| **WebGIS** | Leaflet · 25+ fields | Interactive global basin map |
+| **QGIS** | 13 tools · 5 algorithms | Desktop GIS integration |
+| **Documentation** | 6 docs files | API · Examples · Formulas |
+| **Testing** | 37 pytest tests | CI/CD GitHub Actions |
 
 ### 🌍 26 Basins — Full Registry
 
@@ -100,6 +102,99 @@ Applied to **26 globally contested transboundary basins** across **7 geographic 
 | 🌎 **Americas (6)** | Amazon–Belo Monte · Paraná–Itaipu · Orinoco–Guri · Colorado–Hoover · Columbia–Grand Coulee · Rio Grande–Amistad |
 | 🏛️ **Europe (3)** | Danube–Iron Gates I · Rhine–Basin · Dnieper–Kakhovka |
 | 🦘 **Oceania (1)** | Murray-Darling–Hume |
+
+---
+
+## 📊 System Statistics — v6.0.1 (April 2026)
+
+| Metric | Value |
+|--------|-------|
+| Python modules | 49 |
+| Lines of code | 31,273 |
+| Streamlit pages | 33 |
+| Transboundary basins | 26 |
+| GEE satellite sensors | 7 (parallel fetch) |
+| QGIS tools | 13 |
+| QGIS Processing algorithms | 5 |
+| pytest tests | 37 (8 test classes) |
+| Documentation files | 6 |
+| GitHub releases | 2 (v6.0.1 · v6.01.0) |
+| CI/CD workflows | 2 (tests · daily GEE) |
+| Syntax errors | 0 |
+| NSE (pre-calibration) | 0.63 |
+| KGE (pre-calibration) | 0.74 |
+| Telegram Bot | @HASE_Water_bot |
+| Live App | Streamlit Cloud |
+
+---
+
+## 🆕 Changelog — v6.0.1 (April 2026)
+
+### 🔬 Science · Figure 3 — Water Balance
+- 4-panel interactive figure: (a) GPM precipitation, (b) HBV-96 discharge, (c) ATDI, (d) GRACE-FO TWS
+- NSE/KGE/HIFD/ATDI basin-specific for all 26 basins (TFDD/ICOW dispute data)
+- Figure 3 reads calibrated NSE/KGE automatically after GRDC upload
+
+### 🛰️ GEE Integration — 7 Parallel Sensors
+- **GPM IMERG V07** — daily precipitation (11 km)
+- **GRACE-FO MASCON RL06v4** — terrestrial water storage anomaly
+- **SMAP 10km** — soil moisture (ssm field)
+- **Sentinel-1 SAR** — flood mapping (VV polarization)
+- **Sentinel-2 NDWI/NDVI** — water mask + vegetation
+- **GloFAS ERA5 v4** — river discharge ensemble
+- **Open-Meteo ERA5** — temperature, ET₀, soil moisture
+- Parallel fetch via `concurrent.futures.ThreadPoolExecutor` · 24-hour caching
+- GitHub Actions daily precompute (`precompute_gee_daily.py`)
+
+### 💧 Groundwater · Water Quality Pages
+- Data priority: Direct GEE → GRDC upload → GEE-derived → Simulation
+- Water Quality: removed `statsmodels` dependency (lowess → `go.Scatter`)
+- GRDC upload integration in HBV-96 page
+
+### 🚨 Telegram Alert System
+- Bot `@HASE_Water_bot` fully operational
+- Pre-configured token + chat_id
+- 4-level alerts: INFO / ALERT / WARNING / CRITICAL
+- Auto-dispatch on ATDI threshold breach
+
+### 🗺️ WebGIS — Comprehensive Interactive Map
+- 25+ fields per basin popup: Identity · Physical · HSAE Indices · Remote Sensing · Legal & Risk · UN Articles · Context
+- Progress bars for ATDI/HIFD
+- Real dispute levels from TFDD/ICOW for all 26 basins
+- NSE/KGE/WQI/ASI/CI/P(Negotiation) per basin
+- Live GEE badge when Direct GEE active
+
+### 🌊 HBV-96 + GRDC Upload
+- GRDC upload widget in HBV-96 page
+- SCE-UA calibration saves NSE/KGE to `session_state`
+- Figure 3 reads calibrated values automatically
+- NSE=0.63, KGE=0.74 pre-calibration published metrics
+
+### ⚡ Conflict Index · Negotiation AI
+- Basin-specific ATDI/HIFD for all 26 basins
+- Real GBM Negotiation AI model enabled
+- P(success) + strategy + UN Article path per basin
+
+### 🔌 QGIS Plugin — FINAL (13 Tools + 5 Algorithms)
+- **New tools**: Conflict Index · Negotiation AI · WebGIS Map · Real-Time Dashboard Panel
+- **New algorithms**: HBV-96 Calibration (SCE-UA) · Multi-Basin Comparison (CSV + HTML)
+- `basins_50.json` enriched: runoff_c · context · legal_arts · country list
+- `basin_loader.py` rewritten: computes ATDI/HIFD/NSE/KGE per basin
+- `export_tool.py`: added CSV export support
+- Dashboard Panel: dockable real-time panel in QGIS
+
+### 📚 Documentation (NEW — docs/)
+- `docs/index.md` — Overview & quick start
+- `docs/installation.md` — Full installation guide
+- `docs/indices.md` — Mathematical formulas (ATDI, HIFD, NSE, KGE, WQI, CI)
+- `docs/api_reference.md` — Module & function reference
+- `docs/examples.md` — 7 working code examples
+- `docs/qgis_plugin.md` — Complete QGIS plugin documentation
+
+### 🧪 Tests — Expanded (37 tests)
+- `tests/test_hsae.py` — 37 tests, 8 classes
+- Covers: ATDI · HIFD · NSE · KGE · CI · HBV-96 · Legal thresholds · Negotiation AI
+- CI/CD: `.github/workflows/tests.yml` runs on every push
 
 ---
 
@@ -134,102 +229,22 @@ HBV (Bergström, 1992) · Penman-Monteith ET₀ (Allen et al., 1998) · SCS-CN (
 
 ---
 
-## 📊 System Statistics
-
-| Metric | v5.0.0 | v6.0.0 | **v6.01** |
-|--------|--------|--------|-----------|
-| Python source files | 15 | 23 | **49** |
-| Lines of code | 9,893 | 15,023 | **31,273** |
-| Streamlit pages | 12 | 19 | **33** |
-| Global basins | 24 | 26 | **26** |
-| Satellite sensors | 3 | 8 | **8 + GRACE-FO + SMAP** |
-| UN 1997 articles automated | 12 | 17 | **33** |
-| AI models | RF only | RF+MLP+GBM+IsolationForest | **+ Digital Twin EnKF + Negotiation AI** |
-| Uncertainty quantification | ❌ | ❌ | **✅ Monte Carlo 10K samples** |
-| Sensitivity analysis | ❌ | ❌ | **✅ OAT + Morris + Sobol** |
-| Sediment transport | ❌ | ❌ | **✅ MUSLE + Brune + DCDI** |
-| Treaty diff compliance | ❌ | ❌ | **✅ ATCI — 15 treaties** |
-| ICJ/PCA/ITLOS dossier | ❌ | ❌ | **✅ Auto-generated** |
-| Negotiation AI | ❌ | ❌ | **✅ 47 historical cases** |
-| Conflict index | ❌ | ❌ | **✅ Composite risk score** |
-| GERD case study | ❌ | ❌ | **✅ Phase I–III 2020–2023** |
-| QGIS Plugin tools | ❌ | 5 | **9 tools + 3 Processing algorithms** |
-| QGIS export layers | ❌ | ❌ | **✅ 5-layer GeoJSON/Shapefile** |
-| Climate scenarios (SSP) | ❌ | SSP1/2/3/5 | **SSP1/2/3/5 + conflict risk** |
-| SQLite persistence | ❌ | ✅ | **✅** |
-| Arabic UI | ❌ | ❌ | **✅** |
-| Benchmark comparison | ❌ | ❌ | **✅ vs WEAP/MIKE/HEC-HMS/SWAT+** |
-| Syntax errors | 0 | 0 | **0** |
-
----
-
-## 🔌 QGIS Plugin — HydroSovereign Toolkit v6.01
-
-HSAE includes a companion **QGIS Plugin** (fully updated in v6.01) for desktop GIS integration, enabling direct use of the platform's basin data, ATDI outputs, and QGIS Processing Toolbox algorithms.
-
-| Tool | Description |
-|------|-------------|
-| 🌊 **Load Basin Registry** | Load all 26 transboundary basins as vector layer with ATF risk colours |
-| 📊 **TDI/ATDI Visualiser** | Apply graduated colour map by ATDI% to basin layer |
-| ⚖️ **UNWC Legal Layer** | Overlay UN 1997 compliance status: COMPLIANT → EMERGENCY |
-| 🛰️ **GEE Script Generator** | Generate GEE JavaScript for 7 sensors from QGIS |
-| 📡 **GRDC Stations** | Load gauge stations (Tier 1/2/3) as overlay |
-| 📤 **Export Basin Data** | Export to Shapefile or GeoJSON |
-| 📋 **Dashboard** | HSAE main dashboard dialog in QGIS |
-| 🏛️ **ICJ Dossier Export** | Export legal dossier as TXT |
-| 🔧 **Processing: ATDI** | Calculate ATDI for any vector layer in QGIS Processing Toolbox |
-| 🔧 **Processing: HIFD** | Calculate HIFD from observed/natural flow layers |
-| 🔧 **Processing: Basin Report** | Generate full basin analysis report |
-
-**Install in QGIS:**
-
-[![⬇️ Download QGIS Plugin v6.01](https://img.shields.io/badge/⬇️_Download-QGIS_Plugin_v6.01-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis_v601.zip)
-
-```
-1. Click button above → download hsae_qgis_v601.zip
-2. Open QGIS
-3. Plugins → Manage and Install Plugins → Install from ZIP
-4. Select hsae_qgis_v601.zip → Install Plugin
-5. Restart QGIS → HSAE toolbar appears ✅
-```
-
-Or copy manually:
-```
-hsae_qgis\ → %APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\
-
-> 🔗 **[Browse Plugin Source](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)**
-```
-
-### QGIS ↔ Streamlit Integration
-
-HSAE v6.01 adds a dedicated **Export to QGIS** page in the Streamlit app with 5 ranked layers:
-
-| Layer | Format | Use |
-|-------|--------|-----|
-| ⭐ UNWC Legal Compliance | GeoJSON Polygons | Publication maps · coloured COMPLIANT→EMERGENCY |
-| ⭐ Basin Boundary Polygons | GeoJSON Polygons | Spatial analysis · bounding boxes |
-| Basin Centroids | GeoJSON Points | Labels · symbology |
-| Monthly Time Series | GeoJSON + Temporal | QGIS Temporal Controller animation |
-| Daily CSV | CSV with lat/lon | Advanced analysis |
-
----
-
 ## 🗺️ 33 Streamlit Pages
 
 ### v6.0.0 Core (19 pages)
-Intro · v430 Hybrid DSS · v990 Legal Nexus · Science · Legal · DevOps · Validation · Alerts · HBV · Operations Room · Groundwater · Water Quality · Audit Trail · Real Data APIs · AI ML Engine · Climate SSP · Database · Export · Export to QGIS
+🌐 v430 Hybrid DSS · 📐 TDI/ATDI/AFSF · 🌌 GRACE-FO · 🤝 Negotiation AI · ⚡ Conflict Index · 🌡️ Climate SSP · 🤖 AI Forecast · 🛡️ Audit Chain · 📊 Validation/GRDC · 📡 Digital Twin · 🏛️ Legal/Treaty · 📁 Export · 🌿 Sediment · 💹 Benchmark · 🔬 GERD Case · 📋 Ops Room · 📤 Upload · ⚙️ DevOps · 🌍 Intro
 
 ### v6.01 Science+ (5 pages)
-HBV Calibration · Uncertainty Analysis · Sensitivity Analysis · Sediment Transport · Benchmark
+🔬 Science · Water Balance · 🌊 HBV-96 · Catchment Model · 💧 Groundwater · 🧪 Water Quality · 🚨 Alerts · Telegram
 
 ### v6.01 Satellite (3 pages)
-GRACE-FO · SMAP Soil Moisture · GloFAS 30-Day Forecast
+🛰️ GPM Live · 🌍 GRACE-FO TWS · 💧 SMAP Soil Moisture
 
 ### v6.01 Legal+ (3 pages)
-Treaty Diff · Negotiation AI · ICJ Dossier
+📜 Legal · Treaty Engine · 📊 UNWC Compliance · 🗺️ WebGIS · Global Map
 
 ### v6.01 Intelligence (3 pages)
-WebGIS · Conflict Index · GERD Case Study · Digital Twin EnKF
+🤝 Negotiation AI · 🔮 Climate 2100 · 📊 Validation · GRDC
 
 ---
 
@@ -237,23 +252,22 @@ WebGIS · Conflict Index · GERD Case Study · Digital Twin EnKF
 
 ```bash
 # 1. Clone
-git clone https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601.git
-cd HydroSovereign-AI-Engine-HSAE-
+git clone https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
+cd HydroSovereign-AI-Engine-HSAE-v601
 
-# 2. Install dependencies
+# 2. Install
 pip install -r requirements.txt
 
-# 3. (Optional) GEE Authentication for real satellite data
-earthengine authenticate
-
-# 4. Run
+# 3. Run
 streamlit run app.py
 ```
 
-Opens at: **https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app**
+**Live App:** [https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 
-> ✅ The app runs fully without API keys using built-in physics-based simulation.
-> Real data activated by: GRDC key · NASA Earthdata · GEE authentication · CDS API key
+### Docker
+```bash
+docker-compose up
+```
 
 ---
 
@@ -261,122 +275,175 @@ Opens at: **https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.st
 
 ```
 HydroSovereign_HSAE_v601/
-├── app.py                      Main router (335 lines original + v6.01 extensions)
+├── app.py                      Main router (1,322 lines · all 33 pages)
 ├── basins_global.py            26-basin registry — single source of truth
 ├── hsae_tdi.py                 ★ Canonical TDI/ATDI/AFSF (ε=0.001 · α=0.30)
 │
 ├── Satellite Data
+│   ├── gee_connector.py        GEE parallel fetch — 7 sensors (ThreadPoolExecutor)
 │   ├── gee_engine.py           GEE Python API — 8 sensors
 │   ├── hsae_gee_data.py        GEE scripts + 5 live APIs + parsers
-│   ├── gee_raster.py           GEE raster processing
+│   ├── precompute_gee_daily.py GitHub Actions daily GEE precompute
+│   ├── gee_realtime_reader.py  Read precomputed JSON cache
 │   ├── grace_fo.py             GRACE-FO TWS anomaly (NASA Earthdata)
 │   ├── smap_loader.py          SMAP L4 soil moisture
-│   ├── glofas_loader.py        GloFAS v4 30-day ensemble forecast
+│   ├── glofas_loader.py        GloFAS ERA5 v4 30-day discharge
 │   └── grdc_loader.py          GRDC 43-station discharge (1,257 lines)
 │
 ├── Scientific Core
-│   ├── hsae_hbv.py             HBV-96 catchment model
+│   ├── hsae_hbv.py             HBV-96 catchment model + GRDC upload + SCE-UA
 │   ├── hbv_model.py            HBV standalone + SCE-UA calibration
-│   ├── hbv_calibration_page.py HBV calibration UI
-│   ├── validation_engine.py    Extended validation metrics
+│   ├── hsae_science.py         Water balance + Figure 3 + basin-specific metrics
+│   ├── hsae_validation.py      NSE/KGE/RMSE + GRDC upload + Taylor diagrams
 │   ├── uncertainty_engine.py   Monte Carlo (10K samples) + bootstrap
 │   ├── sensitivity_analysis.py OAT + Morris + Sobol indices
 │   ├── sediment_transport.py   MUSLE + Brune trap + DCDI
-│   ├── hsae_science.py         Water balance + Penman-Monteith
-│   ├── hsae_validation.py      NSE/KGE/RMSE + GRDC upload + Taylor
-│   ├── hsae_v430.py            Hybrid DSS + ASCAF + AFSF
-│   └── hsae_v990.py            Legal Nexus + ATDI
+│   ├── hsae_groundwater.py     MODFLOW + FAO-56 + Muskingum (GEE→GRDC→Sim)
+│   ├── hsae_quality.py         WQI — WHO 2017 + FAO-56 (GEE→GRDC→Sim)
+│   └── hsae_v430.py            Hybrid DSS + ASCAF + AFSF
 │
 ├── AI & Climate
 │   ├── hsae_ai.py              RF+MLP+GBM + IsolationForest + forecast
 │   ├── ai_ensemble.py          Extended ensemble models
-│   ├── ai_forecast.py          Multi-step forecasting + build_forecast_features
+│   ├── ai_forecast.py          Multi-step forecasting
 │   ├── digital_twin.py         Ensemble Kalman Filter (EnKF) real-time assimilation
 │   ├── climate_engine.py       SSP1–5 scenarios + IPCC AR6 params
-│   ├── hsae_climate.py         Climate SSP UI
-│   ├── conflict_index.py       Composite conflict likelihood
+│   ├── conflict_index.py       Composite conflict index (basin-specific all 26)
+│   ├── negotiation_ai.py       GBM negotiation prediction (478 TFDD cases)
 │   └── benchmark_comparison.py Peer tool comparison (WEAP/MIKE/HEC-HMS/SWAT+)
 │
 ├── Legal & Diplomacy
 │   ├── hsae_legal.py           UN 1997 Arts 5–33 + ICJ/PCA/ITLOS
-│   ├── treaty_diff.py          ATCI treaty compliance scoring
-│   ├── negotiation_ai.py       GBM negotiation prediction (47 TFDD cases)
+│   ├── treaty_diff.py          ATCI treaty compliance scoring (15 treaties)
 │   ├── icj_dossier.py          ICJ/PCA/ITLOS dossier auto-generation
 │   └── case_study_gerd.py      GERD Phase I–III TDI evolution 2020–2023
 │
 ├── Operations
 │   ├── hsae_opsroom.py         ASI + ADTS + AWSRM + SITREP dashboard
-│   ├── hsae_alerts.py          4-level alerts + Telegram + Art.12 protest
+│   ├── hsae_alerts.py          Telegram @HASE_Water_bot · 4-level alerts
 │   ├── hsae_audit.py           SHA-256 audit chain
-│   ├── hsae_devops.py          CI/CD monitoring
 │   └── hsae_db.py              SQLite persistence
 │
-├── Domain Modules
-│   ├── hsae_quality.py         WQI — WHO 2017 + FAO-56 + UNWC Arts.20/21
-│   ├── hsae_groundwater.py     MODFLOW + FAO-56 + Muskingum routing
-│   ├── hsae_export.py          HTML/Excel/JSON export + weasyprint PDF
-│   ├── export_qgis.py          5-layer QGIS export (GeoJSON/CSV)
-│   ├── arabic_ui.py            Arabic RTL UI support
-│   ├── webgis_app.py           Interactive WebGIS map
-│   └── hsae_intro.py           Welcome + basin explorer
+├── WebGIS
+│   └── webgis_app.py           Leaflet WebGIS — 25+ fields per basin popup
 │
-├── QGIS Plugin (hsae_qgis/)
-│   ├── plugin.py               7 toolbar tools + 3 Processing algorithms
-│   ├── basin_loader.py         Load 26 basins as vector layer
+├── QGIS Plugin (hsae_qgis/)    ← v6.0.1 FINAL
+│   ├── plugin.py               13 tools + real-time dashboard panel
+│   ├── basin_loader.py         Load 26 basins with ATDI/HIFD/NSE/KGE
+│   ├── dashboard_panel.py      Dockable real-time QGIS panel
+│   ├── export_tool.py          Shapefile / GeoJSON / CSV export
 │   ├── tdi_visualiser.py       TDI graduated colour map
 │   ├── legal_layer.py          UNWC risk overlay
-│   ├── export_tool.py          Shapefile/GeoJSON export
 │   ├── dialog_main.py          HSAE dashboard dialog
 │   ├── hsae_processing_provider.py  Processing Toolbox provider
-│   ├── algorithms/atdi_algorithm.py  Calculate ATDI
-│   ├── algorithms/hifd_algorithm.py  Calculate HIFD
-│   └── algorithms/basin_report_algorithm.py  Full basin report
+│   ├── basins_50.json          26 basins enriched (runoff_c, context, legal_arts)
+│   └── algorithms/
+│       ├── atdi_algorithm.py          ATDI Calculator
+│       ├── hifd_algorithm.py          HIFD Calculator
+│       ├── basin_report_algorithm.py  Basin Legal Report
+│       ├── hbv_algorithm.py           HBV-96 Calibration (SCE-UA) ← NEW
+│       └── comparison_algorithm.py    Multi-Basin Comparison ← NEW
+│
+├── Documentation (docs/)       ← NEW in v6.0.1
+│   ├── index.md                Overview & quick start
+│   ├── installation.md         Installation guide
+│   ├── indices.md              Mathematical formulas
+│   ├── api_reference.md        Module & function reference
+│   ├── examples.md             7 working code examples
+│   └── qgis_plugin.md          QGIS plugin documentation
+│
+├── Tests (tests/)
+│   ├── test_hsae.py            37 tests · 8 classes ← EXPANDED
+│   ├── test_core.py            Core index tests
+│   └── test_group_z_api.py     API tests
 │
 └── Configuration
     ├── requirements.txt
     ├── CITATION.cff
-    ├── paper.md                JOSS paper scaffold
-    ├── paper.bib
+    ├── paper.md / paper.bib
     ├── CONTRIBUTING.md
     ├── INSTALL.md
-    ├── Dockerfile
-    ├── docker-compose.yml
-    ├── .env.example
-    ├── .github/workflows/tests.yml
-    ├── .streamlit/config.toml
+    ├── Dockerfile / docker-compose.yml
+    ├── .github/workflows/tests.yml      ← CI/CD
+    ├── .github/workflows/daily_gee.yml  ← Daily GEE precompute
     └── LICENSE
 ```
 
 ---
 
-## 🛰️ GEE & Data API Workflow
+## 🔌 QGIS Plugin — HydroSovereign Toolkit v6.01 FINAL
 
-**Option A — Simulation (works immediately, no keys needed):**
-```
-streamlit run app.py → fully functional with physics-based simulation
-```
+[![Download QGIS Plugin FINAL](https://img.shields.io/badge/⬇️_Download-HSAE_v601_QGIS_Plugin_FINAL.zip-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/HSAE_v601_QGIS_Plugin_FINAL.zip)
 
-**Option B — Real data (register once, free):**
+**Installation:** QGIS → Plugins → Manage → Install from ZIP → select `HSAE_v601_QGIS_Plugin_FINAL.zip`
 
-| Service | URL | Wait |
-|---------|-----|------|
-| GRDC discharge | grdc.bafg.de | 3–5 days |
-| NASA Earthdata | urs.earthdata.nasa.gov | Instant |
-| Google Earth Engine | earthengine.google.com | 1–3 days |
-| Copernicus CDS | cds.climate.copernicus.eu | Instant |
+### Tools (13)
 
-```bash
-# After GEE registration:
-earthengine authenticate
-# Then use Real Data · APIs → Direct GEE in the app
-```
+| # | Tool | Description |
+|---|------|-------------|
+| 1 | 🌊 Load Basin Registry | 26 basins as point layer with ATDI/HIFD/NSE/KGE |
+| 2 | 📊 TDI/ATDI Visualiser | Graduated colour map by ATDI level |
+| 3 | ⚖️ UNWC Legal Layer | UN 1997 legal risk overlay |
+| 4 | 📤 Export Basin Data | Shapefile / GeoJSON / CSV |
+| 5 | 📋 Dashboard Dialog | Main HSAE analysis dashboard |
+| 6 | 🛰️ GEE Script Generator | Ready-to-use scripts for 7 satellite sensors |
+| 7 | 📡 GRDC Stations | 10 global discharge stations overlay |
+| 8 | ⚡ Conflict Index | ATDI/HIFD CI for all 26 basins (TFDD/ICOW) |
+| 9 | 🤝 Negotiation AI | P(success) from GBM model (478 historical cases) |
+| 10 | 🗺️ WebGIS Map | Standalone Leaflet HTML map — 25+ fields |
+| 11 | 📊 Basin Panel | Dockable real-time dashboard in QGIS |
+| 12 | 🏛️ ICJ/PCA Dossier | Complete legal dossier export (TXT + HTML) |
+| 13 | ℹ️ About | Author · DOI · GitHub · Live App |
 
-**Option C — Manual GEE export:**
-1. **📡 Real Data · APIs** → **GEE Scripts** tab
-2. Copy JavaScript → [code.earthengine.google.com](https://code.earthengine.google.com) → Run → Export to Drive
-3. Download CSV → upload in **GEE Uploads** tab
+### Processing Algorithms (5)
+
+| Algorithm | QGIS ID | Inputs | Outputs |
+|-----------|---------|--------|---------|
+| ATDI Calculator | `atdi:atdicalculator` | rc, cap, nc, disp | ATDI% |
+| HIFD Calculator | `atdi:hifdcalculator` | rc, cap, nc, disp | HIFD% |
+| Basin Legal Report | `atdi:basinreport` | basin parameters | TXT report |
+| HBV-96 Calibration | `atdi:hbv96calibration` | area, rc, P, T | NSE, KGE, CSV |
+| Multi-Basin Comparison | `atdi:multibasincomparison` | basin names | CSV + HTML |
 
 ---
+
+## 🛰️ GEE & Data Workflow
+
+```
+Direct GEE Mode
+├── GPM IMERG V07      → P_mm_day     (11 km · daily)
+├── GRACE-FO MASCON    → tws_cm       (300 km · monthly)
+├── SMAP 10km          → sm_m3m3      (10 km · daily)
+├── Sentinel-1 SAR     → flood extent (10 m · per event)
+├── Sentinel-2 NDWI    → water mask   (10 m · bi-weekly)
+├── GloFAS ERA5 v4     → Q_m3s        (0.1° · daily)
+└── Open-Meteo ERA5    → T_C, ET0     (daily)
+         ↓
+session_state → all 33 pages read live data
+         ↓
+Figure 3 · WebGIS · Conflict Index · Negotiation AI
+```
+
+```bash
+# GEE Authentication
+earthengine authenticate
+# or Service Account:
+export GEE_SA_KEY_PATH=hsae-gee-service.json
+```
+
+---
+
+## 🔬 Key Metrics
+
+| Metric | Value | Status |
+|--------|-------|--------|
+| NSE (pre-calibration) | 0.63 | Blue Nile GERD 2025 |
+| KGE (pre-calibration) | 0.74 | Blue Nile GERD 2025 |
+| ATDI Blue Nile GERD | 49.2% | Art.7 zone |
+| HIFD Blue Nile GERD | 33.4% | Art.20 triggered |
+| P(Negotiation) GERD | 37% | ICJ/PCA recommended |
+| GEE data latency | <2 sec | 24-hr cache |
+| pytest tests | 37 passing | CI/CD verified |
 
 ---
 
@@ -384,47 +451,64 @@ earthengine authenticate
 
 [![Zenodo](https://img.shields.io/badge/Zenodo-All%20Records-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://zenodo.org/search?q=0000-0003-0821-2991)
 
-| Record | Description |
-|--------|-------------|
-| HSAE v6.01 | Full platform release — 49 modules + QGIS plugin |
-| TDI Methodology | Canonical formula documentation (α=0.30, ε=0.001) |
-| 26-Basin Registry | basins_global.py dataset with full metadata |
-| Nile Flow Dataset | 847K rows GPM + SAR daily (19MB) |
+| Release | Tag | Date | Contents |
+|---------|-----|------|----------|
+| HSAE v6.0.1 | v6.0.1 | Apr 2026 | QGIS FINAL + docs + 37 tests |
+| HSAE v6.01 | v6.01.0 | Mar 2026 | Complete scientific release |
+
+---
+
+## 📚 Documentation
+
+| Document | Link |
+|----------|------|
+| Installation Guide | [docs/installation.md](docs/installation.md) |
+| API Reference | [docs/api_reference.md](docs/api_reference.md) |
+| HSAE Indices (formulas) | [docs/indices.md](docs/indices.md) |
+| Examples | [docs/examples.md](docs/examples.md) |
+| QGIS Plugin Docs | [docs/qgis_plugin.md](docs/qgis_plugin.md) |
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pytest tests/ -v
+
+# Output: 37 passed, 0 failed
+```
+
+Tests cover: ATDI · HIFD · NSE · KGE · Conflict Index · HBV-96 · Legal thresholds · Negotiation AI · Data validation
 
 ---
 
 ## 📖 Citation
 
 ```bibtex
-@software{alkedir2026hsae601,
-  author  = {Alkedir, Seifeldin M.G.},
-  title   = {HydroSovereign AI Engine (HSAE) v6.01},
-  year    = {2026},
-  version = {6.01},
-  doi     = {10.5281/zenodo.19180160},
-  url     = {https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601},
-  note    = {49 Python modules · 31,273 lines · 33 pages · QGIS Plugin},
-  orcid   = {0000-0003-0821-2991}
+@software{alkedir2026hsae,
+  author    = {Alkedir, Seifeldin M.G.},
+  title     = {{HydroSovereign AI Engine (HSAE) v6.01}},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.19180160},
+  url       = {https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601},
+  orcid     = {0000-0003-0821-2991}
 }
 ```
-
-> **Note:** Peer-reviewed methodology papers describing the Alkedir indices (ATDI, AHIFD, AFSF, ASI, ALTM, ASCAF, AWSRM, AHLB, ADTS, ATCI, α) are in preparation. This repository and its Zenodo DOI constitute a timestamped scientific priority record. DOI will be updated upon Zenodo publication.
 
 ---
 
 ## 🎬 Demo
 
 [![Live App](https://img.shields.io/badge/🌊_Launch_Live_App-HSAE_v6.01-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
-
 [![YouTube](https://img.shields.io/badge/▶_Watch_Full_Demo-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
 
 ---
 
 ## 📄 License
 
-**GPL-3.0 License** — free to use, modify, and distribute with attribution. Derivative works must also be open source.
-
-The original contributions listed above (ATDI, AHIFD, AFSF, ASI, ALTM, ASCAF, AWSRM, AHLB, ADTS, ATCI, α=0.30) are documented here to record the original formulation. Any academic use must cite the Zenodo DOI and the author's ORCID.
+This project is licensed under the **GNU General Public License v3.0** — see [LICENSE](LICENSE) for details.
 
 ---
 
@@ -436,12 +520,8 @@ The original contributions listed above (ATDI, AHIFD, AFSF, ASI, ALTM, ASCAF, AW
 [![Zenodo](https://img.shields.io/badge/Zenodo-Records-1682D4?style=flat&logo=zenodo&logoColor=white)](https://zenodo.org/search?q=0000-0003-0821-2991)
 [![YouTube](https://img.shields.io/badge/YouTube-Channel-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
 [![QGIS](https://img.shields.io/badge/QGIS-Plugin-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
-[![CV](https://img.shields.io/badge/CV-PDF-6366F1?style=flat&logo=read-the-docs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf)
 [![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 
-*Combining 10 years of field environmental practice with satellite science and AI*
-*to address the water sovereignty challenges of transboundary river basins.*
-
-**HSAE v6.01 · March 2026 · University of Khartoum · ORCID: 0000-0003-0821-2991**
+*HydroSovereign AI Engine v6.01 · Seifeldin M.G. Alkedir · University of Khartoum · 2026*
 
 </div>
