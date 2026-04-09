@@ -1247,7 +1247,11 @@ elif page == "🗺️  WebGIS · Global Map":
                         if _gT  > 0: b["t_c"]      = round(_gT, 1)
                         if _gTWS!= 0: b["tws_cm"]  = round(_gTWS, 1)
                         b["live_data"] = True
-            html = generate_webgis_html(basins_list)
+            import datetime as _dt_wg
+            _wg_key = f"webgis_{basin.get('id','')}_{_dt_wg.date.today()}"
+            if _wg_key not in st.session_state:
+                st.session_state[_wg_key] = generate_webgis_html(basins_list)
+            html = st.session_state[_wg_key]
             st.components.v1.html(html, height=680, scrolling=False)
         except Exception as e:
             st.error(f"WebGIS error: {e}")
