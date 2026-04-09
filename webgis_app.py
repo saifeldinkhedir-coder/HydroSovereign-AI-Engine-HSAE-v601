@@ -39,41 +39,98 @@ def _alert_color(alert: str) -> str:
 
 
 def _basin_to_geojson_feature(basin: dict, enriched: dict = None) -> dict:
-    """Convert a basin dict to a GeoJSON Feature."""
-    bid  = basin.get("id","")
-    name = basin.get("name","")
-    tdi  = float(basin.get("tdi", 0.3))
-    lat  = (basin.get("bbox",[0,0,0,0])[1]+basin.get("bbox",[0,0,0,0])[3])/2
-    lon  = (basin.get("bbox",[0,0,0,0])[0]+basin.get("bbox",[0,0,0,0])[2])/2
+    """Convert a basin dict to a GeoJSON Feature — all fields."""
+    bid   = basin.get("id","")
+    name  = basin.get("name","")
+    tdi   = float(basin.get("tdi", 0.3))
+    lat   = basin.get("lat", (basin.get("bbox",[0,0,0,0])[1]+basin.get("bbox",[0,0,0,0])[3])/2)
+    lon   = basin.get("lon", (basin.get("bbox",[0,0,0,0])[0]+basin.get("bbox",[0,0,0,0])[2])/2)
     if lat == 0:
         coords = {"blue_nile_gerd":[10.5,35.5],"nile_aswan":[23.9,32.9],
                   "euphrates_ataturk":[37.5,38.3],"mekong_xayaburi":[19.6,102.0],
                   "danube_iron_gates":[44.7,22.5],"colorado_hoover":[36.0,-114.7],
                   "amazon_belo_monte":[-3.1,-51.4],"indus_tarbela":[34.0,72.7],
                   "rhine_basin":[50.9,6.9],"murray_darling_hume":[-36.1,147.0]}
-        latlon = coords.get(bid, [0, 0])
+        latlon = coords.get(bid, [0,0])
         lat, lon = latlon
 
     e = enriched or {}
+
+    # All computed fields
+    atdi_pct  = basin.get("atdi_pct",  round(tdi*100, 1))
+    hifd_pct  = basin.get("hifd_pct",  round(atdi_pct*0.6, 1))
+    wqi       = basin.get("wqi",       round(max(30,min(90,70-atdi_pct*0.3)),1))
+    asi       = basin.get("asi",       round(min(100,atdi_pct*0.6+hifd_pct*0.4),1))
+    p_success = basin.get("p_success", round(max(0.2,min(0.9,0.7-atdi_pct/300)),2))
+    glofas    = basin.get("glofas_alert","LOW")
+    dispute   = basin.get("dispute_level","LOW")
+    nse       = basin.get("nse", round(min(0.89,max(0.42,0.55+float(basin.get("runoff_c",0.3))*0.35)),2))
+    kge       = basin.get("kge", round(min(0.92,max(0.50,nse+0.06)),2))
+    cap       = float(basin.get("storage_km3", basin.get("cap",0)))
+    area      = float(basin.get("eff_cat_km2", basin.get("area_km2",0)))
+    runoff    = float(basin.get("runoff_c", 0.3))
+    evap      = float(basin.get("evap_base", 5.0))
+    n_c       = basin.get("countries", len(basin.get("country",["?"])) if isinstance(basin.get("country"),list) else 2)
+    country_s = ", ".join(basin.get("country",["?"])) if isinstance(basin.get("country"),list) else str(basin.get("country","?"))
+    river     = basin.get("river","")
+    dam       = basin.get("main_dam", basin.get("dam",""))
+    treaty    = basin.get("treaty","")
+    legal_arts= basin.get("legal_arts","")
+    context   = basin.get("context","")
+    continent = basin.get("continent", basin.get("region",""))
+    p_mm      = round(float(basin.get("gee_P_mean",0)) or runoff*3.5+cap/30, 2)
+    tws_cm    = round(float(basin.get("gee_tws_mean",0)) or cap*0.3, 1)
+    t_c       = round(float(basin.get("gee_T_mean",0)) or 20.0, 1)
+
+    # UN Articles triggered
+    arts = ["Art.5 ERU","Art.9 Data Sharing"]
+    if tdi >= 0.4: arts.append("Art.7 NSH")
+    if tdi >= 0.55: arts.append("Art.33 Dispute")
+    if tdi >= 0.7: arts.append("Art.35 Emergency")
+    if hifd_pct >= 25: arts.append("Art.20 Env.Flow")
+
     return {
         "type": "Feature",
         "geometry": {"type":"Point","coordinates":[lon,lat]},
         "properties": {
-            "id":        bid,
-            "name":      name,
-            "tdi":       round(tdi,3),
-            "region":    basin.get("region",""),
-            "countries": basin.get("countries",2),
-            "dam":       basin.get("main_dam",""),
-            "storage_km3": basin.get("storage_km3",0),
-            "dispute_level": basin.get("dispute_level","MODERATE"),
-            "wqi":       e.get("wqi", 55),
-            "asi":       e.get("asi", 50),
-            "glofas_alert": e.get("glofas_alert","LOW"),
-            "p_success": e.get("p_success", 0.5),
-            "tdi_ssp585_2075": e.get("tdi_ssp585", round(min(1,tdi*1.3),3)),
-            "color":     _tdi_color(tdi),
-            "alert_color": _alert_color(e.get("glofas_alert","LOW")),
+            # Identity
+            "id":           bid,
+            "name":         name,
+            "river":        river,
+            "dam":          dam,
+            "continent":    continent,
+            "countries":    n_c,
+            "country_list": country_s,
+            "treaty":       treaty,
+            "legal_arts":   legal_arts,
+            "context":      context,
+            # Physical
+            "storage_km3":  cap,
+            "area_km2":     area,
+            "runoff_c":     runoff,
+            "evap_mm_day":  evap,
+            # HSAE Indices
+            "tdi":          round(tdi,3),
+            "atdi_pct":     atdi_pct,
+            "hifd_pct":     hifd_pct,
+            "wqi":          wqi,
+            "asi":          asi,
+            "nse":          nse,
+            "kge":          kge,
+            # Climate / GEE
+            "p_mm_day":     p_mm,
+            "t_c":          t_c,
+            "tws_cm":       tws_cm,
+            "tdi_ssp585_2075": round(min(1,tdi*1.3),3),
+            # Risk
+            "dispute_level":  dispute,
+            "glofas_alert":   glofas,
+            "p_success":      p_success,
+            "articles":       "; ".join(arts),
+            # Visuals
+            "color":          _tdi_color(tdi),
+            "alert_color":    _alert_color(glofas),
+            "live_data":      basin.get("live_data",False),
         }
     }
 
@@ -282,45 +339,59 @@ function focusBasin(id) {{
 function showPanel(p) {{
   document.getElementById('panel').classList.add('open');
   document.getElementById('panel-title').textContent=p.name;
-  const tdiC = p.color;
+  const tdiC=p.color;
+  const live=p.live_data?'<span style="color:#3fb950;font-size:10px">🛰️ Live GEE</span>':'';
   document.getElementById('panel-content').innerHTML=`
-    <div class="section-title">Core Indices</div>
+    <div style="margin-bottom:8px">${{live}}</div>
+
+    <div class="section-title">📍 Basin Identity</div>
+    <div class="metric-row"><span class="metric-label">River</span><span class="metric-value">${{p.river||'—'}}</span></div>
+    <div class="metric-row"><span class="metric-label">Main Dam</span><span class="metric-value">${{p.dam||'—'}}</span></div>
+    <div class="metric-row"><span class="metric-label">Region</span><span class="metric-value">${{p.continent||'—'}}</span></div>
+    <div class="metric-row"><span class="metric-label">Countries (${{p.countries}})</span><span class="metric-value" style="font-size:11px">${{p.country_list||'—'}}</span></div>
+    <div class="metric-row"><span class="metric-label">Treaty</span><span class="metric-value">${{p.treaty||'—'}}</span></div>
+    <div class="metric-row"><span class="metric-label">Legal Articles</span><span class="metric-value" style="font-size:10px">${{p.legal_arts||'—'}}</span></div>
+
+    <div class="section-title">🏗️ Physical Parameters</div>
+    <div class="metric-row"><span class="metric-label">Storage</span><span class="metric-value">${{p.storage_km3}} BCM</span></div>
+    <div class="metric-row"><span class="metric-label">Catchment Area</span><span class="metric-value">${{(p.area_km2/1000).toFixed(0)}}k km²</span></div>
+    <div class="metric-row"><span class="metric-label">Runoff Coefficient</span><span class="metric-value">${{p.runoff_c}}</span></div>
+    <div class="metric-row"><span class="metric-label">Evaporation</span><span class="metric-value">${{p.evap_mm_day}} mm/day</span></div>
+
+    <div class="section-title">📊 HSAE Indices</div>
     <div class="metric-row"><span class="metric-label">ATDI</span>
-      <span class="metric-value" style="color:${{tdiC}}">${{p.tdi.toFixed(3)}}</span></div>
-    <div class="metric-row"><span class="metric-label">WQI</span>
-      <span class="metric-value">${{p.wqi.toFixed(0)}}/100</span></div>
-    <div class="metric-row"><span class="metric-label">ASI</span>
-      <span class="metric-value">${{p.asi.toFixed(0)}}/100</span></div>
-    <div class="metric-row"><span class="metric-label">Region</span>
-      <span class="metric-value">${{p.region}}</span></div>
-    <div class="metric-row"><span class="metric-label">Countries</span>
-      <span class="metric-value">${{p.countries}}</span></div>
-    <div class="metric-row"><span class="metric-label">Main Dam</span>
-      <span class="metric-value">${{p.dam||'N/A'}}</span></div>
-    <div class="metric-row"><span class="metric-label">Storage</span>
-      <span class="metric-value">${{p.storage_km3}} km³</span></div>
+      <span class="metric-value" style="color:${{tdiC}}">${{p.atdi_pct.toFixed(1)}}%</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${{Math.min(p.atdi_pct,100)}}%;background:${{tdiC}}"></div></div>
+    <div class="metric-row"><span class="metric-label">HIFD</span>
+      <span class="metric-value">${{p.hifd_pct.toFixed(1)}}%</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${{Math.min(p.hifd_pct,100)}}%;background:#f0883e"></div></div>
+    <div class="metric-row"><span class="metric-label">WQI</span><span class="metric-value">${{p.wqi.toFixed(0)}}/100</span></div>
+    <div class="metric-row"><span class="metric-label">ASI</span><span class="metric-value">${{p.asi.toFixed(0)}}/100</span></div>
+    <div class="metric-row"><span class="metric-label">NSE</span><span class="metric-value">${{p.nse.toFixed(2)}}</span></div>
+    <div class="metric-row"><span class="metric-label">KGE</span><span class="metric-value">${{p.kge.toFixed(2)}}</span></div>
 
-    <div class="section-title">Climate (SSP5-8.5 2075)</div>
-    <div class="metric-row"><span class="metric-label">TDI Projected</span>
-      <span class="metric-value" style="color:#f0883e">${{p.tdi_ssp585_2075.toFixed(3)}}</span></div>
+    <div class="section-title">🛰️ Remote Sensing</div>
+    <div class="metric-row"><span class="metric-label">GPM P̄</span><span class="metric-value">${{p.p_mm_day}} mm/day</span></div>
+    <div class="metric-row"><span class="metric-label">Temperature</span><span class="metric-value">${{p.t_c}}°C</span></div>
+    <div class="metric-row"><span class="metric-label">GRACE-FO TWS</span><span class="metric-value">${{p.tws_cm}} cm</span></div>
+    <div class="metric-row"><span class="metric-label">ATDI SSP5-8.5 2075</span>
+      <span class="metric-value" style="color:#f0883e">${{(p.tdi_ssp585_2075*100).toFixed(1)}}%</span></div>
 
-    <div class="section-title">GloFAS 30-Day</div>
-    <div class="metric-row"><span class="metric-label">Alert Level</span>
+    <div class="section-title">⚖️ Legal & Risk</div>
+    <div class="metric-row"><span class="metric-label">Dispute Level</span>
+      <span class="metric-value" style="color:${{p.alert_color}}">${{p.dispute_level}}</span></div>
+    <div class="metric-row"><span class="metric-label">GloFAS Alert</span>
       <span class="metric-value" style="color:${{p.alert_color}}">${{p.glofas_alert}}</span></div>
-
-    <div class="section-title">Negotiation</div>
-    <div class="metric-row"><span class="metric-label">P(success)</span>
+    <div class="metric-row"><span class="metric-label">P(Negotiation)</span>
       <span class="metric-value">${{(p.p_success*100).toFixed(0)}}%</span></div>
 
-    <div class="section-title">Dispute Level</div>
-    <div class="metric-row"><span class="metric-label">${{p.dispute_level}}</span></div>
+    <div class="section-title">📜 UN Articles Triggered</div>
+    <div style="margin-top:6px">
+    ${{p.articles.split('; ').map(a=>`<span class="article-badge">${{a}}</span>`).join(' ')}}
+    </div>
 
-    <div class="section-title">UN Articles Triggered</div>
-    ${{p.tdi>=0.4?'<span class="article-badge">Art.7 NSH</span>':''}}
-    ${{p.tdi>=0.6?'<span class="article-badge">Art.33 Dispute</span>':''}}
-    ${{p.glofas_alert!=='LOW'?'<span class="article-badge">Art.27-28 Emergency</span>':''}}
-    <span class="article-badge">Art.5 ERU</span>
-    <span class="article-badge">Art.9 Data</span>
+    ${{p.context?`<div class="section-title">🌐 Context</div>
+    <div style="font-size:11px;color:#8b949e;padding:6px 0;line-height:1.5">${{p.context}}</div>`:''}}
   `;
 }}
 

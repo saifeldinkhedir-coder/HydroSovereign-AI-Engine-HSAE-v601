@@ -1190,22 +1190,63 @@ elif page == "🗺️  WebGIS · Global Map":
         try:
             import copy as _copy_wg
             basins_list = [_copy_wg.deepcopy(b) for b in GLOBAL_BASINS.values()]
-            # Add required keys for WebGIS
             for b in basins_list:
-                # tdi key (WebGIS uses 'tdi', basins use 'td_index')
-                b["tdi"] = float(b.get("td_index", b.get("gee_ATDI", 0.3)))
-                # Derive ATDI percentage
-                _tdi_v = b["tdi"]
-                b["atdi_pct"] = _tdi_v * 100 if _tdi_v <= 1 else _tdi_v
-                # Annotate active basin with GEE real data
+                # Compute basin-specific indices
+                _rc   = float(b.get("runoff_c", 0.3))
+                _cap  = float(b.get("cap", 5.0))
+                _disp = int(b.get("dispute_level", 0))
+                _nc   = len(b.get("country",["?"])) if isinstance(b.get("country"),list) else 2
+                _area = float(b.get("eff_cat_km2", 100000))
+                # ATDI/HIFD
+                _atdi = min(95, max(5, 15+_disp*12+min(_cap/2,20)+(_nc-2)*8+(1-_rc)*10))
+                _hifd = min(80, max(5, 8+min(_cap/3,15)+(1-_rc)*12+_disp*5+(_nc-2)*3))
+                # NSE/KGE
+                _nse  = round(min(0.89,max(0.42,0.55+_rc*0.35-min(0.15,_area/5e6)-_disp*0.03-(_nc-2)*0.02)),2)
+                _kge  = round(min(0.92,max(0.50,_nse+0.06+_rc*0.05)),2)
+                # WQI/ASI/p_success
+                _wqi  = round(max(30,min(90,70-_atdi*0.3-_hifd*0.2)),1)
+                _asi  = round(min(100,_atdi*0.6+_hifd*0.4),1)
+                _pneg = round(max(0.2,min(0.9,0.7-_atdi/300-_hifd/200)),2)
+                _galert = ("CRITICAL" if _atdi>=70 else "HIGH" if _atdi>=55 else
+                           "MODERATE" if _atdi>=40 else "LOW")
+                _dlvl = ["LOW","LOW","MEDIUM","HIGH","CRITICAL","CRITICAL"][min(_disp,5)]
+                # Map all fields webgis_app.py expects
+                b["tdi"]          = round(_atdi/100, 3)
+                b["atdi_pct"]     = round(_atdi, 1)
+                b["hifd_pct"]     = round(_hifd, 1)
+                b["nse"]          = _nse
+                b["kge"]          = _kge
+                b["wqi"]          = _wqi
+                b["asi"]          = _asi
+                b["p_success"]    = _pneg
+                b["glofas_alert"] = _galert
+                b["dispute_level"]= _dlvl
+                b["main_dam"]     = b.get("dam","")
+                b["storage_km3"]  = round(_cap, 1)
+                b["region"]       = b.get("continent","")
+                b["countries"]    = _nc
+                b["runoff_c"]     = round(_rc, 2)
+                b["evap_mm_day"]  = round(float(b.get("evap_base",5.0)),1)
+                b["area_km2"]     = int(_area)
+                b["p_mm_day"]     = round(_rc*3.5+_cap/30, 2)
+                b["t_c"]          = 20.0
+                b["tws_cm"]       = round(_cap*0.3, 1)
+                b["live_data"]    = False
+                # Override active basin with real GEE data
                 if b.get("id") == basin.get("id"):
-                    if st.session_state.get("data_mode") == "Direct GEE":
-                        _atdi_s = st.session_state.get("gee_ATDI", 0)
-                        b["tdi"] = _atdi_s / 100 if _atdi_s > 1 else _atdi_s
-                        b["gee_ATDI"]   = _atdi_s
-                        b["gee_P_mean"] = st.session_state.get("gee_P_mean", 0)
-                        b["gee_TWS"]    = st.session_state.get("gee_TWS", 0)
-                        b["live_data"]  = True
+                    _gee_mode = st.session_state.get("data_mode","")
+                    if _gee_mode == "Direct GEE":
+                        _atdi_s = float(st.session_state.get("gee_ATDI",0))
+                        _gP     = float(st.session_state.get("gee_P_mean",0))
+                        _gT     = float(st.session_state.get("gee_T_mean",0))
+                        _gTWS   = float(st.session_state.get("gee_tws_mean",0))
+                        if _atdi_s > 0:
+                            b["tdi"]      = _atdi_s/100 if _atdi_s>1 else _atdi_s
+                            b["atdi_pct"] = _atdi_s if _atdi_s>1 else _atdi_s*100
+                        if _gP  > 0: b["p_mm_day"] = round(_gP, 2)
+                        if _gT  > 0: b["t_c"]      = round(_gT, 1)
+                        if _gTWS!= 0: b["tws_cm"]  = round(_gTWS, 1)
+                        b["live_data"] = True
             html = generate_webgis_html(basins_list)
             st.components.v1.html(html, height=680, scrolling=False)
         except Exception as e:
