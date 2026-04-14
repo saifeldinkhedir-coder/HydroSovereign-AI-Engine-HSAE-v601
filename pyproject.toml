@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.1.0"
+version = "6.2.0"
 description = "HydroSovereign AI Engine (HSAE) — Transboundary Water Analysis: ATDI, HIFD, HBV-96, GEE, UN Watercourses Convention 1997"
 readme = "README_PYPI.md"
 license = {file = "LICENSE"}
@@ -35,6 +35,7 @@ dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.0.0",
     "scipy>=1.10.0",
+    "scikit-learn>=1.3.0",
 ]
 
 [project.optional-dependencies]
@@ -66,3 +67,6 @@ include = ["hydrosovereign*"]
 
 [tool.setuptools.package-data]
 hydrosovereign = ["data/*.json", "data/*.csv"]
+
+[project.scripts]
+hydrosovereign = "hydrosovereign.cli:main"
