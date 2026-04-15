@@ -240,20 +240,30 @@ def fetch_basin_forcing(
         P   = [max(0.0, float(p or 0)) for p in raw["P_mm_day"]]
         T   = [float(t or 25.0)        for t in raw["T_celsius"]]
 
+        # Extract all features for multi-feature LSTM
+        SM_raw  = raw.get("soil_moisture", [None]*len(P))
+        ET0_raw = raw.get("ET0", [None]*len(P))
+        SM  = [float(v) if v is not None else None for v in SM_raw]
+        ET0 = [float(v) if v is not None else None for v in ET0_raw]
+
         return {
             "basin_name":  basin_name,
             "lat":         lat,
             "lon":         lon,
             "start_date":  start_date,
             "end_date":    end_date,
-            "P":           P,
-            "T":           T,
-            "ET0":         raw.get("ET0"),
+            # Core features
+            "P":           P,       # precipitation (mm/day)
+            "T":           T,       # temperature (°C)
+            "ET0":         ET0,     # evapotranspiration (mm/day)
+            "SM":          SM,      # soil moisture (m³/m³)
+            # Metadata
             "dates":       raw["dates"],
             "n_days":      len(P),
             "source":      raw["source"],
             "runoff_c":    float(basin.get("runoff_c", 0.3)),
             "cap_bcm":     float(basin.get("cap", 10)),
+            "ready_for_lstm": True,  # can pass directly to LSTMForecast.fit_multi()
         }
     except ConnectionError as e:
         logger.warning("Live data unavailable (%s) — loading sample data", e)
@@ -275,11 +285,14 @@ def _load_sample_data(basin_name: str) -> Dict:
             "lon":        raw["lon"],
             "P":          [r["P"] for r in records],
             "T":          [r["T"] for r in records],
+            "ET0":        [r.get("ET0") for r in records],
+            "SM":         [r.get("SM") for r in records],
             "dates":      [r["date"] for r in records],
             "n_days":     len(records),
             "source":     "HSAE bundled sample (Open-Meteo offline)",
             "runoff_c":   raw.get("runoff_c", 0.38),
             "cap_bcm":    raw.get("cap_bcm", 74.0),
+            "ready_for_lstm": True,
         }
 
     # Generic fallback: synthetic seasonal data
@@ -484,6 +497,120 @@ def fetch_gee_basin(
         "source": "Google Earth Engine",
     }
     return result
+
+
+def fetch_sentinel2_wqi(
+    bbox: List[float],
+    start_date: str,
+    end_date: str,
+    project_id: str = "zinc-arc-484714-j8",
+) -> Dict:
+    """
+    Estimate Water Quality Index using Sentinel-2 spectral indices (GEE).
+
+    Computes remote-sensing WQI proxies:
+      - NDWI (B3-B8)/(B3+B8)     : water presence
+      - NDTI (B4-B3)/(B4+B3)     : turbidity proxy
+      - Chlorophyll-a proxy (B5/B4): trophic state
+
+    Parameters
+    ----------
+    bbox : list
+        [lon_min, lat_min, lon_max, lat_max].
+    start_date, end_date : str
+        Date range "YYYY-MM-DD".
+    project_id : str
+        GEE project ID.
+
+    Returns
+    -------
+    dict
+        - ndwi_mean      : water extent index (-1 to 1)
+        - ndti_mean      : turbidity proxy (-1 to 1, higher=more turbid)
+        - chl_proxy      : chlorophyll proxy (higher=more algae)
+        - rs_wqi_score   : remote-sensing WQI estimate (0-100)
+        - water_fraction : fraction of basin covered by water
+
+    Raises
+    ------
+    ImportError
+        If earthengine-api not installed.
+
+    Examples
+    --------
+    >>> wq = fetch_sentinel2_wqi([33,8,37.5,13], "2024-01-01", "2024-12-31")
+    >>> print(f"RS-WQI = {wq['rs_wqi_score']:.1f}")
+    >>> print(f"Turbidity proxy: {wq['ndti_mean']:.3f}")
+    """
+    try:
+        import ee
+    except ImportError:
+        raise ImportError("earthengine-api required: pip install hydrosovereign[gee]")
+
+    try:
+        ee.Initialize(project=project_id)
+    except Exception:
+        try:
+            ee.Initialize()
+        except Exception as e:
+            raise RuntimeError(f"GEE authentication failed: {e}")
+
+    region = ee.Geometry.Rectangle(bbox)
+
+    try:
+        s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+              .filterDate(start_date, end_date)
+              .filterBounds(region)
+              .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 20)))
+
+        # NDWI: (B3-B8)/(B3+B8) — positive = water
+        ndwi_img  = s2.mean().normalizedDifference(["B3","B8"])
+        ndwi_val  = ndwi_img.reduceRegion(ee.Reducer.mean(), region, 20).getInfo()
+        ndwi_mean = float(list(ndwi_val.values())[0] or 0)
+
+        # NDTI: (B4-B3)/(B4+B3) — turbidity proxy
+        ndti_img  = s2.mean().normalizedDifference(["B4","B3"])
+        ndti_val  = ndti_img.reduceRegion(ee.Reducer.mean(), region, 20).getInfo()
+        ndti_mean = float(list(ndti_val.values())[0] or 0)
+
+        # Chlorophyll-a proxy: B5/B4
+        b5 = s2.mean().select("B5")
+        b4 = s2.mean().select("B4")
+        chl_img = b5.divide(b4.add(1e-6))
+        chl_val = chl_img.reduceRegion(ee.Reducer.mean(), region, 20).getInfo()
+        chl_proxy = float(list(chl_val.values())[0] or 1.0)
+
+        # Water fraction: pixels where NDWI > 0
+        water_mask = ndwi_img.gt(0)
+        wf_val = water_mask.reduceRegion(ee.Reducer.mean(), region, 100).getInfo()
+        water_fraction = float(list(wf_val.values())[0] or 0)
+
+        # Composite RS-WQI score (0-100)
+        # High NDWI = more water = better; High NDTI = turbid = worse; High chl = algae = worse
+        rs_wqi = float(max(0, min(100,
+            50
+            + (ndwi_mean * 30)       # water presence boost
+            - (max(0, ndti_mean) * 40)  # turbidity penalty
+            - (max(0, chl_proxy - 1) * 10)  # algae penalty
+        )))
+
+        return {
+            "ndwi_mean":      round(ndwi_mean, 4),
+            "ndti_mean":      round(ndti_mean, 4),
+            "chl_proxy":      round(chl_proxy, 4),
+            "water_fraction": round(water_fraction, 4),
+            "rs_wqi_score":   round(rs_wqi, 1),
+            "source":         "Sentinel-2 SR Harmonized (Copernicus/GEE)",
+            "interpretation": (
+                "EXCELLENT" if rs_wqi > 80 else
+                "GOOD" if rs_wqi > 60 else
+                "MODERATE" if rs_wqi > 40 else "POOR"
+            ),
+        }
+
+    except Exception as e:
+        logger.warning("Sentinel-2 WQI fetch failed: %s", e)
+        return {"error": str(e), "rs_wqi_score": None}
 
 
 def check_connectivity(timeout: int = 5) -> Dict[str, bool]:
