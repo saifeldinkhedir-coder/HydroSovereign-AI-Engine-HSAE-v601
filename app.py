@@ -266,35 +266,40 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
     _req_year = st.session_state.get("date_start", "2025-01-01")[:4]
     precomputed = _load_precomputed(basin_id_pc, _req_year)
     if precomputed:
-        try:
-            import numpy as _np, math as _math
-            P_mm   = precomputed.get("gpm", {}).get("P_mm_day", precomputed.get("gpm", {}).get("P_mm", []))
-            tws_cm = precomputed.get("grace", {}).get("tws_cm", [])
-            sm_obs = precomputed.get("smap", {}).get("sm_m3m3", [])
-            T_C    = precomputed.get("temperature", {}).get("T_C", [P_mm[0]*0+25.0 for _ in P_mm])
-            if P_mm:
-                import pandas as _pd
-                P_arr  = _np.array(P_mm, dtype=float)
-                T_arr  = _np.array(T_C[:len(P_mm)], dtype=float)
-                n2     = min(len(P_arr), len(T_arr))
-                PET_mm = [max(0.0, 0.165*216.7*(12/12)*0.6108*_math.exp(17.27*t/(t+237.3))/(t+273.3)) if t>0 else 0.0 for t in T_arr[:n2]]
-                st.session_state["P_mm"]          = list(P_arr[:n2])
-                st.session_state["T_C"]           = list(T_arr[:n2])
-                st.session_state["PET_mm"]        = PET_mm
-                st.session_state["tws_cm"]        = tws_cm
-                st.session_state["sm_obs"]        = sm_obs
-                st.session_state["gee_P_mean"]    = round(float(P_arr.mean()), 3)
-                st.session_state["gee_T_mean"]    = round(float(T_arr.mean()), 1)
-                st.session_state["gee_tws_mean"]  = round(sum(tws_cm)/len(tws_cm), 2) if tws_cm else 0
-                st.session_state["gee_year"]      = precomputed.get("computed_at","")[:4]
-                st.session_state["gee_forcing"]   = precomputed
-                st.session_state["executed"]      = True
-                st.session_state[cache_key]       = True
-                st.session_state["_gee_fetching"] = False
-                st.session_state["data_mode"]     = "Direct GEE"
-                return True
-        except Exception:
-            pass  # fall through to live GEE
+        import numpy as _np, math as _math
+        _gpm_d = precomputed.get("gpm", {})
+        P_mm   = _gpm_d.get("P_mm_day", _gpm_d.get("P_mm", []))
+        tws_cm = precomputed.get("grace", {}).get("tws_cm", [])
+        sm_obs = precomputed.get("smap", {}).get("sm_m3m3", [])
+        T_C    = precomputed.get("temperature", {}).get("T_C", [])
+        if not T_C:
+            T_C = [25.0] * len(P_mm)
+        if P_mm:
+            P_arr  = _np.array(P_mm, dtype=float)
+            T_arr  = _np.array(T_C[:len(P_mm)], dtype=float)
+            n2     = min(len(P_arr), len(T_arr))
+            PET_mm = []
+            for _t in T_arr[:n2]:
+                try:
+                    _pet = max(0.0, 0.165*216.7*(12/12)*0.6108*_math.exp(17.27*_t/(_t+237.3))/(_t+273.3)) if _t > -270 else 0.0
+                except Exception:
+                    _pet = 0.0
+                PET_mm.append(round(_pet, 3))
+            st.session_state["P_mm"]          = list(P_arr[:n2])
+            st.session_state["T_C"]           = list(T_arr[:n2])
+            st.session_state["PET_mm"]        = PET_mm
+            st.session_state["tws_cm"]        = tws_cm
+            st.session_state["sm_obs"]        = sm_obs
+            st.session_state["gee_P_mean"]    = round(float(P_arr.mean()), 3)
+            st.session_state["gee_T_mean"]    = round(float(T_arr.mean()), 1)
+            st.session_state["gee_tws_mean"]  = round(sum(tws_cm)/len(tws_cm), 2) if tws_cm else 0
+            st.session_state["gee_year"]      = precomputed.get("fetched_at", precomputed.get("computed_at",""))[:4]
+            st.session_state["gee_forcing"]   = precomputed
+            st.session_state["executed"]      = True
+            st.session_state[cache_key]       = True
+            st.session_state["_gee_fetching"] = False
+            st.session_state["data_mode"]     = "Direct GEE"
+            return True
 
     try:
         with st.spinner("🛰️ Connecting to Google Earth Engine..."):
@@ -486,7 +491,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
         st.session_state["_gee_fetching"] = False
         err_msg = str(exc)
         if "earthengine" in err_msg.lower() or "not installed" in err_msg.lower():
-            st.error("❌ earthengine-api not installed on server")
+            st.warning("⚠️ GEE live connection unavailable. Select year **2025** or **2026** for instant precomputed data (updated daily by GitHub Actions).")
         elif "credentials" in err_msg.lower() or "authentication" in err_msg.lower():
             st.error("❌ GEE credentials error — check Streamlit Secrets [gee] section")
         elif "quota" in err_msg.lower():
