@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.4.0"
+version = "6.5.0"
 description = "HydroSovereign AI Engine (HSAE) — Transboundary Water Analysis: ATDI, HIFD, HBV-96, GEE, UN Watercourses Convention 1997"
 readme = "README_PYPI.md"
 license = {file = "LICENSE"}
@@ -43,6 +43,8 @@ gee = ["earthengine-api>=0.1.390"]
 viz = ["plotly>=5.18.0", "matplotlib>=3.7.0"]
 full = [
     "streamlit>=1.35.0",
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.27.0",
     "earthengine-api>=0.1.390",
     "plotly>=5.18.0",
     "matplotlib>=3.7.0",
