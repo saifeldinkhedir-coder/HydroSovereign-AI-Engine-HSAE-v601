@@ -155,7 +155,7 @@ def fetch_s2(lat, lon, yr):
     """
     import datetime as _dt
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(5000)  # 5km radius
+    buffer = point.buffer(10000)  # 10km radius — better orbit coverage
 
     def mask_index(img):
         qa   = img.select("QA60")
@@ -168,11 +168,11 @@ def fetch_s2(lat, lon, yr):
     s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
           .filterDate(start_date, end_date)
           .filterBounds(buffer)
-          .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 60))
+          .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 80))
           .map(mask_index))
 
     results = []
-    # 4 quarterly windows — each is a separate Python call, no server-side map
+    # 4 quarterly windows — Python loop, direct .getInfo() per quarter
     for q in range(4):
         m0    = q * 3 + 1
         m1    = m0 + 3
@@ -180,23 +180,17 @@ def fetch_s2(lat, lon, yr):
         qe    = f"{yr}-{m1:02d}-01" if m1 <= 12 else f"{yr+1}-01-01"
         label = f"{yr}-Q{q+1}"
         try:
-            col = s2.filterDate(qs, qe)
-            # Check if any images exist
-            n_imgs = col.size().getInfo()
-            if n_imgs == 0:
-                continue
-            img = col.mean()
-            # Direct Python getInfo — no server-side Dictionary.get issue
+            img = s2.filterDate(qs, qe).mean()
             raw = img.reduceRegion(
                 reducer   = ee.Reducer.mean(),
                 geometry  = buffer,
                 scale     = 20,
-                maxPixels = 1e7,
+                maxPixels = 1e8,
                 bestEffort= True
-            ).getInfo()  # returns Python dict
+            ).getInfo()  # Python dict — no server-side issues
             ndwi_v = raw.get("NDWI")
             ndvi_v = raw.get("NDVI")
-            if ndwi_v is not None:
+            if ndwi_v is not None and not (ndwi_v == 0 and ndvi_v == 0):
                 results.append((label, float(ndwi_v), float(ndvi_v or 0.4)))
         except Exception:
             continue
