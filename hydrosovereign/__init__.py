@@ -5,7 +5,7 @@ Author:  Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 DOI:     10.5281/zenodo.19180160
 """
 
-__version__   = "6.3.1"
+__version__   = "6.4.0"
 __author__    = "Seifeldin M.G. Alkedir"
 __email__     = "saifeldinkhedir@gmail.com"
 __orcid__     = "0000-0003-0821-2991"
@@ -16,7 +16,7 @@ __license__   = "GPL-3.0"
 from .api import analyze_basin, analyze_all_basins
 
 # Live data fetchers
-from .data import fetch_basin_forcing, fetch_openmeteo, fetch_gee_basin
+from .data import fetch_basin_forcing, fetch_openmeteo, fetch_gee_basin, fetch_sentinel2_wqi
 
 # Core indices (backward compatible)
 from .indices import (compute_atdi, compute_hifd, compute_nse, compute_kge,
