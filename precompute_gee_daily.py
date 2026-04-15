@@ -239,6 +239,7 @@ def process_basin(basin_id, cfg):
     lat    = cfg["lat"]; lon = cfg["lon"]
     rc     = cfg["runoff_c"]; area = cfg["area_km2"]
     region = ee.Geometry.Rectangle(cfg["bbox"])
+    yr     = year   # make yr available for fetch_s2(lat, lon, yr) etc.
     result = {"basin_id": basin_id, "fetched_at": datetime.datetime.utcnow().isoformat()}
 
     # 1 — GPM
