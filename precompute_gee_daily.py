@@ -197,46 +197,81 @@ def fetch_sentinel1(region, start, end):
 
 
 def fetch_sentinel2(region, start, end):
-    """Sentinel-2 SR — monthly NDWI and NDVI (cloud-masked)."""
+    """Sentinel-2 SR — monthly NDWI and NDVI (cloud-masked, QA60).
+    
+    Fix: compute NDWI/NDVI per image BEFORE monthly compositing,
+    then use mean reducer — avoids ee.Algorithms.If band-type mismatch.
+    """
     try:
-        def mask_clouds(img):
-            qa = img.select("QA60")
-            mask = qa.bitwiseAnd(1<<10).eq(0).And(qa.bitwiseAnd(1<<11).eq(0))
-            return img.updateMask(mask).divide(10000)
+        def mask_and_index(img):
+            # Cloud mask via QA60
+            qa   = img.select("QA60")
+            mask = qa.bitwiseAnd(1 << 10).eq(0).And(qa.bitwiseAnd(1 << 11).eq(0))
+            img  = img.updateMask(mask).divide(10000)
+            # NDWI = (Green - NIR) / (Green + NIR)   [open water]
+            # Using B3 (Green) and B8 (NIR)
+            ndwi = img.normalizedDifference(["B3", "B8"]).rename("NDWI")
+            # NDVI = (NIR - Red) / (NIR + Red)
+            ndvi = img.normalizedDifference(["B8", "B4"]).rename("NDVI")
+            return ee.Image.cat([ndwi, ndvi]).set("system:time_start",
+                                                   img.get("system:time_start"))
+
         s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-              .filterDate(start, end).filterBounds(region)
-              .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 30))
-              .map(mask_clouds))
+              .filterDate(start, end)
+              .filterBounds(region)
+              .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 40))
+              .map(mask_and_index))   # now each image has NDWI + NDVI only
+
         months = ee.List.sequence(0, 11)
         yr     = int(start[:4])
+
         def mo_s2(m):
-            m  = ee.Number(m).add(1)
-            d0 = ee.Date.fromYMD(yr, m, 1); d1 = d0.advance(1,"month")
-            col= s2.filterDate(d0, d1)
-            img= ee.Image(ee.Algorithms.If(col.size().gt(0),col.median(),
-                                           ee.Image.constant(0).rename("B3")))
-            nir = img.select(ee.List(["B8","B3"]).get(ee.Number(0).min(0)))
-            grn = img.select(ee.List(["B3","B3"]).get(0))
-            sw1 = img.select(ee.List(["B11","B3"]).get(ee.Number(0).min(0)))
-            ndwi= nir.subtract(sw1).divide(nir.add(sw1).add(1e-6))
-            ndvi= nir.subtract(grn).divide(nir.add(grn).add(1e-6))
-            val = ee.Image.cat([ndwi.rename("ndwi"), ndvi.rename("ndvi")]).reduceRegion(
-                ee.Reducer.mean(), region, 30, maxPixels=1e9)
-            return ee.Feature(None,{"month":d0.format("YYYY-MM"),
-                                    "NDWI":val.get("ndwi"),
-                                    "NDVI":val.get("ndvi")})
+            m   = ee.Number(m).add(1)
+            d0  = ee.Date.fromYMD(yr, m, 1)
+            d1  = d0.advance(1, "month")
+            col = s2.filterDate(d0, d1)
+            # Use mean composite — works even if col is empty (returns null pixels)
+            img = col.mean()
+            val = img.reduceRegion(
+                reducer  = ee.Reducer.mean(),
+                geometry = region,
+                scale    = 100,          # 100m scale for speed
+                maxPixels= 1e9,
+                bestEffort=True
+            )
+            return ee.Feature(None, {
+                "month": d0.format("YYYY-MM"),
+                "NDWI":  val.get("NDWI"),
+                "NDVI":  val.get("NDVI"),
+            })
+
         feats = ee.FeatureCollection(months.map(mo_s2)).getInfo()["features"]
-        vals  = [(f["properties"]["month"],
-                  safe_get(f["properties"].get("NDWI",0)),
-                  safe_get(f["properties"].get("NDVI",0.4))) for f in feats]
-        ndwi = [d[1] for d in vals]; ndvi = [d[2] for d in vals]
-        return {"months":[d[0] for d in vals],"NDWI":ndwi,"NDVI":ndvi,
-                "mean_NDWI":round(sum(ndwi)/max(len(ndwi),1),4),
-                "mean_NDVI":round(sum(ndvi)/max(len(ndvi),1),4),
-                "source":"COPERNICUS/S2_SR_HARMONIZED","n_months":len(ndwi),"error":None}
+        vals  = [
+            (f["properties"]["month"],
+             safe_get(f["properties"].get("NDWI", 0)),
+             safe_get(f["properties"].get("NDVI", 0.4)))
+            for f in feats
+            if f["properties"].get("NDWI") is not None
+        ]
+        if not vals:
+            return {"error":"No valid S2 pixels (cloud cover too high)",
+                    "NDWI":[],"NDVI":[],"mean_NDWI":0,"mean_NDVI":0,"months":[],"n_months":0}
+
+        ndwi = [d[1] for d in vals]
+        ndvi = [d[2] for d in vals]
+        return {
+            "months":    [d[0] for d in vals],
+            "NDWI":      ndwi,
+            "NDVI":      ndvi,
+            "mean_NDWI": round(sum(ndwi) / max(len(ndwi), 1), 4),
+            "mean_NDVI": round(sum(ndvi) / max(len(ndvi), 1), 4),
+            "source":    "COPERNICUS/S2_SR_HARMONIZED",
+            "n_months":  len(ndwi),
+            "error":     None,
+        }
     except Exception as e:
-        return {"error":str(e),"NDWI":[],"NDVI":[],"mean_NDWI":0,"mean_NDVI":0.4,
-                "months":[],"n_months":0}
+        return {"error": str(e), "NDWI": [], "NDVI": [], "mean_NDWI": 0, "mean_NDVI": 0,
+                "months": [], "n_months": 0}
 
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
