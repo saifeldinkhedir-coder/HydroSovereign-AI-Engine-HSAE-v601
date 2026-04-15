@@ -1,5 +1,31 @@
 # Changelog — hydrosovereign
 
+## [6.5.0] — April 2026 (current)
+
+### Added 🟢
+- `api_server.py` — FastAPI REST service (11 endpoints)
+- `Dockerfile` — multi-stage production Docker image
+- `environment.yml` — Conda reproducibility
+- `mkdocs.yml` + `docs/` — full documentation site (MkDocs Material)
+- `examples/nile_basin_example.ipynb` — complete Jupyter case study
+- `.github/workflows/ci.yml` — GitHub Actions CI/CD
+- `[api]` optional extra: `pip install hydrosovereign[api]`
+
+### REST API Endpoints
+  GET  /          — package info
+  POST /analyze   — full basin analysis
+  GET  /analyze/all — all 26 basins ranked
+  GET  /basins    — list basins
+  POST /indices   — ATDI/HIFD/CI
+  POST /wqi       — Water Quality Index
+  POST /negotiate — Negotiation AI
+  POST /forecast  — LSTM discharge forecast
+  GET  /legal/{name} — UNWC 1997 assessment
+  GET  /alerts/{name} — alert levels
+  GET  /health    — health check
+
+# Changelog — hydrosovereign
+
 ## [6.2.0] — April 2026 (current)
 
 ### Fixed 🔴 Critical
