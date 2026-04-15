@@ -264,7 +264,7 @@ def process_basin(basin_id, cfg):
 
     # 4 — Sentinel-2
     try:
-        result["sentinel2"] = fetch_s2(region, year)
+        result["sentinel2"] = fetch_s2(lat, lon, yr)
     except Exception as e:
         result["sentinel2"] = {"error": str(e), "NDWI": [], "NDVI": [],
                                "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
