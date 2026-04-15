@@ -5,6 +5,7 @@ from .fetchers import (
     fetch_openmeteo_forecast,
     fetch_basin_forcing,
     fetch_gee_basin,
+    fetch_sentinel2_wqi,
     check_connectivity,
 )
 DATA_DIR = Path(__file__).parent
@@ -13,6 +14,7 @@ __all__ = [
     "fetch_openmeteo_forecast",
     "fetch_basin_forcing",
     "fetch_gee_basin",
+    "fetch_sentinel2_wqi",
     "check_connectivity",
     "DATA_DIR",
 ]
