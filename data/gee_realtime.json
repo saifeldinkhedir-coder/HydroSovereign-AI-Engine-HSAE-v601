@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "computed_at": "2026-04-15T08:41:56.807082",
+  "computed_at": "2026-04-15T08:45:50.633187",
   "date_range": {
     "start": "2025-04-15",
     "end": "2026-04-15"
@@ -9,7 +9,7 @@
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-15T08:41:56.807438",
+      "fetched_at": "2026-04-15T08:45:50.633574",
       "gpm": {
         "months": [
           "2026-01",
@@ -45,7 +45,7 @@
         "error": null
       },
       "grace": {
-        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220101_20220103):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
+        "error": "'NoneType' object has no attribute 'map'",
         "tws_cm": [],
         "mean_tws": 0,
         "months": [],
@@ -160,7 +160,7 @@
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-15T08:42:05.815006",
+      "fetched_at": "2026-04-15T08:45:53.036353",
       "gpm": {
         "months": [
           "2026-01",
@@ -196,7 +196,7 @@
         "error": null
       },
       "grace": {
-        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220128_20220130):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
+        "error": "'NoneType' object has no attribute 'map'",
         "tws_cm": [],
         "mean_tws": 0,
         "months": [],
@@ -311,7 +311,7 @@
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-15T08:43:05.142627",
+      "fetched_at": "2026-04-15T08:45:55.194305",
       "gpm": {
         "months": [
           "2026-01",
@@ -347,7 +347,7 @@
         "error": null
       },
       "grace": {
-        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220107_20220109):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
+        "error": "'NoneType' object has no attribute 'map'",
         "tws_cm": [],
         "mean_tws": 0,
         "months": [],
@@ -462,7 +462,7 @@
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-15T08:44:03.898698",
+      "fetched_at": "2026-04-15T08:45:57.237580",
       "gpm": {
         "months": [
           "2026-01",
@@ -498,7 +498,7 @@
         "error": null
       },
       "grace": {
-        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220125_20220127):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
+        "error": "'NoneType' object has no attribute 'map'",
         "tws_cm": [],
         "mean_tws": 0,
         "months": [],
@@ -613,7 +613,7 @@
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-15T08:44:10.398443",
+      "fetched_at": "2026-04-15T08:46:49.927369",
       "gpm": {
         "months": [
           "2026-01",
@@ -649,7 +649,7 @@
         "error": null
       },
       "grace": {
-        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220125_20220127):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
+        "error": "'NoneType' object has no attribute 'map'",
         "tws_cm": [],
         "mean_tws": 0,
         "months": [],
