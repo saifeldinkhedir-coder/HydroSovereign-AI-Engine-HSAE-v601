@@ -148,15 +148,12 @@ def fetch_s1(region, yr):
 
 
 def fetch_s2(lat, lon, yr):
-    """Sentinel-2 SR — NDWI + NDVI using point-sample (memory-safe).
-    
-    Uses a 5km point buffer instead of full basin polygon.
-    This is GEE-memory-safe regardless of basin size and parallel workers.
-    Gives representative optical indices for the dam/reservoir area.
+    """Sentinel-2 SR — NDWI + NDVI using 5km point buffer (GEE memory-safe).
+    Samples a 5km circle around the dam centroid instead of full basin polygon.
+    This stays well within GEE memory limits even when running in parallel.
     """
-    # Use 5km buffer around basin centroid — representative of reservoir
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(5000)   # 5km radius
+    buffer = point.buffer(5000)  # 5km radius around dam/reservoir centroid
 
     def mask_index(img):
         qa   = img.select("QA60")
@@ -181,8 +178,7 @@ def fetch_s2(lat, lon, yr):
             reducer=ee.Reducer.mean(), geometry=buffer,
             scale=10, maxPixels=1e7, bestEffort=True)
         return ee.Feature(None, {"month": d0.format("YYYY-MM"),
-                                 "NDWI": val.get("NDWI"),
-                                 "NDVI": val.get("NDVI")})
+                                 "NDWI": val.get("NDWI"), "NDVI": val.get("NDVI")})
 
     feats = ee.FeatureCollection(ee.List.sequence(0,11).map(mo)).getInfo()["features"]
     vals  = [(f["properties"]["month"],
@@ -191,19 +187,15 @@ def fetch_s2(lat, lon, yr):
              for f in feats if f["properties"].get("NDWI") is not None]
 
     if not vals:
-        return {"error": "No S2 data (cloud/coverage)", "NDWI": [], "NDVI": [],
+        return {"error": "No S2 data (cloud/no coverage)", "NDWI": [], "NDVI": [],
                 "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
 
     ndwi = [d[1] for d in vals]; ndvi = [d[2] for d in vals]
-    return {
-        "months":    [d[0] for d in vals], "NDWI": ndwi, "NDVI": ndvi,
-        "mean_NDWI": round(sum(ndwi)/max(len(ndwi),1), 4),
-        "mean_NDVI": round(sum(ndvi)/max(len(ndvi),1), 4),
-        "source":    "COPERNICUS/S2_SR_HARMONIZED (5km buffer, 10m)",
-        "n_months":  len(vals), "error": None,
-    }
-
-
+    return {"months": [d[0] for d in vals], "NDWI": ndwi, "NDVI": ndvi,
+            "mean_NDWI": round(sum(ndwi)/max(len(ndwi),1), 4),
+            "mean_NDVI": round(sum(ndvi)/max(len(ndvi),1), 4),
+            "source": "COPERNICUS/S2_SR_HARMONIZED (5km, 10m)",
+            "n_months": len(vals), "error": None}
 def fetch_openmeteo(lat, lon):
     """Open-Meteo ERA5 — temperature + precipitation + soil moisture."""
     url = (f"https://archive-api.open-meteo.com/v1/archive"
