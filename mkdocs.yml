@@ -1,0 +1,50 @@
+site_name: HydroSovereign AI Engine
+site_description: AI-powered transboundary water governance
+site_author: Seifeldin M.G. Alkedir
+site_url: https://saifeldinkhedir-coder.github.io/HydroSovereign-AI-Engine-HSAE-v601
+repo_url: https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
+repo_name: HSAE
+
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: teal
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Quick Start: quickstart.md
+  - Architecture: architecture.md
+  - Indices: indices.md
+  - AI Modules: ai_modules.md
+  - Live Data: live_data.md
+  - Case Study — Nile: case_study_nile.md
+  - REST API: rest_api.md
+  - CLI Reference: cli.md
+  - Changelog: changelog.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - tables
+  - attr_list
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/saifeldinkhedir-coder
+    - icon: fontawesome/solid/graduation-cap
+      link: https://orcid.org/0000-0003-0821-2991
