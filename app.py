@@ -206,6 +206,7 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
+@st.cache_data(ttl=3600, show_spinner=False)
 def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
     """Load pre-computed GEE data from JSON if available.
     Accepts any year within the cached date range (start→end).
