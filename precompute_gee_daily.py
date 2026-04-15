@@ -148,59 +148,53 @@ def fetch_s1(region, yr):
 
 
 def fetch_s2(lat, lon, yr):
-    """Sentinel-2 SR — NDWI + NDVI, quarterly, 10km buffer.
+    """Sentinel-2 SR — NDWI + NDVI, quarterly, 10km buffer, no pre-filter.
     
-    Key design decisions:
-    - No QA60 mask inside ee.map() (causes band-type errors server-side)
-    - Use unmasked median → ignore zeros → robust to cloud
-    - NO cloud filter pre-filter (let the median handle it naturally)
-    - Python-level quarterly loop → direct .getInfo() per quarter (no memory issues)
-    - 10km buffer around dam centroid
+    Each quarter filtered independently on full S2 archive.
+    Computes normalizedDifference server-side then getInfo() per quarter.
+    Memory-safe: only 10km buffer, one quarter at a time.
     """
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(10000)
-
-    def add_indices(img):
-        """Add NDWI + NDVI without any masking (masking causes band errors)."""
-        scaled = img.divide(10000)
-        ndwi   = scaled.normalizedDifference(["B3", "B8"]).rename("NDWI")
-        ndvi   = scaled.normalizedDifference(["B8", "B4"]).rename("NDVI")
-        return ndwi.addBands(ndvi)
-
-    # No cloud filter — median over many images naturally suppresses clouds
-    s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-          .filterDate(start_date, end_date)
-          .filterBounds(buffer)
-          .select(["B3","B4","B8"])   # only bands we need — less memory
-          .map(add_indices))
+    buffer = point.buffer(10000)   # 10km
 
     results = []
     for q in range(4):
         m0    = q * 3 + 1
         qs    = f"{yr}-{m0:02d}-01"
-        qe    = f"{yr}-{m0+3:02d}-01" if m0 + 3 <= 12 else f"{yr+1}-01-01"
+        qe    = f"{yr}-{m0+3:02d}-01" if (m0 + 3) <= 12 else f"{yr+1}-01-01"
         label = f"{yr}-Q{q+1}"
         try:
-            col = s2.filterDate(qs, qe)
-            n   = col.size().getInfo()
+            col = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                   .filterDate(qs, qe)       # quarterly — no dependency on start_date
+                   .filterBounds(buffer)
+                   .select(["B3","B4","B8"]))  # Green, Red, NIR
+
+            n = col.size().getInfo()
             if n == 0:
                 continue
-            img = col.median()
+
+            # Median composite → normalizedDifference directly
+            median = col.median().divide(10000)   # scale to reflectance
+            ndwi   = median.normalizedDifference(["B3", "B8"]).rename("NDWI")
+            ndvi   = median.normalizedDifference(["B8", "B4"]).rename("NDVI")
+            img    = ndwi.addBands(ndvi)
+
             raw = img.reduceRegion(
-                reducer   = ee.Reducer.median(),
+                reducer   = ee.Reducer.mean(),
                 geometry  = buffer,
                 scale     = 30,
                 maxPixels = 1e7,
                 bestEffort= True
             ).getInfo()
-            ndwi_v = raw.get("NDWI"); ndvi_v = raw.get("NDVI")
-            if ndwi_v is not None:
-                results.append((label, float(ndwi_v), float(ndvi_v) if ndvi_v else 0.4))
-        except Exception as _e:
-            continue   # skip cloudy/missing quarters silently
+
+            nw = raw.get("NDWI"); nv = raw.get("NDVI")
+            if nw is not None and nw != 0:
+                results.append((label, float(nw), float(nv) if nv else 0.3))
+        except Exception:
+            continue
 
     if not results:
-        return {"error": "No S2 scenes available for this basin/period",
+        return {"error": "No Sentinel-2 data available (coverage/cloud)",
                 "NDWI": [], "NDVI": [], "mean_NDWI": 0, "mean_NDVI": 0,
                 "months": [], "n_months": 0}
 
@@ -209,7 +203,7 @@ def fetch_s2(lat, lon, yr):
         "months":    [r[0] for r in results], "NDWI": ndwi, "NDVI": ndvi,
         "mean_NDWI": round(sum(ndwi)/len(ndwi), 4),
         "mean_NDVI": round(sum(ndvi)/len(ndvi), 4),
-        "source":    "COPERNICUS/S2_SR_HARMONIZED (10km, 30m, quarterly median)",
+        "source":    "COPERNICUS/S2_SR_HARMONIZED (10km, 30m, quarterly)",
         "n_months":  len(results), "error": None,
     }
 
