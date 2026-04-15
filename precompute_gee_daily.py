@@ -56,22 +56,14 @@ def safe_get(v):
 
 
 def open_meteo_fetch(lat, lon, variables: list, start: str, end: str) -> dict:
-    """Fetch daily Open-Meteo ERA5 data and return monthly aggregates (with retry)."""
+    """Fetch daily Open-Meteo ERA5 data and return monthly aggregates."""
     var_str = ",".join(variables)
     url = (f"https://archive-api.open-meteo.com/v1/archive"
            f"?latitude={lat}&longitude={lon}"
            f"&start_date={start}&end_date={end}"
            f"&daily={var_str}&timezone=UTC")
-    # Retry up to 3 times with 5s delay
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(url, timeout=45) as r:
-                d = json.loads(r.read())
-            break
-        except Exception as e:
-            if attempt == 2: raise
-            print(f"  ⏳ Open-Meteo retry {attempt+1}/3: {e}")
-            time.sleep(5)
+    with urllib.request.urlopen(url, timeout=25) as r:
+        d = json.loads(r.read())
     daily  = d.get("daily", {})
     times  = daily.get("time", [])
     result = {}
@@ -137,25 +129,10 @@ def fetch_gpm_gee(region, start: str, end: str, year: int) -> dict:
 
 def fetch_grace_gee(region) -> dict:
     """GRACE-FO TWS via GEE (2022-2023 range — confirmed available)."""
-    # GRACE-FO: try both V04 and V03 collections
-    grace = None
-    for grace_col, grace_band in [
-        ("NASA/GRACE/MASS_GRIDS_V04/LAND", "lwe_thickness_csr"),
-        ("NASA/GRACE/MASS_GRIDS/LAND",     "lwe_thickness_csr"),
-    ]:
-        try:
-            _coll = (ee.ImageCollection(grace_col)
-                     .filterDate("2021-01-01", "2024-12-31")
-                     .filterBounds(region)
-                     .select(grace_band))
-            n = _coll.size().getInfo()
-            if n > 0:
-                grace = _coll
-                print(f"  📡 GRACE: using {grace_col}, n={n}")
-                break
-        except Exception as _ge:
-            print(f"  ⚠️  GRACE {grace_col}: {_ge}")
-            continue
+    grace = (ee.ImageCollection("NASA/GRACE/MASS_GRIDS_V04/LAND")
+             .filterDate("2022-01-01", "2024-06-30")
+             .filterBounds(region)
+             .select("lwe_thickness_csr"))
 
     def extract_tws(img):
         val = img.reduceRegion(
