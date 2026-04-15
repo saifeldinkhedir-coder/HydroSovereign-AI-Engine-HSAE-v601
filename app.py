@@ -266,7 +266,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
     if precomputed:
         try:
             import numpy as _np, math as _math
-            P_mm   = precomputed.get("gpm", {}).get("P_mm", [])
+            P_mm   = precomputed.get("gpm", {}).get("P_mm_day", precomputed.get("gpm", {}).get("P_mm", []))
             tws_cm = precomputed.get("grace", {}).get("tws_cm", [])
             sm_obs = precomputed.get("smap", {}).get("sm_m3m3", [])
             T_C    = precomputed.get("temperature", {}).get("T_C", [P_mm[0]*0+25.0 for _ in P_mm])
