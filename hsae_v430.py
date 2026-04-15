@@ -42,8 +42,12 @@ from plotly.subplots import make_subplots
 from datetime import date, timedelta
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
-import folium
-from streamlit_folium import st_folium
+try:
+    import folium
+    from streamlit_folium import st_folium
+    _FOLIUM_OK = True
+except ImportError:
+    _FOLIUM_OK = False
 
 from basins_global import (
     GLOBAL_BASINS, search_basins, CONTINENTS, ALL_NAMES,
