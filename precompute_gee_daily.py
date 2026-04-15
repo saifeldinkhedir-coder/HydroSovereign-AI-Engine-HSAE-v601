@@ -148,12 +148,14 @@ def fetch_s1(region, yr):
 
 
 def fetch_s2(lat, lon, yr):
-    """Sentinel-2 SR — NDWI + NDVI using 5km point buffer (GEE memory-safe).
-    Samples a 5km circle around the dam centroid instead of full basin polygon.
-    This stays well within GEE memory limits even when running in parallel.
+    """Sentinel-2 SR — quarterly NDWI + NDVI.
+    Uses Python-level loop with direct .getInfo() per quarter.
+    No server-side ee.ImageCollection.map() — avoids Dictionary key errors.
+    5km buffer around dam centroid — memory-safe in parallel.
     """
+    import datetime as _dt
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(5000)  # 5km radius around dam/reservoir centroid
+    buffer = point.buffer(5000)  # 5km radius
 
     def mask_index(img):
         qa   = img.select("QA60")
@@ -161,206 +163,56 @@ def fetch_s2(lat, lon, yr):
         img  = img.updateMask(mask).divide(10000)
         ndwi = img.normalizedDifference(["B3", "B8"]).rename("NDWI")
         ndvi = img.normalizedDifference(["B8", "B4"]).rename("NDVI")
-        return ee.Image.cat([ndwi, ndvi]).set(
-            "system:time_start", img.get("system:time_start"))
+        return ee.Image.cat([ndwi, ndvi]).copyProperties(img, ["system:time_start"])
 
     s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
           .filterDate(start_date, end_date)
           .filterBounds(buffer)
-          .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 50))
+          .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 60))
           .map(mask_index))
 
-    def mo(m):
-        m   = ee.Number(m).add(1)
-        d0  = ee.Date.fromYMD(yr, m, 1); d1 = d0.advance(1, "month")
-        img = s2.filterDate(d0, d1).mean()
-        val = img.reduceRegion(
-            reducer=ee.Reducer.mean(), geometry=buffer,
-            scale=10, maxPixels=1e7, bestEffort=True)
-        # Use ee.Algorithms.If to safely get values that may not exist
-        ndwi_safe = ee.Algorithms.If(val.contains("NDWI"), val.get("NDWI"), None)
-        ndvi_safe = ee.Algorithms.If(val.contains("NDVI"), val.get("NDVI"), None)
-        return ee.Feature(None, {"month": d0.format("YYYY-MM"),
-                                 "NDWI": ndwi_safe, "NDVI": ndvi_safe})
-
-    feats = ee.FeatureCollection(ee.List.sequence(0,11).map(mo)).getInfo()["features"]
-    vals  = [(f["properties"]["month"],
-              sg(f["properties"].get("NDWI") or 0),
-              sg(f["properties"].get("NDVI") or 0.4))
-             for f in feats
-             if f["properties"].get("NDWI") is not None
-             and f["properties"]["NDWI"] != 0]
-
-    if not vals:
-        return {"error": "No S2 data (cloud/no coverage)", "NDWI": [], "NDVI": [],
-                "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
-
-    ndwi = [d[1] for d in vals]; ndvi = [d[2] for d in vals]
-    return {"months": [d[0] for d in vals], "NDWI": ndwi, "NDVI": ndvi,
-            "mean_NDWI": round(sum(ndwi)/max(len(ndwi),1), 4),
-            "mean_NDVI": round(sum(ndvi)/max(len(ndvi),1), 4),
-            "source": "COPERNICUS/S2_SR_HARMONIZED (5km, 10m)",
-            "n_months": len(vals), "error": None}
-def fetch_openmeteo(lat, lon):
-    """Open-Meteo ERA5 — temperature + precipitation + soil moisture."""
-    url = (f"https://archive-api.open-meteo.com/v1/archive"
-           f"?latitude={lat}&longitude={lon}"
-           f"&start_date={start_date}&end_date={end_date}"
-           f"&daily=temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean"
-           f"&timezone=UTC")
-    for attempt in range(4):
+    results = []
+    # 4 quarterly windows — each is a separate Python call, no server-side map
+    for q in range(4):
+        m0    = q * 3 + 1
+        m1    = m0 + 3
+        qs    = f"{yr}-{m0:02d}-01"
+        qe    = f"{yr}-{m1:02d}-01" if m1 <= 12 else f"{yr+1}-01-01"
+        label = f"{yr}-Q{q+1}"
         try:
-            with urllib.request.urlopen(url, timeout=60) as r:
-                d = json.loads(r.read())
-            daily = d.get("daily", {})
-            times = daily.get("time", [])
-            out = {}
-            for var in ["temperature_2m_mean","precipitation_sum","soil_moisture_0_to_7cm_mean"]:
-                vals = daily.get(var, [])
-                monthly = {}
-                for i, t in enumerate(times):
-                    m = t[:7]
-                    v = vals[i] if i < len(vals) else None
-                    if v is not None:
-                        monthly.setdefault(m, []).append(float(v))
-                months = sorted(monthly)
-                out[var] = {
-                    "months": months,
-                    "monthly": [round(sum(monthly[m])/len(monthly[m]),4) for m in months],
-                    "mean": round(sum(sum(monthly[m]) for m in months)/
-                                  max(sum(len(monthly[m]) for m in months),1), 4)
-                }
-            return out
-        except Exception as e:
-            if attempt == 3: raise
-            time.sleep(5 * (attempt + 1))
+            col = s2.filterDate(qs, qe)
+            # Check if any images exist
+            n_imgs = col.size().getInfo()
+            if n_imgs == 0:
+                continue
+            img = col.mean()
+            # Direct Python getInfo — no server-side Dictionary.get issue
+            raw = img.reduceRegion(
+                reducer   = ee.Reducer.mean(),
+                geometry  = buffer,
+                scale     = 20,
+                maxPixels = 1e7,
+                bestEffort= True
+            ).getInfo()  # returns Python dict
+            ndwi_v = raw.get("NDWI")
+            ndvi_v = raw.get("NDVI")
+            if ndwi_v is not None:
+                results.append((label, float(ndwi_v), float(ndvi_v or 0.4)))
+        except Exception:
+            continue
 
+    if not results:
+        return {"error": "No S2 coverage or too cloudy for all quarters",
+                "NDWI": [], "NDVI": [], "mean_NDWI": 0, "mean_NDVI": 0,
+                "months": [], "n_months": 0}
 
-# ── Per-basin worker (runs in parallel) ──────────────────────────────────────
-
-def process_basin(basin_id, cfg):
-    """Fetch all 7 sources for one basin. Returns (basin_id, result_dict)."""
-    t0     = time.time()
-    lat    = cfg["lat"]; lon = cfg["lon"]
-    rc     = cfg["runoff_c"]; area = cfg["area_km2"]
-    region = ee.Geometry.Rectangle(cfg["bbox"])
-    yr     = year   # make yr available for fetch_s2(lat, lon, yr) etc.
-    result = {"basin_id": basin_id, "fetched_at": datetime.datetime.utcnow().isoformat()}
-
-    # 1 — GPM
-    try:
-        result["gpm"] = fetch_gpm(region, year)
-    except Exception as e:
-        result["gpm"] = {"error": str(e), "P_mm_day": [], "mean_P": 0,
-                         "months": [], "n_months": 0}
-
-    # 2 — GRACE
-    try:
-        result["grace"] = fetch_grace(region)
-    except Exception as e:
-        result["grace"] = {"error": str(e), "tws_cm": [], "mean_tws": 0,
-                           "months": [], "n_months": 0}
-
-    # 3 — Sentinel-1
-    try:
-        result["sentinel1"] = fetch_s1(region, year)
-    except Exception as e:
-        result["sentinel1"] = {"error": str(e), "VV_dB": [], "mean_VV": -20,
-                               "months": [], "n_months": 0}
-
-    # 4 — Sentinel-2
-    try:
-        result["sentinel2"] = fetch_s2(lat, lon, yr)
-    except Exception as e:
-        result["sentinel2"] = {"error": str(e), "NDWI": [], "NDVI": [],
-                               "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
-
-    # 5+7 — Open-Meteo (T + SM + P-backup)
-    try:
-        om  = fetch_openmeteo(lat, lon)
-        T   = om["temperature_2m_mean"]
-        P   = om["precipitation_sum"]
-        SM  = om["soil_moisture_0_to_7cm_mean"]
-        result["temperature"] = {"months": T["months"], "T_C": T["monthly"],
-                                  "mean_T": T["mean"], "source": "Open-Meteo ERA5",
-                                  "n_months": len(T["months"]), "error": None}
-        result["smap"]        = {"months": SM["months"], "sm_m3m3": SM["monthly"],
-                                  "mean_sm": SM["mean"], "source": "Open-Meteo SMAP-proxy",
-                                  "n_months": len(SM["months"]), "error": None}
-        # GPM backup
-        if not result["gpm"].get("P_mm_day"):
-            result["gpm"] = {"months": P["months"], "P_mm_day": P["monthly"],
-                              "mean_P": P["mean"], "source": "Open-Meteo ERA5 (backup)",
-                              "n_months": len(P["months"]), "error": None}
-    except Exception as e:
-        result["temperature"] = {"error": str(e), "T_C": [], "mean_T": 25.0,
-                                  "months": [], "n_months": 0}
-        result["smap"]        = {"error": str(e), "sm_m3m3": [], "mean_sm": 0.2,
-                                  "months": [], "n_months": 0}
-
-    # 6 — GloFAS (derived from GPM × runoff_c × area)
-    P_vals = result["gpm"].get("P_mm_day", [])
-    if P_vals:
-        Q = [round(p * rc * area / 86.4, 1) for p in P_vals]
-        result["glofas"] = {"Q_m3s": Q,
-                             "mean_Q": round(sum(Q)/max(len(Q),1), 1),
-                             "source": "Derived: GPM × runoff_c × area",
-                             "n_months": len(Q),
-                             "months": result["gpm"]["months"],
-                             "error": None}
-    else:
-        result["glofas"] = {"error": "No GPM", "Q_m3s": [], "mean_Q": 0,
-                             "months": [], "n_months": 0}
-
-    elapsed = time.time() - t0
-    # Status line
-    icons = {k: "✅" if result.get(k,{}).get("n_months",0)>0 else "❌"
-             for k in ["gpm","grace","sentinel1","sentinel2","smap","glofas","temperature"]}
-    print(f"  {basin_id:<20} {icons['gpm']}GPM {icons['grace']}GRACE "
-          f"{icons['sentinel1']}S1 {icons['sentinel2']}S2 "
-          f"{icons['smap']}SM {icons['glofas']}Q {icons['temperature']}T  "
-          f"({elapsed:.0f}s)")
-    return basin_id, result
-
-
-# ── Parallel execution ────────────────────────────────────────────────────────
-print(f"\n⚡ Processing {len(BASINS)} basins in parallel (8 workers)...")
-t_start = time.time()
-
-output = {
-    "schema_version": "4.0",
-    "computed_at":    datetime.datetime.utcnow().isoformat(),
-    "date_range":     {"start": start_date, "end": end_date},
-    "n_basins":       len(BASINS),
-    "sources":        ["GPM IMERG V07","GRACE-FO MASCON","Sentinel-1 GRD",
-                       "Sentinel-2 SR","SMAP","GloFAS ERA5","Open-Meteo ERA5"],
-    "basins":         {}
-}
-
-with ThreadPoolExecutor(max_workers=8) as pool:
-    futures = {pool.submit(process_basin, bid, cfg): bid
-               for bid, cfg in BASINS.items()}
-    for fut in as_completed(futures):
-        bid, res = fut.result()
-        output["basins"][bid] = res
-
-elapsed_total = time.time() - t_start
-print(f"\n⚡ All basins done in {elapsed_total:.0f}s  ({elapsed_total/60:.1f} min)")
-
-# ── Save ──────────────────────────────────────────────────────────────────────
-Path("data").mkdir(exist_ok=True)
-with open("data/gee_realtime.json", "w") as f:
-    json.dump(output, f, indent=2)
-
-# ── Final report ──────────────────────────────────────────────────────────────
-SRCS = [("gpm","GPM"),("grace","GRACE"),("sentinel1","S1"),("sentinel2","S2"),
-        ("smap","SMAP"),("glofas","GloFAS"),("temperature","ERA5-T")]
-print(f"\n{'='*55}")
-print(f"FINAL REPORT — schema v4.0")
-print(f"{'='*55}")
-for key, label in SRCS:
-    ok = sum(1 for bd in output["basins"].values() if bd.get(key,{}).get("n_months",0)>0)
-    icon = "✅" if ok==len(BASINS) else "⚠️" if ok>0 else "❌"
-    print(f"  {icon} {label:<8} {ok:>2}/{len(BASINS)} basins")
-print(f"{'='*55}")
-print(f"✅ Saved: data/gee_realtime.json  ({elapsed_total:.0f}s total)")
+    ndwi = [r[1] for r in results]
+    ndvi = [r[2] for r in results]
+    return {
+        "months":    [r[0] for r in results],
+        "NDWI":      ndwi, "NDVI": ndvi,
+        "mean_NDWI": round(sum(ndwi) / len(ndwi), 4),
+        "mean_NDVI": round(sum(ndvi) / len(ndvi), 4),
+        "source":    "COPERNICUS/S2_SR_HARMONIZED (5km buffer, 20m, quarterly)",
+        "n_months":  len(results), "error": None,
+    }
