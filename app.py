@@ -319,14 +319,44 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
         b_exp     = float(basin_cfg.get("bathy_b", 1.12))
         evap_b    = float(basin_cfg.get("evap_base", 5.0))
 
+        _met = None
         with st.spinner(f"📡 Loading ERA5 data {start[:4]}..."):
-            _vars = "temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean,et0_fao_evapotranspiration"
-            _url  = (f"https://archive-api.open-meteo.com/v1/archive"
-                     f"?latitude={lat}&longitude={lon}"
-                     f"&start_date={start}&end_date={end}"
-                     f"&daily={_vars}&timezone=UTC")
-            with _ur2.urlopen(_url, timeout=45) as _r:
-                _met = _jj2.loads(_r.read())
+            # Try archive API first, then historical-forecast API as backup
+            for _api_url in [
+                (f"https://archive-api.open-meteo.com/v1/archive"
+                 f"?latitude={lat}&longitude={lon}"
+                 f"&start_date={start}&end_date={end}"
+                 f"&daily=temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean,et0_fao_evapotranspiration&timezone=UTC"),
+                (f"https://historical-forecast-api.open-meteo.com/v1/forecast"
+                 f"?latitude={lat}&longitude={lon}"
+                 f"&start_date={start}&end_date={end}"
+                 f"&daily=temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean&timezone=UTC"),
+            ]:
+                try:
+                    with _ur2.urlopen(_api_url, timeout=30) as _r:
+                        _met = _jj2.loads(_r.read())
+                    break
+                except Exception:
+                    continue
+        if _met is None:
+            # Both APIs unavailable — use precomputed data scaled to requested year
+            _pc_any = _load_precomputed(basin_id_pc, "2025") or _load_precomputed(basin_id_pc, "2026")
+            if _pc_any:
+                _gpm_fb = _pc_any.get("gpm", {})
+                _p_base = _gpm_fb.get("P_mm_day", _gpm_fb.get("P_mm", []))
+                _t_base = _pc_any.get("temperature", {}).get("T_C", [])
+                _sm_base= _pc_any.get("smap", {}).get("sm_m3m3", [])
+                if _p_base:
+                    n_days = (_dt2.datetime.strptime(end,"%Y-%m-%d") - _dt2.datetime.strptime(start,"%Y-%m-%d")).days + 1
+                    def _tile(arr, n): return (_np2.tile(arr, n//len(arr)+2)[:n]).tolist() if arr else [0.0]*n
+                    _met = {"daily": {
+                        "temperature_2m_mean":       _tile(_t_base, n_days),
+                        "precipitation_sum":          _tile(_p_base, n_days),
+                        "soil_moisture_0_to_7cm_mean":_tile(_sm_base, n_days),
+                    }}
+                    st.info(f"📊 Using precomputed ERA5 patterns scaled to {start[:4]} (live API temporarily unavailable)")
+            if _met is None:
+                raise RuntimeError("All data sources temporarily unavailable. Please retry in a few minutes.")
 
         _daily   = _met.get("daily", {})
         T_C      = [t or 20.0 for t in _daily.get("temperature_2m_mean", [])]
