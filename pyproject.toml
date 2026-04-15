@@ -1,3 +1,6 @@
+# NOTE: This pyproject.toml is for the hydrosovereign PyPI package only.
+# Streamlit Cloud uses requirements.txt for the app dependencies.
+
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
