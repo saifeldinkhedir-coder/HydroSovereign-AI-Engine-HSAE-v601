@@ -42,8 +42,14 @@ from plotly.subplots import make_subplots
 from datetime import date, timedelta
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score
-import folium
-from streamlit_folium import st_folium
+try:
+    import folium
+    from streamlit_folium import st_folium
+    _FOLIUM_AVAILABLE = True
+except Exception:
+    folium = None
+    st_folium = None
+    _FOLIUM_AVAILABLE = False
 
 from basins_global import (
     GLOBAL_BASINS, search_basins, CONTINENTS, ALL_NAMES,
@@ -309,7 +315,29 @@ def page_v430():
 
     # ── World Map ─────────────────────────────────────────────────────────
     st.markdown("### 🌐 Global Basin Network")
-    m = folium.Map(location=[basin["lat"], basin["lon"]],
+    if not _FOLIUM_AVAILABLE:
+        # Plotly fallback map when folium is unavailable
+        import plotly.express as _px
+        _map_df = __import__('pandas').DataFrame([
+            {"lat": cfg["lat"], "lon": cfg["lon"],
+             "name": nm, "active": (nm == basin_name)}
+            for nm, cfg in GLOBAL_BASINS.items()
+        ])
+        _fig_map = _px.scatter_map(
+            _map_df, lat="lat", lon="lon", hover_name="name",
+            color="active", color_discrete_map={True:"#10b981", False:"#6b7280"},
+            zoom=2, height=380,
+        ) if hasattr(_px, 'scatter_map') else _px.scatter_mapbox(
+            _map_df, lat="lat", lon="lon", hover_name="name",
+            color="active", color_discrete_map={True:"#10b981", False:"#6b7280"},
+            zoom=2, height=380, mapbox_style="carto-darkmatter",
+        )
+        _fig_map.update_layout(margin=dict(l=0,r=0,t=0,b=0), showlegend=False)
+        c_map, c_spec = st.columns([2, 1])
+        with c_map:
+            st.plotly_chart(_fig_map, use_container_width=True)
+    else:
+        m = folium.Map(location=[basin["lat"], basin["lon"]],
                    zoom_start=4, tiles="CartoDB dark_matter")
     for nm, cfg in GLOBAL_BASINS.items():
         active = (nm == basin_name)
