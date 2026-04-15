@@ -1,6 +1,6 @@
 {
   "schema_version": "3.0",
-  "computed_at": "2026-04-15T17:58:52.377058",
+  "computed_at": "2026-04-15T18:18:46.181104",
   "date_range": {
     "start": "2025-04-15",
     "end": "2026-04-15"
@@ -18,7 +18,7 @@
   "basins": {
     "GERD_ETH": {
       "basin_id": "GERD_ETH",
-      "fetched_at": "2026-04-15T17:58:52.377403",
+      "fetched_at": "2026-04-15T18:18:46.181437",
       "gpm": {
         "months": [
           "2026-01",
@@ -212,11 +212,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -329,7 +329,7 @@
     },
     "ROS_SDN": {
       "basin_id": "ROS_SDN",
-      "fetched_at": "2026-04-15T17:59:00.759076",
+      "fetched_at": "2026-04-15T18:19:04.672797",
       "gpm": {
         "months": [
           "2026-01",
@@ -523,11 +523,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -640,7 +640,7 @@
     },
     "ASWAN_EGY": {
       "basin_id": "ASWAN_EGY",
-      "fetched_at": "2026-04-15T17:59:23.524375",
+      "fetched_at": "2026-04-15T18:19:20.504848",
       "gpm": {
         "months": [
           "2026-01",
@@ -834,11 +834,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -951,7 +951,7 @@
     },
     "KARIBA_ZAM": {
       "basin_id": "KARIBA_ZAM",
-      "fetched_at": "2026-04-15T18:00:42.060434",
+      "fetched_at": "2026-04-15T18:19:42.580962",
       "gpm": {
         "months": [
           "2026-01",
@@ -1145,11 +1145,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -1262,7 +1262,7 @@
     },
     "INGA_COD": {
       "basin_id": "INGA_COD",
-      "fetched_at": "2026-04-15T18:00:48.846818",
+      "fetched_at": "2026-04-15T18:20:09.241642",
       "gpm": {
         "months": [
           "2026-01",
@@ -1456,11 +1456,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -1573,7 +1573,7 @@
     },
     "KAINJI_NGA": {
       "basin_id": "KAINJI_NGA",
-      "fetched_at": "2026-04-15T18:00:55.206595",
+      "fetched_at": "2026-04-15T18:20:28.267297",
       "gpm": {
         "months": [
           "2026-01",
@@ -1767,11 +1767,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -1884,7 +1884,7 @@
     },
     "ATATURK_TUR": {
       "basin_id": "ATATURK_TUR",
-      "fetched_at": "2026-04-15T18:02:12.011284",
+      "fetched_at": "2026-04-15T18:20:43.889822",
       "gpm": {
         "months": [
           "2026-01",
@@ -2078,11 +2078,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -2195,7 +2195,7 @@
     },
     "MOSUL_IRQ": {
       "basin_id": "MOSUL_IRQ",
-      "fetched_at": "2026-04-15T18:02:24.055806",
+      "fetched_at": "2026-04-15T18:21:05.522479",
       "gpm": {
         "months": [
           "2026-01",
@@ -2389,11 +2389,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -2506,7 +2506,7 @@
     },
     "NUREK_TJK": {
       "basin_id": "NUREK_TJK",
-      "fetched_at": "2026-04-15T18:02:43.709727",
+      "fetched_at": "2026-04-15T18:21:31.240661",
       "gpm": {
         "months": [
           "2026-01",
@@ -2688,11 +2688,11 @@
           -10.987729662237667,
           -10.610614967672275,
           -10.422037163768525,
-          -10.416901087526764,
-          -10.442995962364064,
-          -10.686510578245603,
-          -10.947373923260017,
-          -10.21018576570117
+          -10.41690108752676,
+          -10.44299596236406,
+          -10.6865105782456,
+          -10.947373923260015,
+          -10.210185765701171
         ],
         "mean_VV": -12.96,
         "source": "COPERNICUS/S1_GRD",
@@ -2700,11 +2700,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -2817,7 +2817,7 @@
     },
     "TOKTO_KGZ": {
       "basin_id": "TOKTO_KGZ",
-      "fetched_at": "2026-04-15T18:02:56.718760",
+      "fetched_at": "2026-04-15T18:22:00.946436",
       "gpm": {
         "months": [
           "2026-01",
@@ -2995,15 +2995,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -11.740737390724178,
-          -11.479421240865673,
-          -11.418069619365749,
-          -11.352929571885818,
-          -11.58484938058217,
+          -11.740737390724181,
+          -11.47942124086567,
+          -11.418069619365747,
+          -11.35292957188582,
+          -11.584849380582165,
           -11.770801551965274,
-          -12.003890061066985,
-          -12.231917117705642,
-          -11.833848716229456
+          -12.003890061066983,
+          -12.23191711770564,
+          -11.833848716229458
         ],
         "mean_VV": -13.78,
         "source": "COPERNICUS/S1_GRD",
@@ -3011,11 +3011,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -3128,7 +3128,7 @@
     },
     "TARB_PAK": {
       "basin_id": "TARB_PAK",
-      "fetched_at": "2026-04-15T18:03:13.072812",
+      "fetched_at": "2026-04-15T18:22:30.275280",
       "gpm": {
         "months": [
           "2026-01",
@@ -3306,15 +3306,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -9.670153686260125,
+          -9.670153686260123,
           -9.379632151358937,
-          -9.024154112659694,
-          -8.399363507338823,
-          -8.448216278427191,
+          -9.024154112659692,
+          -8.39936350733882,
+          -8.44821627842719,
           -8.47433750489138,
-          -8.760695315918452,
-          -8.993107116633869,
-          -9.068377187724124
+          -8.76069531591845,
+          -8.99310711663387,
+          -9.068377187724128
         ],
         "mean_VV": -11.68,
         "source": "COPERNICUS/S1_GRD",
@@ -3322,11 +3322,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -3439,7 +3439,7 @@
     },
     "SUBANS_IND": {
       "basin_id": "SUBANS_IND",
-      "fetched_at": "2026-04-15T18:03:30.377729",
+      "fetched_at": "2026-04-15T18:23:07.049430",
       "gpm": {
         "months": [
           "2026-01",
@@ -3617,13 +3617,13 @@
           -20.0,
           -20.0,
           -20.0,
-          -8.571485827218611,
+          -8.571485827218607,
           -8.191797214624513,
           -7.961887122918781,
-          -7.661986005485804,
-          -7.567505800615667,
+          -7.661986005485805,
+          -7.567505800615669,
           -7.6690094579783485,
-          -7.920608101611905,
+          -7.920608101611906,
           -8.317744408485806,
           -8.691193031755136
         ],
@@ -3633,11 +3633,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -3750,7 +3750,7 @@
     },
     "FARAKKA_IND": {
       "basin_id": "FARAKKA_IND",
-      "fetched_at": "2026-04-15T18:03:47.633237",
+      "fetched_at": "2026-04-15T18:23:57.855865",
       "gpm": {
         "months": [
           "2026-01",
@@ -3928,15 +3928,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -9.649206074354348,
+          -9.649206074354346,
           -9.17840904946189,
-          -8.608751688566795,
-          -9.038622409053081,
-          -9.245851693736254,
-          -9.100831510248627,
-          -9.199714462794896,
-          -9.30267338562871,
-          -9.57361272107401
+          -8.608751688566793,
+          -9.03862240905308,
+          -9.245851693736252,
+          -9.100831510248625,
+          -9.199714462794894,
+          -9.302673385628712,
+          -9.573612721074012
         ],
         "mean_VV": -11.91,
         "source": "COPERNICUS/S1_GRD",
@@ -3944,11 +3944,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -4061,7 +4061,7 @@
     },
     "XAYA_LAO": {
       "basin_id": "XAYA_LAO",
-      "fetched_at": "2026-04-15T18:05:09.476076",
+      "fetched_at": "2026-04-15T18:24:32.330660",
       "gpm": {
         "months": [
           "2026-01",
@@ -4239,15 +4239,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -8.462432884335412,
+          -8.46243288433541,
           -7.836372139541831,
-          -7.520680343465383,
+          -7.52068034346538,
           -7.394662767609683,
-          -7.486007517529199,
+          -7.486007517529197,
           -7.4917054279002455,
           -7.654327829901036,
-          -7.916928034408877,
-          -8.261048280367133
+          -7.916928034408879,
+          -8.261048280367138
         ],
         "mean_VV": -10.84,
         "source": "COPERNICUS/S1_GRD",
@@ -4255,11 +4255,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -4372,7 +4372,7 @@
     },
     "MYIN_MMR": {
       "basin_id": "MYIN_MMR",
-      "fetched_at": "2026-04-15T18:06:25.814389",
+      "fetched_at": "2026-04-15T18:25:07.643860",
       "gpm": {
         "months": [
           "2026-01",
@@ -4551,14 +4551,14 @@
           -20.0,
           -20.0,
           -8.437839030395908,
-          -7.803690417255932,
+          -7.803690417255933,
           -7.455447640421607,
-          -7.39797454313077,
+          -7.397974543130772,
           -7.492906612067276,
-          -7.4910723002792166,
-          -7.674588297026491,
+          -7.491072300279215,
+          -7.67458829702649,
           -7.897538866710637,
-          -8.487243568070504
+          -8.487243568070502
         ],
         "mean_VV": -10.84,
         "source": "COPERNICUS/S1_GRD",
@@ -4566,11 +4566,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -4683,7 +4683,7 @@
     },
     "3GORGES_CHN": {
       "basin_id": "3GORGES_CHN",
-      "fetched_at": "2026-04-15T18:06:38.820964",
+      "fetched_at": "2026-04-15T18:25:36.506745",
       "gpm": {
         "months": [
           "2026-01",
@@ -4861,15 +4861,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -8.861420420096378,
+          -8.86142042009638,
           -8.83436448450562,
-          -8.38043268809252,
-          -8.35299069333334,
+          -8.380432688092519,
+          -8.352990693333341,
           -8.67371527500427,
-          -8.33670014905234,
-          -8.162994030132191,
-          -8.701259348655004,
-          -9.034664161344955
+          -8.336700149052339,
+          -8.16299403013219,
+          -8.701259348655002,
+          -9.034664161344953
         ],
         "mean_VV": -11.44,
         "source": "COPERNICUS/S1_GRD",
@@ -4877,11 +4877,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -4994,7 +4994,7 @@
     },
     "IRONGATE_EU": {
       "basin_id": "IRONGATE_EU",
-      "fetched_at": "2026-04-15T18:06:45.140030",
+      "fetched_at": "2026-04-15T18:26:09.728897",
       "gpm": {
         "months": [
           "2026-01",
@@ -5173,14 +5173,14 @@
           -20.0,
           -20.0,
           -11.128341323207817,
-          -10.763557576629172,
+          -10.76355757662917,
           -10.518325417292289,
-          -10.519863234926296,
-          -10.929037219305702,
-          -11.047736486542679,
-          -10.499579098468969,
-          -9.726150868379477,
-          -9.8847419568619
+          -10.519863234926298,
+          -10.929037219305705,
+          -11.04773648654268,
+          -10.499579098468965,
+          -9.726150868379476,
+          -9.884741956861896
         ],
         "mean_VV": -12.92,
         "source": "COPERNICUS/S1_GRD",
@@ -5188,11 +5188,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -5305,7 +5305,7 @@
     },
     "RHINE_EU": {
       "basin_id": "RHINE_EU",
-      "fetched_at": "2026-04-15T18:07:11.455232",
+      "fetched_at": "2026-04-15T18:26:41.277821",
       "gpm": {
         "months": [
           "2026-01",
@@ -5483,15 +5483,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -10.266960360086475,
-          -10.746262491847913,
-          -9.716036668740658,
-          -9.684777311490315,
-          -9.835943076031201,
-          -9.554778045089082,
-          -9.504446308268866,
-          -9.407613725088273,
-          -9.559809586871829
+          -10.266960360086477,
+          -10.746262491847915,
+          -9.716036668740657,
+          -9.684777311490313,
+          -9.835943076031205,
+          -9.554778045089083,
+          -9.504446308268868,
+          -9.407613725088272,
+          -9.559809586871832
         ],
         "mean_VV": -12.36,
         "source": "COPERNICUS/S1_GRD",
@@ -5499,11 +5499,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -5616,7 +5616,7 @@
     },
     "KAKHOVKA_UKR": {
       "basin_id": "KAKHOVKA_UKR",
-      "fetched_at": "2026-04-15T18:07:26.788757",
+      "fetched_at": "2026-04-15T18:27:16.670765",
       "gpm": {
         "months": [
           "2026-01",
@@ -5797,12 +5797,12 @@
           -16.53285196269026,
           -14.88790222997402,
           -14.667224580193531,
-          -14.916628870574241,
-          -15.08206218582239,
-          -14.671330451267979,
-          -13.752566182980464,
-          -12.970936701678358,
-          -12.762671279876583
+          -14.91662887057423,
+          -15.082062185822387,
+          -14.671330451267975,
+          -13.75256618298047,
+          -12.97093670167836,
+          -12.762671279876589
         ],
         "mean_VV": -15.85,
         "source": "COPERNICUS/S1_GRD",
@@ -5810,11 +5810,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -5927,7 +5927,7 @@
     },
     "AMZ_BRA": {
       "basin_id": "AMZ_BRA",
-      "fetched_at": "2026-04-15T18:07:57.127355",
+      "fetched_at": "2026-04-15T18:28:00.499844",
       "gpm": {
         "months": [
           "2026-01",
@@ -6105,15 +6105,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -8.538380172299826,
-          -8.403549778878185,
-          -8.610687535704816,
+          -8.538380172299824,
+          -8.403549778878183,
+          -8.610687535704818,
           -8.710291538827256,
-          -8.95396809525856,
+          -8.953968095258563,
           -9.104534247826125,
           -9.264977145707679,
           -9.174440038656494,
-          -8.87972183641204
+          -8.879721836412042
         ],
         "mean_VV": -11.64,
         "source": "COPERNICUS/S1_GRD",
@@ -6121,11 +6121,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -6238,7 +6238,7 @@
     },
     "ITAIPU_BR_PY": {
       "basin_id": "ITAIPU_BR_PY",
-      "fetched_at": "2026-04-15T18:08:08.675187",
+      "fetched_at": "2026-04-15T18:28:41.528859",
       "gpm": {
         "months": [
           "2026-01",
@@ -6418,13 +6418,13 @@
           -20.0,
           -10.154260998896508,
           -10.122161969799274,
-          -9.613577624660333,
-          -10.713776665838099,
+          -9.613577624660332,
+          -10.7137766658381,
           -10.772352370456696,
-          -10.833406526756802,
+          -10.833406526756805,
           -10.078717042531062,
-          -9.846989122229841,
-          -9.6126880044184
+          -9.846989122229846,
+          -9.612688004418402
         ],
         "mean_VV": -12.65,
         "source": "COPERNICUS/S1_GRD",
@@ -6432,11 +6432,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -6549,7 +6549,7 @@
     },
     "GURI_VEN": {
       "basin_id": "GURI_VEN",
-      "fetched_at": "2026-04-15T18:08:16.150653",
+      "fetched_at": "2026-04-15T18:29:06.951444",
       "gpm": {
         "months": [
           "2026-01",
@@ -6727,15 +6727,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -11.075882110766981,
+          -11.075882110766985,
           -10.565386365934412,
-          -9.852497517855737,
-          -10.208669575458526,
-          -10.399290747501716,
+          -9.852497517855733,
+          -10.208669575458527,
+          -10.399290747501714,
           -10.46316980161172,
-          -10.502504899129008,
-          -10.326932368684778,
-          -10.20115822826497
+          -10.502504899129006,
+          -10.326932368684773,
+          -10.201158228264973
         ],
         "mean_VV": -12.8,
         "source": "COPERNICUS/S1_GRD",
@@ -6743,11 +6743,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -6860,7 +6860,7 @@
     },
     "HOOVER_USA": {
       "basin_id": "HOOVER_USA",
-      "fetched_at": "2026-04-15T18:08:35.326125",
+      "fetched_at": "2026-04-15T18:29:38.855395",
       "gpm": {
         "months": [
           "2026-01",
@@ -7038,14 +7038,14 @@
           -20.0,
           -20.0,
           -20.0,
-          -12.024984905985095,
-          -11.834669999648161,
-          -11.452240123655665,
-          -11.502560686976143,
-          -11.343777007146402,
+          -12.024984905985097,
+          -11.834669999648165,
+          -11.452240123655661,
+          -11.50256068697614,
+          -11.3437770071464,
           -11.692003675043107,
-          -11.99955392718777,
-          -11.589385063634872,
+          -11.999553927187769,
+          -11.589385063634875,
           -12.011951021126874
         ],
         "mean_VV": -13.79,
@@ -7054,11 +7054,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -7171,7 +7171,7 @@
     },
     "COULEE_USA": {
       "basin_id": "COULEE_USA",
-      "fetched_at": "2026-04-15T18:08:51.783503",
+      "fetched_at": "2026-04-15T18:30:17.203446",
       "gpm": {
         "months": [
           "2026-01",
@@ -7349,15 +7349,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -11.445357632382843,
+          -11.44535763238284,
           -11.164536334301898,
-          -10.797300202083667,
-          -10.739260553143733,
-          -10.792793587110253,
-          -10.959382200823004,
+          -10.797300202083665,
+          -10.739260553143737,
+          -10.792793587110252,
+          -10.959382200823002,
           -10.799949732784473,
-          -10.300915842115911,
-          -10.244276045206627
+          -10.300915842115907,
+          -10.244276045206625
         ],
         "mean_VV": -13.1,
         "source": "COPERNICUS/S1_GRD",
@@ -7365,11 +7365,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -7482,7 +7482,7 @@
     },
     "AMISTAD_MEX": {
       "basin_id": "AMISTAD_MEX",
-      "fetched_at": "2026-04-15T18:09:17.622435",
+      "fetched_at": "2026-04-15T18:30:52.538254",
       "gpm": {
         "months": [
           "2026-01",
@@ -7661,14 +7661,14 @@
           -20.0,
           -20.0,
           -11.77747133289842,
-          -11.678680299561602,
-          -11.459649496875812,
-          -11.188181571443009,
-          -11.64248256319639,
-          -11.675235938017067,
+          -11.6786802995616,
+          -11.459649496875809,
+          -11.188181571443012,
+          -11.642482563196385,
+          -11.67523593801707,
           -11.802177929304152,
-          -12.067078559881336,
-          -12.235664751244864
+          -12.067078559881338,
+          -12.23566475124487
         ],
         "mean_VV": -13.79,
         "source": "COPERNICUS/S1_GRD",
@@ -7676,11 +7676,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
@@ -7793,7 +7793,7 @@
     },
     "HUME_AUS": {
       "basin_id": "HUME_AUS",
-      "fetched_at": "2026-04-15T18:09:28.197128",
+      "fetched_at": "2026-04-15T18:31:27.708751",
       "gpm": {
         "months": [
           "2026-01",
@@ -7971,15 +7971,15 @@
           -20.0,
           -20.0,
           -20.0,
-          -15.254895162673613,
+          -15.254895162673614,
           -13.90814769442675,
-          -13.411810639972309,
-          -12.660749469100656,
-          -13.425343623541597,
-          -13.464639199436675,
-          -13.803421426955115,
+          -13.411810639972307,
+          -12.660749469100661,
+          -13.425343623541593,
+          -13.464639199436686,
+          -13.803421426955111,
           -13.992169933161287,
-          -14.2868201878415
+          -14.286820187841501
         ],
         "mean_VV": -15.35,
         "source": "COPERNICUS/S1_GRD",
@@ -7987,11 +7987,11 @@
         "error": null
       },
       "sentinel2": {
-        "error": "Image.select, argument 'bandSelectors': Invalid type.\nExpected type: List<Object>.\nActual type: String.\nActual value: B8",
+        "error": "User memory limit exceeded.",
         "NDWI": [],
         "NDVI": [],
         "mean_NDWI": 0,
-        "mean_NDVI": 0.4,
+        "mean_NDVI": 0,
         "months": [],
         "n_months": 0
       },
