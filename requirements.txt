@@ -1,5 +1,5 @@
 # ════════════════════════════════════════════════════════
-# HSAE v6.01 — Complete Requirements
+# HSAE v6.0.0 — Complete Requirements
 # HydroSovereign AI Engine
 # Author: Seifeldin M.G. Alkedir — University of Khartoum
 # ════════════════════════════════════════════════════════
@@ -30,5 +30,15 @@ openpyxl>=3.1.0
 schedule>=1.2.0
 python-telegram-bot>=20.0
 
+# ── Database ─────────────────────────────────────────────
+# SQLite is built into Python — no extra package needed
+
+# ── Optional: Production Scheduler ───────────────────────
+# APScheduler>=3.10.0   # alternative to schedule for Streamlit Cloud
+
 # ── GEE Python API (required for Direct GEE mode) ────────
 earthengine-api>=0.1.400
+
+# ── Install command ───────────────────────────────────────
+# pip install streamlit pandas numpy scipy plotly folium streamlit-folium \
+#             scikit-learn requests openpyxl schedule python-telegram-bot
