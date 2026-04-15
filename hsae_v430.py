@@ -47,6 +47,8 @@ try:
     from streamlit_folium import st_folium
     _FOLIUM_OK = True
 except ImportError:
+    folium     = None   # type: ignore
+    st_folium  = None   # type: ignore
     _FOLIUM_OK = False
 
 from basins_global import (
@@ -313,7 +315,10 @@ def page_v430():
 
     # ── World Map ─────────────────────────────────────────────────────────
     st.markdown("### 🌐 Global Basin Network")
-    m = folium.Map(location=[basin["lat"], basin["lon"]],
+    if not _FOLIUM_OK:
+        st.info("🗺️ Map unavailable — folium not installed. All other features work normally.")
+    else:
+      m = folium.Map(location=[basin["lat"], basin["lon"]],
                    zoom_start=4, tiles="CartoDB dark_matter")
     for nm, cfg in GLOBAL_BASINS.items():
         active = (nm == basin_name)
