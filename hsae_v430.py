@@ -315,48 +315,48 @@ def page_v430():
 
     # ── World Map ─────────────────────────────────────────────────────────
     st.markdown("### 🌐 Global Basin Network")
+    c_map, c_spec = st.columns([2, 1])
     if not _FOLIUM_AVAILABLE:
-        # Plotly fallback map when folium is unavailable
-        import plotly.express as _px
-        _map_df = __import__('pandas').DataFrame([
-            {"lat": cfg["lat"], "lon": cfg["lon"],
-             "name": nm, "active": (nm == basin_name)}
-            for nm, cfg in GLOBAL_BASINS.items()
-        ])
-        _fig_map = _px.scatter_map(
-            _map_df, lat="lat", lon="lon", hover_name="name",
-            color="active", color_discrete_map={True:"#10b981", False:"#6b7280"},
-            zoom=2, height=380,
-        ) if hasattr(_px, 'scatter_map') else _px.scatter_mapbox(
-            _map_df, lat="lat", lon="lon", hover_name="name",
-            color="active", color_discrete_map={True:"#10b981", False:"#6b7280"},
-            zoom=2, height=380, mapbox_style="carto-darkmatter",
-        )
-        _fig_map.update_layout(margin=dict(l=0,r=0,t=0,b=0), showlegend=False)
-        c_map, c_spec = st.columns([2, 1])
         with c_map:
-            st.plotly_chart(_fig_map, use_container_width=True)
+            import plotly.express as _px
+            import pandas as _pd_map
+            _map_df = _pd_map.DataFrame([
+                {"lat": cfg["lat"], "lon": cfg["lon"],
+                 "name": nm, "size": 20 if nm == basin_name else 8,
+                 "color": "#10b981" if nm == basin_name else "#6b7280"}
+                for nm, cfg in GLOBAL_BASINS.items()
+            ])
+            try:
+                _fig_map = _px.scatter_mapbox(
+                    _map_df, lat="lat", lon="lon", hover_name="name",
+                    size="size", color="color",
+                    color_discrete_map={"#10b981":"#10b981","#6b7280":"#6b7280"},
+                    zoom=2, height=380, mapbox_style="carto-darkmatter",
+                )
+                _fig_map.update_layout(margin=dict(l=0,r=0,t=0,b=0), showlegend=False)
+                st.plotly_chart(_fig_map, use_container_width=True)
+            except Exception:
+                st.info("🌍 Map: select a basin above to see its location.")
     else:
         m = folium.Map(location=[basin["lat"], basin["lon"]],
-                   zoom_start=4, tiles="CartoDB dark_matter")
-    for nm, cfg in GLOBAL_BASINS.items():
-        active = (nm == basin_name)
-        folium.CircleMarker(
-            [cfg["lat"], cfg["lon"]],
-            radius=16 if active else 7,
-            color="#10b981" if active else "#6b7280",
-            fill=True, fill_opacity=0.85 if active else 0.5,
-            weight=3 if active else 1,
-            popup=folium.Popup(
-                f"<b>{nm}</b><br>{cfg['river']} · {cfg['dam']}<br>"
-                f"Cap: {cfg['cap']} BCM  Head: {cfg['head']} m<br>"
-                f"{', '.join(cfg.get('country',[])[:3])}",
-                max_width=260),
-            tooltip=nm,
-        ).add_to(m)
-    c_map, c_spec = st.columns([2, 1])
-    with c_map:
-        st_folium(m, width=680, height=380, key="map_v430")
+                       zoom_start=4, tiles="CartoDB dark_matter")
+        for nm, cfg in GLOBAL_BASINS.items():
+            active = (nm == basin_name)
+            folium.CircleMarker(
+                [cfg["lat"], cfg["lon"]],
+                radius=16 if active else 7,
+                color="#10b981" if active else "#6b7280",
+                fill=True, fill_opacity=0.85 if active else 0.5,
+                weight=3 if active else 1,
+                popup=folium.Popup(
+                    f"<b>{nm}</b><br>{cfg['river']} · {cfg['dam']}<br>"
+                    f"Cap: {cfg['cap']} BCM  Head: {cfg['head']} m<br>"
+                    f"{', '.join(cfg.get('country',[])[:3])}",
+                    max_width=260),
+                tooltip=nm,
+            ).add_to(m)
+        with c_map:
+            st_folium(m, width=680, height=380, key="map_v430")
     with c_spec:
         st.latex(rf"V = {basin['bathy_a']:.3f} \times A^{{{basin['bathy_b']:.2f}}}")
         st.caption(
