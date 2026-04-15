@@ -177,14 +177,19 @@ def fetch_s2(lat, lon, yr):
         val = img.reduceRegion(
             reducer=ee.Reducer.mean(), geometry=buffer,
             scale=10, maxPixels=1e7, bestEffort=True)
+        # Use ee.Algorithms.If to safely get values that may not exist
+        ndwi_safe = ee.Algorithms.If(val.contains("NDWI"), val.get("NDWI"), None)
+        ndvi_safe = ee.Algorithms.If(val.contains("NDVI"), val.get("NDVI"), None)
         return ee.Feature(None, {"month": d0.format("YYYY-MM"),
-                                 "NDWI": val.get("NDWI"), "NDVI": val.get("NDVI")})
+                                 "NDWI": ndwi_safe, "NDVI": ndvi_safe})
 
     feats = ee.FeatureCollection(ee.List.sequence(0,11).map(mo)).getInfo()["features"]
     vals  = [(f["properties"]["month"],
-              sg(f["properties"].get("NDWI", 0)),
-              sg(f["properties"].get("NDVI", 0.4)))
-             for f in feats if f["properties"].get("NDWI") is not None]
+              sg(f["properties"].get("NDWI") or 0),
+              sg(f["properties"].get("NDVI") or 0.4))
+             for f in feats
+             if f["properties"].get("NDWI") is not None
+             and f["properties"]["NDWI"] != 0]
 
     if not vals:
         return {"error": "No S2 data (cloud/no coverage)", "NDWI": [], "NDVI": [],
