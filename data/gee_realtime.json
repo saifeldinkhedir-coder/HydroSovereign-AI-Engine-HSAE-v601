@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "computed_at": "2026-04-15T07:16:33.645413",
+  "computed_at": "2026-04-15T08:41:56.807082",
   "date_range": {
     "start": "2025-04-15",
     "end": "2026-04-15"
@@ -9,7 +9,7 @@
   "basins": {
     "blue_nile_gerd": {
       "basin_id": "blue_nile_gerd",
-      "fetched_at": "2026-04-15T07:16:33.645702",
+      "fetched_at": "2026-04-15T08:41:56.807438",
       "gpm": {
         "months": [
           "2026-01",
@@ -29,7 +29,7 @@
           0.16731022790706873,
           0.33108733293037707,
           1.5509771287081144,
-          3.3939655319004474,
+          3.3373795249675946,
           0.0,
           0.0,
           0.0,
@@ -39,18 +39,17 @@
           0.0,
           0.0
         ],
-        "mean_P": 0.454,
+        "mean_P": 0.449,
         "source": "NASA/GPM_L3/IMERG_V07",
         "n_months": 12,
         "error": null
       },
       "grace": {
-        "months": [],
+        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220101_20220103):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
         "tws_cm": [],
         "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0,
-        "error": null
+        "months": [],
+        "n_months": 0
       },
       "temperature": {
         "months": [
@@ -129,7 +128,7 @@
           128.0,
           253.4,
           1186.9,
-          2597.3,
+          2554.0,
           0.0,
           0.0,
           0.0,
@@ -139,7 +138,7 @@
           0.0,
           0.0
         ],
-        "mean_Q": 347.1,
+        "mean_Q": 343.5,
         "source": "Derived: GPM \u00d7 runoff_c \u00d7 area",
         "n_months": 12,
         "error": null,
@@ -161,7 +160,7 @@
     },
     "nile_aswan": {
       "basin_id": "nile_aswan",
-      "fetched_at": "2026-04-15T07:16:40.795333",
+      "fetched_at": "2026-04-15T08:42:05.815006",
       "gpm": {
         "months": [
           "2026-01",
@@ -181,7 +180,7 @@
           0.0014319378435902763,
           0.0006991011035370321,
           0.18225758687116467,
-          0.15972904868912338,
+          0.1569577254005617,
           0.0,
           0.0,
           0.0,
@@ -191,35 +190,96 @@
           0.0,
           0.0
         ],
-        "mean_P": 0.029,
+        "mean_P": 0.028,
         "source": "NASA/GPM_L3/IMERG_V07",
         "n_months": 12,
         "error": null
       },
       "grace": {
-        "months": [],
+        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220128_20220130):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
         "tws_cm": [],
         "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0,
-        "error": null
+        "months": [],
+        "n_months": 0
       },
       "temperature": {
-        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04"
+        ],
+        "T_C": [
+          29.81,
+          31.3,
+          33.17,
+          35.63,
+          36.35,
+          31.93,
+          29.67,
+          25.37,
+          18.41,
+          18.27,
+          20.8,
+          22.41,
+          26.07
+        ],
+        "mean_T": 27.64,
+        "source": "Open-Meteo ERA5",
+        "n_months": 13,
+        "error": null
       },
       "smap": {
-        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
-        "sm_m3m3": [],
-        "mean_sm": 0
+        "months": [
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04"
+        ],
+        "sm_m3m3": [
+          0.0097,
+          0.0096,
+          0.0092,
+          0.009,
+          0.01,
+          0.0098,
+          0.01,
+          0.0105,
+          0.0127,
+          0.0115,
+          0.01,
+          0.0126,
+          0.0119
+        ],
+        "mean_sm": 0.0105,
+        "source": "Open-Meteo ERA5 soil moisture (SMAP proxy)",
+        "n_months": 13,
+        "error": null
       },
       "glofas": {
         "Q_m3s": [
           4.8,
           2.3,
           611.7,
-          536.1,
+          526.8,
           0.0,
           0.0,
           0.0,
@@ -229,7 +289,7 @@
           0.0,
           0.0
         ],
-        "mean_Q": 96.2,
+        "mean_Q": 95.5,
         "source": "Derived: GPM \u00d7 runoff_c \u00d7 area",
         "n_months": 12,
         "error": null,
@@ -251,7 +311,7 @@
     },
     "euphrates_ataturk": {
       "basin_id": "euphrates_ataturk",
-      "fetched_at": "2026-04-15T07:17:12.584903",
+      "fetched_at": "2026-04-15T08:43:05.142627",
       "gpm": {
         "months": [
           "2026-01",
@@ -271,7 +331,7 @@
           3.7939255031198265,
           3.4571817933022975,
           2.703295619599521,
-          3.44942587248981,
+          3.3960339987277988,
           0.0,
           0.0,
           0.0,
@@ -281,18 +341,17 @@
           0.0,
           0.0
         ],
-        "mean_P": 1.117,
+        "mean_P": 1.113,
         "source": "NASA/GPM_L3/IMERG_V07",
         "n_months": 12,
         "error": null
       },
       "grace": {
-        "months": [],
+        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220107_20220109):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
         "tws_cm": [],
         "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0,
-        "error": null
+        "months": [],
+        "n_months": 0
       },
       "temperature": {
         "months": [
@@ -371,7 +430,7 @@
           3899.3,
           3553.2,
           2778.4,
-          3545.2,
+          3490.4,
           0.0,
           0.0,
           0.0,
@@ -381,7 +440,7 @@
           0.0,
           0.0
         ],
-        "mean_Q": 1148.0,
+        "mean_Q": 1143.4,
         "source": "Derived: GPM \u00d7 runoff_c \u00d7 area",
         "n_months": 12,
         "error": null,
@@ -403,7 +462,7 @@
     },
     "mekong_xayaburi": {
       "basin_id": "mekong_xayaburi",
-      "fetched_at": "2026-04-15T07:17:17.403982",
+      "fetched_at": "2026-04-15T08:44:03.898698",
       "gpm": {
         "months": [
           "2026-01",
@@ -423,7 +482,7 @@
           0.01297472638617539,
           1.4136348961801863,
           1.1214652046000788,
-          0.18427786221043108,
+          0.18138785524970585,
           0.0,
           0.0,
           0.0,
@@ -433,35 +492,96 @@
           0.0,
           0.0
         ],
-        "mean_P": 0.228,
+        "mean_P": 0.227,
         "source": "NASA/GPM_L3/IMERG_V07",
         "n_months": 12,
         "error": null
       },
       "grace": {
-        "months": [],
+        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220125_20220127):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
         "tws_cm": [],
         "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0,
-        "error": null
+        "months": [],
+        "n_months": 0
       },
       "temperature": {
-        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
-        "T_C": [],
-        "mean_T": 0
+        "months": [
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04"
+        ],
+        "T_C": [
+          27.84,
+          26.42,
+          26.26,
+          25.61,
+          25.56,
+          25.12,
+          24.85,
+          21.77,
+          21.19,
+          20.01,
+          24.32,
+          26.37,
+          29.96
+        ],
+        "mean_T": 24.7,
+        "source": "Open-Meteo ERA5",
+        "n_months": 13,
+        "error": null
       },
       "smap": {
-        "error": "<urlopen error _ssl.c:993: The handshake operation timed out>",
-        "sm_m3m3": [],
-        "mean_sm": 0
+        "months": [
+          "2025-04",
+          "2025-05",
+          "2025-06",
+          "2025-07",
+          "2025-08",
+          "2025-09",
+          "2025-10",
+          "2025-11",
+          "2025-12",
+          "2026-01",
+          "2026-02",
+          "2026-03",
+          "2026-04"
+        ],
+        "sm_m3m3": [
+          0.3489,
+          0.4124,
+          0.4711,
+          0.4858,
+          0.4404,
+          0.4907,
+          0.4565,
+          0.4365,
+          0.3986,
+          0.3424,
+          0.2833,
+          0.2943,
+          0.2851
+        ],
+        "mean_sm": 0.4029,
+        "source": "Open-Meteo ERA5 soil moisture (SMAP proxy)",
+        "n_months": 13,
+        "error": null
       },
       "glofas": {
         "Q_m3s": [
           53.7,
           5853.3,
           4643.6,
-          763.0,
+          751.1,
           0.0,
           0.0,
           0.0,
@@ -471,7 +591,7 @@
           0.0,
           0.0
         ],
-        "mean_Q": 942.8,
+        "mean_Q": 941.8,
         "source": "Derived: GPM \u00d7 runoff_c \u00d7 area",
         "n_months": 12,
         "error": null,
@@ -493,7 +613,7 @@
     },
     "indus_tarbela": {
       "basin_id": "indus_tarbela",
-      "fetched_at": "2026-04-15T07:17:49.379306",
+      "fetched_at": "2026-04-15T08:44:10.398443",
       "gpm": {
         "months": [
           "2026-01",
@@ -513,7 +633,7 @@
           1.1380236840836873,
           0.17437343419643522,
           3.160344215852257,
-          4.248255361602181,
+          4.188324794918453,
           0.0,
           0.0,
           0.0,
@@ -523,18 +643,17 @@
           0.0,
           0.0
         ],
-        "mean_P": 0.727,
+        "mean_P": 0.722,
         "source": "NASA/GPM_L3/IMERG_V07",
         "n_months": 12,
         "error": null
       },
       "grace": {
-        "months": [],
+        "error": "Error in map(ID=NASA_USDA_SMAP_SM20220125_20220127):\nDictionary.get: Dictionary does not contain key: 'lwe_thickness_csr'.",
         "tws_cm": [],
         "mean_tws": 0,
-        "source": "NASA/GRACE/MASS_GRIDS_V04/LAND",
-        "n_months": 0,
-        "error": null
+        "months": [],
+        "n_months": 0
       },
       "temperature": {
         "months": [
@@ -613,7 +732,7 @@
           1530.0,
           234.4,
           4248.9,
-          5711.5,
+          5631.0,
           0.0,
           0.0,
           0.0,
@@ -623,7 +742,7 @@
           0.0,
           0.0
         ],
-        "mean_Q": 977.1,
+        "mean_Q": 970.4,
         "source": "Derived: GPM \u00d7 runoff_c \u00d7 area",
         "n_months": 12,
         "error": null,
