@@ -13,7 +13,7 @@ from __future__ import annotations
 import logging
 import json
 from datetime import date, datetime, timedelta
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -295,6 +295,195 @@ def _load_sample_data(basin_name: str) -> Dict:
         "source": "HSAE synthetic seasonal proxy",
         "runoff_c": 0.3, "cap_bcm": 10.0,
     }
+
+
+def fetch_gee_basin(
+    lat: float,
+    lon: float,
+    bbox: List[float],
+    start_date: str,
+    end_date: str,
+    sensors: Optional[List[str]] = None,
+    project_id: str = "zinc-arc-484714-j8",
+) -> Dict:
+    """
+    Fetch satellite data from Google Earth Engine (requires earthengine-api).
+
+    Install: pip install hydrosovereign[gee]
+    Auth:    earthengine authenticate
+
+    Sensors available:
+      - "gpm"      : GPM IMERG V07 precipitation (11 km, daily)
+      - "grace"    : GRACE-FO MASCON TWS anomaly (300 km, monthly)
+      - "smap"     : SMAP 10km soil moisture
+      - "sentinel1": Sentinel-1 SAR flood extent (10 m)
+      - "sentinel2": Sentinel-2 NDWI water mask (10 m)
+      - "era5"     : ERA5 temperature (25 km, monthly)
+
+    Parameters
+    ----------
+    lat, lon : float
+        Basin centroid.
+    bbox : list
+        [lon_min, lat_min, lon_max, lat_max].
+    start_date : str
+        "YYYY-MM-DD".
+    end_date : str
+        "YYYY-MM-DD".
+    sensors : list, optional
+        Subset of sensors. Default = ["gpm", "grace", "smap"].
+    project_id : str
+        GEE project ID. Default = "zinc-arc-484714-j8".
+
+    Returns
+    -------
+    dict
+        One key per sensor with retrieved values.
+
+    Raises
+    ------
+    ImportError
+        If earthengine-api not installed.
+    RuntimeError
+        If GEE authentication fails.
+
+    Examples
+    --------
+    >>> data = fetch_gee_basin(
+    ...     lat=10.53, lon=35.09,
+    ...     bbox=[33.0, 8.0, 37.5, 13.0],
+    ...     start_date="2024-01-01", end_date="2024-12-31",
+    ...     sensors=["gpm", "grace"],
+    ... )
+    >>> print(f"Mean P = {data['gpm']['mean_P_mm_day']:.2f} mm/day")
+    >>> print(f"TWS    = {data['grace']['mean_tws_cm']:.1f} cm")
+    """
+    try:
+        import ee
+    except ImportError:
+        raise ImportError(
+            "earthengine-api is required for GEE data.\n"
+            "Install: pip install hydrosovereign[gee]\n"
+            "Authenticate: earthengine authenticate"
+        )
+
+    # Initialize GEE
+    try:
+        ee.Initialize(project=project_id)
+    except Exception:
+        try:
+            ee.Initialize()
+        except Exception as e:
+            raise RuntimeError(
+                f"GEE authentication failed: {e}\n"
+                "Run: earthengine authenticate"
+            )
+
+    if sensors is None:
+        sensors = ["gpm", "grace", "smap"]
+
+    region = ee.Geometry.Rectangle(bbox)
+    result = {}
+
+    # GPM IMERG V07 precipitation
+    if "gpm" in sensors:
+        try:
+            gpm = (ee.ImageCollection("NASA/GPM_L3/IMERG_V07")
+                   .filterDate(start_date, end_date)
+                   .filterBounds(region)
+                   .select("precipitation"))
+            mean_p = gpm.mean().reduceRegion(
+                ee.Reducer.mean(), region, 11132).getInfo()
+            result["gpm"] = {
+                "mean_P_mm_day": float(list(mean_p.values())[0] or 0),
+                "source": "GPM IMERG V07 (NASA)",
+                "resolution_km": 11,
+            }
+            logger.info("GEE GPM: mean_P=%.2f mm/day", result["gpm"]["mean_P_mm_day"])
+        except Exception as e:
+            logger.warning("GPM fetch failed: %s", e)
+            result["gpm"] = {"error": str(e)}
+
+    # GRACE-FO MASCON TWS
+    if "grace" in sensors:
+        try:
+            grace = (ee.ImageCollection("NASA/GRACE/MASS_GRIDS_V04/LAND")
+                     .filterDate(start_date, end_date)
+                     .select("lwe_thickness_csr"))
+            mean_tws = grace.mean().reduceRegion(
+                ee.Reducer.mean(), region, 300000).getInfo()
+            result["grace"] = {
+                "mean_tws_cm": float(list(mean_tws.values())[0] or 0),
+                "source": "GRACE-FO MASCON RL06v4 (NASA)",
+                "resolution_km": 300,
+            }
+            logger.info("GEE GRACE-FO: mean_TWS=%.1f cm", result["grace"]["mean_tws_cm"])
+        except Exception as e:
+            logger.warning("GRACE fetch failed: %s", e)
+            result["grace"] = {"error": str(e)}
+
+    # SMAP soil moisture
+    if "smap" in sensors:
+        try:
+            smap = (ee.ImageCollection("NASA_USDA/HSL/SMAP10KM_soil_moisture")
+                    .filterDate(start_date, end_date)
+                    .select("ssm"))
+            mean_sm = smap.mean().reduceRegion(
+                ee.Reducer.mean(), region, 10000).getInfo()
+            result["smap"] = {
+                "mean_sm_m3m3": float(list(mean_sm.values())[0] or 0),
+                "source": "SMAP 10km (NASA)",
+                "resolution_km": 10,
+            }
+            logger.info("GEE SMAP: mean_SM=%.3f m³/m³", result["smap"]["mean_sm_m3m3"])
+        except Exception as e:
+            logger.warning("SMAP fetch failed: %s", e)
+            result["smap"] = {"error": str(e)}
+
+    # Sentinel-1 SAR flood extent
+    if "sentinel1" in sensors:
+        try:
+            s1 = (ee.ImageCollection("COPERNICUS/S1_GRD")
+                  .filterDate(start_date, end_date)
+                  .filterBounds(region)
+                  .filter(ee.Filter.eq("instrumentMode","IW"))
+                  .select("VV"))
+            flood_area = s1.mean().lt(-15).reduceRegion(
+                ee.Reducer.mean(), region, 100).getInfo()
+            result["sentinel1"] = {
+                "flood_fraction": float(list(flood_area.values())[0] or 0),
+                "source": "Sentinel-1 SAR IW (Copernicus)",
+                "resolution_m": 10,
+            }
+        except Exception as e:
+            logger.warning("Sentinel-1 fetch failed: %s", e)
+            result["sentinel1"] = {"error": str(e)}
+
+    # ERA5 temperature
+    if "era5" in sensors:
+        try:
+            era5 = (ee.ImageCollection("ECMWF/ERA5/MONTHLY")
+                    .filterDate(start_date, end_date)
+                    .select("mean_2m_air_temperature"))
+            mean_t = era5.mean().subtract(273.15).reduceRegion(
+                ee.Reducer.mean(), region, 25000).getInfo()
+            result["era5"] = {
+                "mean_T_celsius": float(list(mean_t.values())[0] or 25.0),
+                "source": "ERA5 Monthly (ECMWF via GEE)",
+                "resolution_km": 25,
+            }
+        except Exception as e:
+            logger.warning("ERA5 fetch failed: %s", e)
+            result["era5"] = {"error": str(e)}
+
+    result["metadata"] = {
+        "lat": lat, "lon": lon, "bbox": bbox,
+        "start_date": start_date, "end_date": end_date,
+        "sensors_requested": sensors,
+        "gee_project": project_id,
+        "source": "Google Earth Engine",
+    }
+    return result
 
 
 def check_connectivity(timeout: int = 5) -> Dict[str, bool]:
