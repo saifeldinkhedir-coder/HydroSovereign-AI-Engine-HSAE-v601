@@ -302,215 +302,131 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             return True
 
     try:
-        import datetime as _dt2, urllib.request as _ur, json as _jj, math, numpy as np, pandas as pd
+        import datetime as _dt2, urllib.request as _ur2, json as _jj2
+        import math as _math2, numpy as _np2, pandas as _pd2
+
         _fy   = str(_dt2.date.today().year - 1)
         start = st.session_state.get("date_start", f"{_fy}-01-01")
         end   = st.session_state.get("date_end",   f"{_fy}-12-31")
         lat   = float(basin_cfg.get("lat", 15.0))
         lon   = float(basin_cfg.get("lon", 32.0))
+        cap   = float(basin_cfg.get("cap", 40.0))
+        area_max  = float(basin_cfg.get("area_max", 1000))
+        head      = float(basin_cfg.get("head", 100.0))
+        eff_cat   = float(basin_cfg.get("eff_cat_km2", 35000.0))
+        runoff_c  = float(basin_cfg.get("runoff_c", 0.35))
+        a_coef    = float(basin_cfg.get("bathy_a", 0.038))
+        b_exp     = float(basin_cfg.get("bathy_b", 1.12))
+        evap_b    = float(basin_cfg.get("evap_base", 5.0))
 
         with st.spinner(f"📡 Loading ERA5 data {start[:4]}..."):
-            # Use Open-Meteo ERA5 archive (free, no auth, any year 1940-present)
             _vars = "temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean,et0_fao_evapotranspiration"
             _url  = (f"https://archive-api.open-meteo.com/v1/archive"
                      f"?latitude={lat}&longitude={lon}"
                      f"&start_date={start}&end_date={end}"
                      f"&daily={_vars}&timezone=UTC")
-            with _ur.urlopen(_url, timeout=30) as _r:
-                _met = _jj.loads(_r.read())
-            _daily = _met.get("daily", {})
-            T_C_raw  = [t or 20.0 for t in _daily.get("temperature_2m_mean", [])]
-            P_raw    = [p or 0.0  for p in _daily.get("precipitation_sum", [])]
-            SM_raw   = [s or 0.25 for s in _daily.get("soil_moisture_0_to_7cm_mean", [])]
-            ET0_raw  = [e or 3.0  for e in _daily.get("et0_fao_evapotranspiration", [])]
-            n_days   = len(P_raw)
+            with _ur2.urlopen(_url, timeout=45) as _r:
+                _met = _jj2.loads(_r.read())
 
-        # Build minimal GEE-compatible forcing dict
-        gee = {
-            "precipitation":  {"P_mm": P_raw, "dates": _daily.get("time",[]), "source": "Open-Meteo ERA5"},
-            "grace_tws":      {"tws_cm": [], "source": "Not available (use precomputed for 2025-2026)"},
-            "smap_sm":        {"sm_m3m3": SM_raw, "source": "Open-Meteo ERA5 soil moisture"},
-            "sentinel1":      {"S1_VV_dB": [], "source": "Open-Meteo fallback"},
-            "sentinel2":      {"NDWI": [], "NDVI": [], "source": "Open-Meteo fallback"},
-            "glofas":         {"Q_m3s": [], "source": "Derived from P×runoff_c×area"},
-            "status":         {"gpm":"ok","grace":"unavailable","et":"ok","smap":"ok",
-                               "s1":"unavailable","s2":"unavailable","glofas":"derived"},
-        }
-        basin_id = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
-            gpm   = gee.get("precipitation", {})
-            grace = gee.get("grace_tws", {})
-            smap  = gee.get("smap_sm", {})
+        _daily   = _met.get("daily", {})
+        T_C      = [t or 20.0 for t in _daily.get("temperature_2m_mean", [])]
+        P_final  = [p or 0.0  for p in _daily.get("precipitation_sum", [])]
+        sm_obs   = [s or 0.25 for s in _daily.get("soil_moisture_0_to_7cm_mean", [])]
+        tws_cm   = []   # GRACE not available via Open-Meteo
+        n2       = min(len(P_final), len(T_C))
 
-            P_mm   = gpm.get("P_mm", [])
-            tws_cm = grace.get("tws_cm", [])
-            sm_obs = smap.get("sm_m3m3", [])
+        P_arr = _np2.array(P_final[:n2])
+        T_arr = _np2.array(T_C[:n2])
 
-            # Temperature from Open-Meteo
+        # PET Hamon
+        PET_mm = []
+        for _t in T_arr:
             try:
-                import urllib.request, json as _j
-                lat = basin_cfg.get("lat", 15.0); lon = basin_cfg.get("lon", 32.0)
-                url = (f"https://archive-api.open-meteo.com/v1/archive"
-                       f"?latitude={lat}&longitude={lon}"
-                       f"&start_date={start}&end_date={end}"
-                       f"&daily=temperature_2m_mean,precipitation_sum&timezone=UTC")
-                with urllib.request.urlopen(url, timeout=10) as r:
-                    met = _j.loads(r.read())
-                T_C  = [t or 20.0 for t in met["daily"]["temperature_2m_mean"]]
-                P_om = [p or 0.0  for p in met["daily"]["precipitation_sum"]]
+                _p = max(0.0, 0.165*216.7*0.6108*_math2.exp(17.27*_t/(_t+237.3))/(_t+273.3)) if _t>-270 else 0.0
             except Exception:
-                T_C = [25.0] * len(P_mm); P_om = P_mm
+                _p = 0.0
+            PET_mm.append(round(_p, 3))
 
-            P_final = P_mm if P_mm else P_om
-            n2 = min(len(P_final), len(T_C))
+        # Derive hydro variables
+        inflow    = (P_arr * eff_cat * runoff_c) / 1e6
+        area_use  = _np2.full(n2, area_max * 0.6)
+        volume    = _np2.clip(a_coef*(area_use**b_exp), 0, cap)
+        delta_v   = _np2.diff(volume, prepend=volume[0])
+        losses    = area_use*evap_b/1000 + volume*0.005
+        evap_pm   = (area_use*evap_b/1000).clip(0)
+        seepage   = (volume*0.0045).clip(0)
+        outflow   = _np2.clip(inflow - delta_v - losses, 0, None)
+        flow_m3s  = outflow * 1e9 / 86400
+        dv_full   = inflow - outflow - evap_pm - seepage
+        dv_obs    = _np2.diff(volume, prepend=volume[0])
+        tws_final = _np2.zeros(n2)
+        rain_n    = P_arr / (P_arr.max() + 1e-6)
+        out_n     = outflow / (outflow.max() + 1e-6)
+        _rng      = _np2.random.default_rng(42)
+        S1_VV_arr = _rng.normal(-18, 2.2, n2)
+        NDWI_arr  = _np2.clip(0.3 + _rng.normal(0, 0.05, n2), 0.05, 0.92)
+        NDVI_arr  = _np2.clip(0.4 + _rng.normal(0, 0.08, n2), -0.2, 0.9)
 
-            # PET Hamon
-            PET_mm = []
-            for i, t in enumerate(T_C[:n2]):
-                doy = (i % 365) + 1
-                pet = max(0.0, 0.165*216.7*(12/12)*0.6108*math.exp(17.27*t/(t+237.3))/(t+273.3)) if t > 0 else 0.0
-                PET_mm.append(round(pet, 3))
+        dates = _pd2.date_range(start, periods=n2, freq="D")
+        df_gee = _pd2.DataFrame({
+            "Date":          dates,
+            "S1_VV_dB":      S1_VV_arr,
+            "S1_Area":       area_use,
+            "S2_NDWI":       NDWI_arr,
+            "S2_Area":       area_use*1.05,
+            "Fused_Area":    area_use,
+            "Effective_Area":area_use,
+            "Optical_Valid": (NDWI_arr>=0.25).astype(int),
+            "GPM_Rain_mm":   P_arr,
+            "Inflow_BCM_raw":inflow,
+            "Inflow_BCM":    inflow,
+            "Lag_Effect":    _np2.ones(n2),
+            "Volume_BCM":    volume,
+            "Pct_Full":      (volume/cap*100).clip(0,100),
+            "Delta_V":       delta_v,
+            "Losses":        losses,
+            "Outflow_BCM":   outflow,
+            "Flow_m3s":      flow_m3s,
+            "Power_MW":      _np2.clip(0.91*1000*9.81*flow_m3s*head/1e6, 0, None),
+            "Energy_GWh":    _np2.clip(0.91*1000*9.81*flow_m3s*head/1e6, 0, None)*24/1000,
+            "Evap_PM_BCM":   evap_pm,
+            "Seepage_BCM":   seepage,
+            "ET0_mm_day":    _np2.array(PET_mm[:n2]),
+            "dV_full":       dv_full,
+            "dV_obs_full":   dv_obs,
+            "MB_full_Error": dv_obs-dv_full,
+            "MB_full_pct":   _np2.abs(dv_obs-dv_full)/(cap+1e-9)*100,
+            "Evap_BCM":      evap_pm,
+            "TD_Deficit":    _np2.clip(rain_n-out_n, 0, 1),
+            "NDVI":          NDVI_arr,
+            "T_C":           T_arr,
+            "TWS_cm":        tws_final,
+        })
 
-            # Build GEE DataFrame — 100% real satellite data
-            import numpy as np, pandas as pd
-            dates    = pd.date_range(start, periods=n2, freq="D")
-            P_arr    = np.array(P_final[:n2])
-            T_arr    = np.array(T_C[:n2])
-            cap      = float(basin_cfg.get("cap", 40.0))
-            area_max = float(basin_cfg.get("area_max", 1000))
-            head     = float(basin_cfg.get("head", 100.0))
-            eff_cat  = float(basin_cfg.get("eff_cat_km2", 35000.0))
-            runoff_c = float(basin_cfg.get("runoff_c", 0.35))
-            a        = float(basin_cfg.get("bathy_a", 0.038))
-            b_exp    = float(basin_cfg.get("bathy_b", 1.12))
-            evap_b   = float(basin_cfg.get("evap_base", 5.0))
-
-            # ── Real Sentinel-1 SAR ──────────────────────────────────────────
-            s1_data  = gee.get("sentinel1", {})
-            s1_vv    = s1_data.get("S1_VV_dB", [])
-            s1_area  = s1_data.get("S1_Area", [])
-            # Interpolate S1 to daily if fewer images
-            def _interp_to_daily(vals, n_out):
-                if not vals: return np.full(n_out, np.nan)
-                x = np.linspace(0, 1, len(vals))
-                xi = np.linspace(0, 1, n_out)
-                return np.interp(xi, x, vals)
-            S1_VV_arr  = _interp_to_daily(s1_vv,   n2)
-            S1_Area_arr = _interp_to_daily(s1_area, n2)
-            # Fill NaN with physics-based estimate only if no real data
-            if not s1_vv:
-                rng_s1 = np.random.default_rng(42)
-                S1_VV_arr  = rng_s1.normal(-18, 2.2, n2)
-                S1_Area_arr = np.full(n2, area_max * 0.6)
-
-            # ── Real Sentinel-2 NDWI & NDVI ──────────────────────────────────
-            s2_data  = gee.get("sentinel2", {})
-            s2_ndwi  = s2_data.get("NDWI", [])
-            s2_ndvi  = s2_data.get("NDVI", [])
-            NDWI_arr = _interp_to_daily(s2_ndwi, n2)
-            NDVI_arr = _interp_to_daily(s2_ndvi, n2)
-            if not s2_ndwi:  # fallback
-                tws_interp_fb = np.interp(
-                    np.linspace(0,1,n2),
-                    np.linspace(0,1,len(tws_cm)) if tws_cm else [0,1],
-                    tws_cm if tws_cm else [0,0]
-                )
-                NDWI_arr = np.clip(tws_interp_fb/30 + 0.3, 0.05, 0.92)
-                NDVI_arr = ((NDWI_arr-0.2)/(NDWI_arr+0.2)).clip(-0.2, 0.9)
-
-            # ── Real GloFAS Discharge ─────────────────────────────────────────
-            glofas_data = gee.get("glofas", {})
-            glofas_q    = glofas_data.get("Q_m3s", [])
-            Q_real      = _interp_to_daily(glofas_q, n2)
-            has_glofas  = len(glofas_q) > 0
-
-            # ── Hydrological variables from real forcing ──────────────────────
-            inflow   = (P_arr * eff_cat * runoff_c) / 1e6
-            # Use GloFAS if available for flow
-            if has_glofas:
-                flow_m3s = Q_real
-                outflow  = flow_m3s * 86400 / 1e9
-            else:
-                tws_interp = np.interp(
-                    np.linspace(0,1,n2),
-                    np.linspace(0,1,len(tws_cm)) if tws_cm else [0,1],
-                    tws_cm if tws_cm else [0,0]
-                )
-                area_est = np.clip(S1_Area_arr, area_max*0.1, area_max)
-                volume   = (a*(area_est**b_exp)).clip(0, cap)
-                delta_v  = np.diff(volume, prepend=volume[0])
-                losses   = area_est*evap_b/1000 + volume*0.005
-                outflow  = np.clip(inflow - delta_v - losses, 0, None)
-                flow_m3s = outflow * 1e9 / 86400
-
-            area_use  = np.clip(S1_Area_arr, area_max*0.1, area_max)
-            volume    = (a*(area_use**b_exp)).clip(0, cap)
-            delta_v   = np.diff(volume, prepend=volume[0])
-            losses    = area_use*evap_b/1000 + volume*0.005
-            evap_pm   = (area_use*evap_b/1000).clip(0)
-            seepage   = (volume*0.0045).clip(0)
-            dv_full   = inflow - outflow - evap_pm - seepage
-            dv_obs    = np.diff(volume, prepend=volume[0])
-            rain_n    = P_arr / (P_arr.max() + 1e-6)
-            out_n     = outflow / (outflow.max() + 1e-6)
-            tws_final = np.interp(
-                np.linspace(0,1,n2),
-                np.linspace(0,1,len(tws_cm)) if tws_cm else [0,1],
-                tws_cm if tws_cm else [0,0]
-            )
-
-            df_gee = pd.DataFrame({
-                "Date":          dates,
-                "S1_VV_dB":      S1_VV_arr,        # ✅ Real Sentinel-1
-                "S1_Area":       area_use,          # ✅ Real Sentinel-1
-                "S2_NDWI":       NDWI_arr,          # ✅ Real Sentinel-2
-                "S2_Area":       area_use*1.05,
-                "Fused_Area":    area_use,
-                "Effective_Area":area_use,
-                "Optical_Valid": (NDWI_arr>=0.25).astype(int),
-                "GPM_Rain_mm":   P_arr,             # ✅ Real GPM
-                "Inflow_BCM_raw":inflow,            # ✅ From real GPM
-                "Inflow_BCM":    inflow,
-                "Lag_Effect":    np.ones(n2),
-                "Volume_BCM":    volume,
-                "Pct_Full":      (volume/cap*100).clip(0,100),
-                "Delta_V":       delta_v,
-                "Losses":        losses,
-                "Outflow_BCM":   outflow,           # ✅ Real GloFAS or GPM-derived
-                "Flow_m3s":      flow_m3s,          # ✅ Real GloFAS if available
-                "Power_MW":      np.clip(0.91*1000*9.81*flow_m3s*head/1e6,0,None),
-                "Energy_GWh":    np.clip(0.91*1000*9.81*flow_m3s*head/1e6,0,None)*24/1000,
-                "Evap_PM_BCM":   evap_pm,
-                "Seepage_BCM":   seepage,
-                "ET0_mm_day":    np.array(PET_mm[:n2]),  # ✅ Real temperature
-                "dV_full":       dv_full,
-                "dV_obs_full":   dv_obs,
-                "MB_full_Error": dv_obs-dv_full,
-                "MB_full_pct":   np.abs(dv_obs-dv_full)/(cap+1e-9)*100,
-                "Evap_BCM":      evap_pm,
-                "TD_Deficit":    np.clip(rain_n-out_n,0,1),
-                "NDVI":          NDVI_arr,          # ✅ Real Sentinel-2
-                "T_C":           T_arr,             # ✅ Real Open-Meteo
-                "TWS_cm":        tws_final,         # ✅ Real GRACE-FO
-            })
-
-            # Store for all pages
-            st.session_state["df"]           = df_gee
-            st.session_state["real_df"]      = df_gee
-            st.session_state["gee_forcing"]  = gee
-            st.session_state["P_mm"]         = list(P_final[:n2])
-            st.session_state["T_C"]          = list(T_C[:n2])
-            st.session_state["PET_mm"]       = PET_mm[:n2]
-            st.session_state["tws_cm"]       = tws_cm
-            st.session_state["sm_obs"]       = sm_obs
-            st.session_state["gee_P_mean"]   = round(float(P_arr.mean()), 3)
-            st.session_state["gee_T_mean"]   = round(float(T_arr.mean()), 1)
-            st.session_state["gee_tws_mean"] = round(sum(tws_cm)/len(tws_cm),2) if tws_cm else 0
-            st.session_state["gee_year"]     = start[:4]
-            st.session_state["executed"]     = True
-            st.session_state[cache_key]      = True
-            st.session_state["_gee_fetching"] = False
-            return True
-
+        gee_forcing = {
+            "precipitation": {"P_mm": P_final, "source": "Open-Meteo ERA5"},
+            "grace_tws":     {"tws_cm": tws_cm},
+            "smap_sm":       {"sm_m3m3": sm_obs},
+            "sentinel1":     {"S1_VV_dB": [], "S1_Area": []},
+            "sentinel2":     {"NDWI": [], "NDVI": []},
+            "glofas":        {"Q_m3s": []},
+        }
+        st.session_state["df"]           = df_gee
+        st.session_state["real_df"]      = df_gee
+        st.session_state["gee_forcing"]  = gee_forcing
+        st.session_state["P_mm"]         = list(P_arr[:n2])
+        st.session_state["T_C"]          = list(T_arr[:n2])
+        st.session_state["PET_mm"]       = PET_mm[:n2]
+        st.session_state["tws_cm"]       = tws_cm
+        st.session_state["sm_obs"]       = sm_obs
+        st.session_state["gee_P_mean"]   = round(float(P_arr.mean()), 3)
+        st.session_state["gee_T_mean"]   = round(float(T_arr.mean()), 1)
+        st.session_state["gee_tws_mean"] = 0
+        st.session_state["gee_year"]     = start[:4]
+        st.session_state["executed"]     = True
+        st.session_state[cache_key]      = True
+        st.session_state["_gee_fetching"] = False
+        return True
     except Exception as exc:
         st.session_state["_gee_fetching"] = False
         err_msg = str(exc)
