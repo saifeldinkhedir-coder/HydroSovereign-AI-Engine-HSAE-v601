@@ -210,3 +210,150 @@ def fetch_s2(lat, lon, yr):
         "source":    "COPERNICUS/S2_SR_HARMONIZED (5km buffer, 20m, quarterly)",
         "n_months":  len(results), "error": None,
     }
+
+
+def fetch_openmeteo(lat, lon):
+    """Open-Meteo ERA5 — temperature + precipitation + soil moisture (free API)."""
+    url = (f"https://archive-api.open-meteo.com/v1/archive"
+           f"?latitude={lat}&longitude={lon}"
+           f"&start_date={start_date}&end_date={end_date}"
+           f"&daily=temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean"
+           f"&timezone=UTC")
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as r:
+                d = json.loads(r.read())
+            daily  = d.get("daily", {})
+            times  = daily.get("time", [])
+            out    = {}
+            for var in ["temperature_2m_mean","precipitation_sum","soil_moisture_0_to_7cm_mean"]:
+                vals = daily.get(var, [])
+                monthly = {}
+                for i, t in enumerate(times):
+                    m = t[:7]
+                    v = vals[i] if i < len(vals) else None
+                    if v is not None:
+                        monthly.setdefault(m, []).append(float(v))
+                months = sorted(monthly)
+                out[var] = {
+                    "months":  months,
+                    "monthly": [round(sum(monthly[m])/len(monthly[m]),4) for m in months],
+                    "mean":    round(sum(sum(monthly[m]) for m in months)/
+                                     max(sum(len(monthly[m]) for m in months),1), 4)
+                }
+            return out
+        except Exception as e:
+            if attempt == 3: raise
+            time.sleep(5 * (attempt + 1))
+
+
+# ── Per-basin worker (runs in parallel) ───────────────────────────────────────
+
+def process_basin(basin_id, cfg):
+    """Fetch all 7 sources for one basin. Called by ThreadPoolExecutor."""
+    t0     = time.time()
+    lat    = cfg["lat"]; lon = cfg["lon"]
+    rc     = cfg["runoff_c"]; area = cfg["area_km2"]
+    region = ee.Geometry.Rectangle(cfg["bbox"])
+    yr     = year   # global variable from module scope
+    result = {"basin_id": basin_id, "fetched_at": datetime.datetime.utcnow().isoformat()}
+
+    # 1 — GPM IMERG V07
+    try:
+        result["gpm"] = fetch_gpm(region, yr)
+    except Exception as e:
+        result["gpm"] = {"error": str(e), "P_mm_day": [], "mean_P": 0, "months": [], "n_months": 0}
+
+    # 2 — GRACE-FO MASCON
+    try:
+        result["grace"] = fetch_grace(region)
+    except Exception as e:
+        result["grace"] = {"error": str(e), "tws_cm": [], "mean_tws": 0, "months": [], "n_months": 0}
+
+    # 3 — Sentinel-1 GRD
+    try:
+        result["sentinel1"] = fetch_s1(region, yr)
+    except Exception as e:
+        result["sentinel1"] = {"error": str(e), "VV_dB": [], "mean_VV": -20, "months": [], "n_months": 0}
+
+    # 4 — Sentinel-2 SR (NDWI + NDVI)
+    try:
+        result["sentinel2"] = fetch_s2(lat, lon, yr)
+    except Exception as e:
+        result["sentinel2"] = {"error": str(e), "NDWI": [], "NDVI": [],
+                               "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
+
+    # 5+7 — Open-Meteo ERA5 (Temperature + SM + P-backup)
+    try:
+        om  = fetch_openmeteo(lat, lon)
+        T   = om["temperature_2m_mean"]
+        P   = om["precipitation_sum"]
+        SM  = om["soil_moisture_0_to_7cm_mean"]
+        result["temperature"] = {"months": T["months"], "T_C": T["monthly"],
+                                  "mean_T": T["mean"], "source": "Open-Meteo ERA5",
+                                  "n_months": len(T["months"]), "error": None}
+        result["smap"]        = {"months": SM["months"], "sm_m3m3": SM["monthly"],
+                                  "mean_sm": SM["mean"], "source": "Open-Meteo SMAP-proxy",
+                                  "n_months": len(SM["months"]), "error": None}
+        if not result["gpm"].get("P_mm_day"):
+            result["gpm"] = {"months": P["months"], "P_mm_day": P["monthly"],
+                              "mean_P": P["mean"], "source": "Open-Meteo ERA5 (backup)",
+                              "n_months": len(P["months"]), "error": None}
+    except Exception as e:
+        result["temperature"] = {"error": str(e), "T_C": [], "mean_T": 25.0, "months": [], "n_months": 0}
+        result["smap"]        = {"error": str(e), "sm_m3m3": [], "mean_sm": 0.2, "months": [], "n_months": 0}
+
+    # 6 — GloFAS ERA5 (derived: GPM × runoff_c × area)
+    P_vals = result["gpm"].get("P_mm_day", [])
+    if P_vals:
+        Q = [round(p * rc * area / 86.4, 1) for p in P_vals]
+        result["glofas"] = {"Q_m3s": Q, "mean_Q": round(sum(Q)/max(len(Q),1), 1),
+                             "source": "Derived: GPM × runoff_c × area",
+                             "n_months": len(Q), "months": result["gpm"]["months"], "error": None}
+    else:
+        result["glofas"] = {"error": "No GPM data", "Q_m3s": [], "mean_Q": 0, "months": [], "n_months": 0}
+
+    elapsed = time.time() - t0
+    s = {k: ("✅" if result.get(k,{}).get("n_months",0)>0 else "❌")
+         for k in ["gpm","grace","sentinel1","sentinel2","smap","glofas","temperature"]}
+    print(f"  {basin_id:<18} {s['gpm']}GPM {s['grace']}GRC {s['sentinel1']}S1 "
+          f"{s['sentinel2']}S2 {s['smap']}SM {s['glofas']}Q {s['temperature']}T  ({elapsed:.0f}s)")
+    return basin_id, result
+
+
+# ── Parallel execution ─────────────────────────────────────────────────────────
+print(f"\n⚡ Starting parallel fetch — {len(BASINS)} basins × 8 workers...")
+t0_total = time.time()
+
+output = {
+    "schema_version": "4.0",
+    "computed_at":    datetime.datetime.utcnow().isoformat(),
+    "date_range":     {"start": start_date, "end": end_date},
+    "n_basins":       len(BASINS),
+    "sources":        ["GPM IMERG V07","GRACE-FO MASCON","Sentinel-1 GRD",
+                       "Sentinel-2 SR","SMAP","GloFAS ERA5","Open-Meteo ERA5"],
+    "basins":         {}
+}
+
+with ThreadPoolExecutor(max_workers=8) as pool:
+    futures = {pool.submit(process_basin, bid, cfg): bid for bid, cfg in BASINS.items()}
+    for fut in as_completed(futures):
+        bid, res = fut.result()
+        output["basins"][bid] = res
+
+elapsed_total = time.time() - t0_total
+print(f"\n⚡ Completed in {elapsed_total:.0f}s ({elapsed_total/60:.1f} min)")
+
+# ── Save ───────────────────────────────────────────────────────────────────────
+Path("data").mkdir(exist_ok=True)
+with open("data/gee_realtime.json", "w") as f:
+    json.dump(output, f, indent=2)
+
+# ── Report ─────────────────────────────────────────────────────────────────────
+SRCS = [("GPM","gpm"),("GRACE","grace"),("S1","sentinel1"),("S2","sentinel2"),
+        ("SMAP","smap"),("GloFAS","glofas"),("ERA5-T","temperature")]
+print(f"\n{'='*50}  schema v{output['schema_version']}")
+for label, key in SRCS:
+    ok = sum(1 for bd in output["basins"].values() if bd.get(key,{}).get("n_months",0)>0)
+    print(f"  {'✅' if ok==len(BASINS) else '⚠️' if ok>0 else '❌'} {label:<8} {ok:>2}/{len(BASINS)}")
+print(f"✅ Saved data/gee_realtime.json  ({elapsed_total:.0f}s)")
