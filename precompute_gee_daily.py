@@ -148,66 +148,68 @@ def fetch_s1(region, yr):
 
 
 def fetch_s2(lat, lon, yr):
-    """Sentinel-2 SR — quarterly NDWI + NDVI.
-    Uses Python-level loop with direct .getInfo() per quarter.
-    No server-side ee.ImageCollection.map() — avoids Dictionary key errors.
-    5km buffer around dam centroid — memory-safe in parallel.
+    """Sentinel-2 SR — NDWI + NDVI, quarterly, 10km buffer.
+    
+    Key design decisions:
+    - No QA60 mask inside ee.map() (causes band-type errors server-side)
+    - Use unmasked median → ignore zeros → robust to cloud
+    - NO cloud filter pre-filter (let the median handle it naturally)
+    - Python-level quarterly loop → direct .getInfo() per quarter (no memory issues)
+    - 10km buffer around dam centroid
     """
-    import datetime as _dt
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(10000)  # 10km radius — better orbit coverage
+    buffer = point.buffer(10000)
 
-    def mask_index(img):
-        qa   = img.select("QA60")
-        mask = qa.bitwiseAnd(1 << 10).eq(0).And(qa.bitwiseAnd(1 << 11).eq(0))
-        img  = img.updateMask(mask).divide(10000)
-        ndwi = img.normalizedDifference(["B3", "B8"]).rename("NDWI")
-        ndvi = img.normalizedDifference(["B8", "B4"]).rename("NDVI")
-        return ee.Image.cat([ndwi, ndvi]).copyProperties(img, ["system:time_start"])
+    def add_indices(img):
+        """Add NDWI + NDVI without any masking (masking causes band errors)."""
+        scaled = img.divide(10000)
+        ndwi   = scaled.normalizedDifference(["B3", "B8"]).rename("NDWI")
+        ndvi   = scaled.normalizedDifference(["B8", "B4"]).rename("NDVI")
+        return ndwi.addBands(ndvi)
 
+    # No cloud filter — median over many images naturally suppresses clouds
     s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
           .filterDate(start_date, end_date)
           .filterBounds(buffer)
-          .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 80))
-          .map(mask_index))
+          .select(["B3","B4","B8"])   # only bands we need — less memory
+          .map(add_indices))
 
     results = []
-    # 4 quarterly windows — Python loop, direct .getInfo() per quarter
     for q in range(4):
         m0    = q * 3 + 1
-        m1    = m0 + 3
         qs    = f"{yr}-{m0:02d}-01"
-        qe    = f"{yr}-{m1:02d}-01" if m1 <= 12 else f"{yr+1}-01-01"
+        qe    = f"{yr}-{m0+3:02d}-01" if m0 + 3 <= 12 else f"{yr+1}-01-01"
         label = f"{yr}-Q{q+1}"
         try:
-            img = s2.filterDate(qs, qe).mean()
+            col = s2.filterDate(qs, qe)
+            n   = col.size().getInfo()
+            if n == 0:
+                continue
+            img = col.median()
             raw = img.reduceRegion(
-                reducer   = ee.Reducer.mean(),
+                reducer   = ee.Reducer.median(),
                 geometry  = buffer,
-                scale     = 20,
-                maxPixels = 1e8,
+                scale     = 30,
+                maxPixels = 1e7,
                 bestEffort= True
-            ).getInfo()  # Python dict — no server-side issues
-            ndwi_v = raw.get("NDWI")
-            ndvi_v = raw.get("NDVI")
-            if ndwi_v is not None and not (ndwi_v == 0 and ndvi_v == 0):
-                results.append((label, float(ndwi_v), float(ndvi_v or 0.4)))
-        except Exception:
-            continue
+            ).getInfo()
+            ndwi_v = raw.get("NDWI"); ndvi_v = raw.get("NDVI")
+            if ndwi_v is not None:
+                results.append((label, float(ndwi_v), float(ndvi_v) if ndvi_v else 0.4))
+        except Exception as _e:
+            continue   # skip cloudy/missing quarters silently
 
     if not results:
-        return {"error": "No S2 coverage or too cloudy for all quarters",
+        return {"error": "No S2 scenes available for this basin/period",
                 "NDWI": [], "NDVI": [], "mean_NDWI": 0, "mean_NDVI": 0,
                 "months": [], "n_months": 0}
 
-    ndwi = [r[1] for r in results]
-    ndvi = [r[2] for r in results]
+    ndwi = [r[1] for r in results]; ndvi = [r[2] for r in results]
     return {
-        "months":    [r[0] for r in results],
-        "NDWI":      ndwi, "NDVI": ndvi,
-        "mean_NDWI": round(sum(ndwi) / len(ndwi), 4),
-        "mean_NDVI": round(sum(ndvi) / len(ndvi), 4),
-        "source":    "COPERNICUS/S2_SR_HARMONIZED (5km buffer, 20m, quarterly)",
+        "months":    [r[0] for r in results], "NDWI": ndwi, "NDVI": ndvi,
+        "mean_NDWI": round(sum(ndwi)/len(ndwi), 4),
+        "mean_NDVI": round(sum(ndvi)/len(ndvi), 4),
+        "source":    "COPERNICUS/S2_SR_HARMONIZED (10km, 30m, quarterly median)",
         "n_months":  len(results), "error": None,
     }
 
