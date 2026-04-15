@@ -207,30 +207,32 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
 def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
-    """Load pre-computed GEE data from JSON if available."""
-    import json
+    """Load pre-computed GEE data from JSON if available.
+    Accepts any year within the cached date range (start→end).
+    """
+    import json as _j, datetime as _dt
     from pathlib import Path
     json_path = Path("data/gee_realtime.json")
     if not json_path.exists():
         return None
     try:
         with open(json_path) as f:
-            data = json.load(f)
-        # Check data year from date_range, not computed_at
-        dr = data.get("date_range", {})
-        data_year = dr.get("start", "2025-01-01")[:4]
-        if data_year != str(year):
-            return None
+            data = _j.load(f)
+        # Accept if requested year is within the cached range
+        dr          = data.get("date_range", {})
+        range_start = dr.get("start", "2000-01-01")[:4]
+        range_end   = dr.get("end",   "2026-12-31")[:4]
+        if not (range_start <= str(year) <= range_end):
+            return None   # true historical query — use live GEE
+        # Check data age — accept if less than 48 hours old
+        computed_at = data.get("computed_at", "")
+        if computed_at:
+            age = _dt.datetime.utcnow() - _dt.datetime.fromisoformat(computed_at)
+            if age.total_seconds() > 48 * 3600:
+                return None  # too old — trigger fresh fetch
         basin_data = data.get("basins", {}).get(basin_id)
         if not basin_data:
             return None
-        # Check data age — use if less than 36 hours old
-        import datetime
-        computed_at = data.get("computed_at", "")
-        if computed_at:
-            age = datetime.datetime.utcnow() - datetime.datetime.fromisoformat(computed_at)
-            if age.total_seconds() > 36 * 3600:
-                return None  # too old
         return basin_data
     except Exception:
         return None
