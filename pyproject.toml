@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.2.0"
+version = "6.3.0"
 description = "HydroSovereign AI Engine (HSAE) — Transboundary Water Analysis: ATDI, HIFD, HBV-96, GEE, UN Watercourses Convention 1997"
 readme = "README_PYPI.md"
 license = {file = "LICENSE"}
