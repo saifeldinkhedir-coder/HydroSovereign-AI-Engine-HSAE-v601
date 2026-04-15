@@ -207,31 +207,29 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
 def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
-    """Load pre-computed GEE data from data/gee_realtime.json (updated daily by GitHub Actions)."""
-    import json as _json
+    """Load pre-computed GEE data from JSON if available."""
+    import json
     from pathlib import Path
     json_path = Path("data/gee_realtime.json")
     if not json_path.exists():
         return None
     try:
         with open(json_path) as f:
-            data = _json.load(f)
-        # Accept data regardless of year — GitHub Actions keeps it fresh
+            data = json.load(f)
+        # Check data year from date_range, not computed_at
+        dr = data.get("date_range", {})
+        data_year = dr.get("start", "2025-01-01")[:4]
+        if data_year != str(year):
+            return None
         basin_data = data.get("basins", {}).get(basin_id)
         if not basin_data:
-            # Try alternate key formats
-            for key in data.get("basins", {}):
-                if basin_id.replace("_","-") in key or key.replace("-","_") == basin_id:
-                    basin_data = data["basins"][key]
-                    break
-        if not basin_data:
             return None
-        # Accept if less than 72 hours old (3 days buffer for weekends)
-        import datetime as _dt
+        # Check data age — use if less than 36 hours old
+        import datetime
         computed_at = data.get("computed_at", "")
         if computed_at:
-            age = _dt.datetime.utcnow() - _dt.datetime.fromisoformat(computed_at)
-            if age.total_seconds() > 72 * 3600:
+            age = datetime.datetime.utcnow() - datetime.datetime.fromisoformat(computed_at)
+            if age.total_seconds() > 36 * 3600:
                 return None  # too old
         return basin_data
     except Exception:
@@ -268,13 +266,10 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
     if precomputed:
         try:
             import numpy as _np, math as _math
-            # Key names match data/gee_realtime.json structure
-            _gpm   = precomputed.get("gpm", {})
-            P_mm   = _gpm.get("P_mm_day", _gpm.get("P_mm", []))  # P_mm_day in realtime JSON
+            P_mm   = precomputed.get("gpm", {}).get("P_mm", [])
             tws_cm = precomputed.get("grace", {}).get("tws_cm", [])
             sm_obs = precomputed.get("smap", {}).get("sm_m3m3", [])
-            _temp  = precomputed.get("temperature", {})
-            T_C    = _temp.get("T_C", [25.0] * len(P_mm))
+            T_C    = precomputed.get("temperature", {}).get("T_C", [P_mm[0]*0+25.0 for _ in P_mm])
             if P_mm:
                 import pandas as _pd
                 P_arr  = _np.array(P_mm, dtype=float)
@@ -295,10 +290,9 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
                 st.session_state[cache_key]       = True
                 st.session_state["_gee_fetching"] = False
                 st.session_state["data_mode"]     = "Direct GEE"
-                st.session_state["_gee_source"]  = "precomputed"
                 return True
-        except Exception as _pce:
-            pass  # fall through to live GEE if precomputed fails
+        except Exception:
+            pass  # fall through to live GEE
 
     try:
         with st.spinner("🛰️ Connecting to Google Earth Engine..."):
