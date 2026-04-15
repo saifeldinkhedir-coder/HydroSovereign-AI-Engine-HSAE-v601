@@ -302,17 +302,41 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
             return True
 
     try:
-        with st.spinner("🛰️ Connecting to Google Earth Engine..."):
-            from gee_connector import fetch_all_forcing
-            import math, datetime
+        import datetime as _dt2, urllib.request as _ur, json as _jj, math, numpy as np, pandas as pd
+        _fy   = str(_dt2.date.today().year - 1)
+        start = st.session_state.get("date_start", f"{_fy}-01-01")
+        end   = st.session_state.get("date_end",   f"{_fy}-12-31")
+        lat   = float(basin_cfg.get("lat", 15.0))
+        lon   = float(basin_cfg.get("lon", 32.0))
 
-            basin_id = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
-            import datetime as _dt2
-            _fy = str(_dt2.date.today().year - 1)
-            start = st.session_state.get("date_start", f"{_fy}-01-01")
-            end   = st.session_state.get("date_end",   f"{_fy}-12-31")
+        with st.spinner(f"📡 Loading ERA5 data {start[:4]}..."):
+            # Use Open-Meteo ERA5 archive (free, no auth, any year 1940-present)
+            _vars = "temperature_2m_mean,precipitation_sum,soil_moisture_0_to_7cm_mean,et0_fao_evapotranspiration"
+            _url  = (f"https://archive-api.open-meteo.com/v1/archive"
+                     f"?latitude={lat}&longitude={lon}"
+                     f"&start_date={start}&end_date={end}"
+                     f"&daily={_vars}&timezone=UTC")
+            with _ur.urlopen(_url, timeout=30) as _r:
+                _met = _jj.loads(_r.read())
+            _daily = _met.get("daily", {})
+            T_C_raw  = [t or 20.0 for t in _daily.get("temperature_2m_mean", [])]
+            P_raw    = [p or 0.0  for p in _daily.get("precipitation_sum", [])]
+            SM_raw   = [s or 0.25 for s in _daily.get("soil_moisture_0_to_7cm_mean", [])]
+            ET0_raw  = [e or 3.0  for e in _daily.get("et0_fao_evapotranspiration", [])]
+            n_days   = len(P_raw)
 
-            gee   = fetch_all_forcing(basin_id, start, end)
+        # Build minimal GEE-compatible forcing dict
+        gee = {
+            "precipitation":  {"P_mm": P_raw, "dates": _daily.get("time",[]), "source": "Open-Meteo ERA5"},
+            "grace_tws":      {"tws_cm": [], "source": "Not available (use precomputed for 2025-2026)"},
+            "smap_sm":        {"sm_m3m3": SM_raw, "source": "Open-Meteo ERA5 soil moisture"},
+            "sentinel1":      {"S1_VV_dB": [], "source": "Open-Meteo fallback"},
+            "sentinel2":      {"NDWI": [], "NDVI": [], "source": "Open-Meteo fallback"},
+            "glofas":         {"Q_m3s": [], "source": "Derived from P×runoff_c×area"},
+            "status":         {"gpm":"ok","grace":"unavailable","et":"ok","smap":"ok",
+                               "s1":"unavailable","s2":"unavailable","glofas":"derived"},
+        }
+        basin_id = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
             gpm   = gee.get("precipitation", {})
             grace = gee.get("grace_tws", {})
             smap  = gee.get("smap_sm", {})
@@ -491,7 +515,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
         st.session_state["_gee_fetching"] = False
         err_msg = str(exc)
         if "earthengine" in err_msg.lower() or "not installed" in err_msg.lower():
-            st.warning("⚠️ GEE live connection unavailable. Select year **2025** or **2026** for instant precomputed data (updated daily by GitHub Actions).")
+            st.warning("⚠️ Data load failed. Please check your date range and try again.")
         elif "credentials" in err_msg.lower() or "authentication" in err_msg.lower():
             st.error("❌ GEE credentials error — check Streamlit Secrets [gee] section")
         elif "quota" in err_msg.lower():
