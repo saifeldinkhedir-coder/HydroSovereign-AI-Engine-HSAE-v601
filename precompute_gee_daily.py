@@ -148,38 +148,48 @@ def fetch_s1(region, yr):
 
 
 def fetch_s2(lat, lon, yr):
-    """Sentinel-2 SR — NDWI + NDVI, quarterly, 10km buffer, no pre-filter.
+    """Sentinel-2 SR — monthly NDWI + NDVI for the past 12 months.
     
-    Each quarter filtered independently on full S2 archive.
-    Computes normalizedDifference server-side then getInfo() per quarter.
-    Memory-safe: only 10km buffer, one quarter at a time.
+    Architecture matches daily pipeline:
+    - Daily run at 06:00 UTC fetches the rolling past-year window
+    - Monthly composites (12 months) consistent with GPM, S1, SMAP, GloFAS
+    - 10km buffer around dam centroid (memory-safe in parallel workers)
+    - Each month queried independently: no pre-filter, no start_date dependency
+    - Median composite per month: cloud-robust without explicit masking
     """
+    import datetime as _dt
     point  = ee.Geometry.Point([lon, lat])
-    buffer = point.buffer(10000)   # 10km
+    buffer = point.buffer(10000)   # 10km — matches S1 scale
+
+    # Generate the same 12-month windows as GPM/S1/GloFAS
+    today  = _dt.date.today()
+    months = []
+    for i in range(12, 0, -1):
+        # Go back i months from today
+        y = today.year - ((today.month - i - 1) // 12 + (1 if today.month - i < 1 else 0))
+        m = ((today.month - i - 1) % 12) + 1
+        months.append((y, m))
 
     results = []
-    for q in range(4):
-        m0    = q * 3 + 1
-        qs    = f"{yr}-{m0:02d}-01"
-        qe    = f"{yr}-{m0+3:02d}-01" if (m0 + 3) <= 12 else f"{yr+1}-01-01"
-        label = f"{yr}-Q{q+1}"
+    for (y, m) in months:
+        d0    = f"{y}-{m:02d}-01"
+        d1    = f"{y}-{m+1:02d}-01" if m < 12 else f"{y+1}-01-01"
+        label = f"{y}-{m:02d}"
         try:
             col = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
-                   .filterDate(qs, qe)       # quarterly — no dependency on start_date
+                   .filterDate(d0, d1)
                    .filterBounds(buffer)
-                   .select(["B3","B4","B8"]))  # Green, Red, NIR
+                   .select(["B3","B4","B8"]))  # Green, Red, NIR only
 
             n = col.size().getInfo()
             if n == 0:
-                continue
+                continue   # no imagery this month — skip (daily update fills gaps)
 
-            # Median composite → normalizedDifference directly
-            median = col.median().divide(10000)   # scale to reflectance
+            median = col.median().divide(10000)
             ndwi   = median.normalizedDifference(["B3", "B8"]).rename("NDWI")
             ndvi   = median.normalizedDifference(["B8", "B4"]).rename("NDVI")
-            img    = ndwi.addBands(ndvi)
 
-            raw = img.reduceRegion(
+            raw = ndwi.addBands(ndvi).reduceRegion(
                 reducer   = ee.Reducer.mean(),
                 geometry  = buffer,
                 scale     = 30,
@@ -188,23 +198,26 @@ def fetch_s2(lat, lon, yr):
             ).getInfo()
 
             nw = raw.get("NDWI"); nv = raw.get("NDVI")
-            if nw is not None and nw != 0:
+            if nw is not None and nw != 0.0:
                 results.append((label, float(nw), float(nv) if nv else 0.3))
         except Exception:
             continue
 
     if not results:
-        return {"error": "No Sentinel-2 data available (coverage/cloud)",
+        return {"error": "No Sentinel-2 coverage in past 12 months",
                 "NDWI": [], "NDVI": [], "mean_NDWI": 0, "mean_NDVI": 0,
                 "months": [], "n_months": 0}
 
     ndwi = [r[1] for r in results]; ndvi = [r[2] for r in results]
     return {
-        "months":    [r[0] for r in results], "NDWI": ndwi, "NDVI": ndvi,
+        "months":    [r[0] for r in results],
+        "NDWI":      ndwi,
+        "NDVI":      ndvi,
         "mean_NDWI": round(sum(ndwi)/len(ndwi), 4),
         "mean_NDVI": round(sum(ndvi)/len(ndvi), 4),
-        "source":    "COPERNICUS/S2_SR_HARMONIZED (10km, 30m, quarterly)",
-        "n_months":  len(results), "error": None,
+        "source":    "COPERNICUS/S2_SR_HARMONIZED (10km buffer, 30m, monthly)",
+        "n_months":  len(results),
+        "error":     None,
     }
 
 
