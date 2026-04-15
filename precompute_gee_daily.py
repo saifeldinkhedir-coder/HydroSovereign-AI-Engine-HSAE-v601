@@ -147,10 +147,17 @@ def fetch_s1(region, yr):
             "source": "COPERNICUS/S1_GRD", "n_months": len(vals), "error": None}
 
 
-def fetch_s2(region, yr):
-    """Sentinel-2 SR — quarterly NDWI + NDVI (cloud-masked, memory-efficient).
-    Uses 1000m scale + quarterly composites to stay within GEE memory limits.
+def fetch_s2(lat, lon, yr):
+    """Sentinel-2 SR — NDWI + NDVI using point-sample (memory-safe).
+    
+    Uses a 5km point buffer instead of full basin polygon.
+    This is GEE-memory-safe regardless of basin size and parallel workers.
+    Gives representative optical indices for the dam/reservoir area.
     """
+    # Use 5km buffer around basin centroid — representative of reservoir
+    point  = ee.Geometry.Point([lon, lat])
+    buffer = point.buffer(5000)   # 5km radius
+
     def mask_index(img):
         qa   = img.select("QA60")
         mask = qa.bitwiseAnd(1 << 10).eq(0).And(qa.bitwiseAnd(1 << 11).eq(0))
@@ -162,44 +169,38 @@ def fetch_s2(region, yr):
 
     s2 = (ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
           .filterDate(start_date, end_date)
-          .filterBounds(region)
+          .filterBounds(buffer)
           .filter(ee.Filter.lt("CLOUDY_PIXEL_PERCENTAGE", 50))
           .map(mask_index))
 
-    # Quarterly composites (4 per year) — reduces memory × 3
-    quarters = [
-        (f"{yr}-01-01", f"{yr}-04-01", f"{yr}-Q1"),
-        (f"{yr}-04-01", f"{yr}-07-01", f"{yr}-Q2"),
-        (f"{yr}-07-01", f"{yr}-10-01", f"{yr}-Q3"),
-        (f"{yr}-10-01", f"{yr+1}-01-01", f"{yr}-Q4"),
-    ]
-    results = []
-    for q_start, q_end, q_label in quarters:
-        col = s2.filterDate(q_start, q_end)
-        img = col.mean()
+    def mo(m):
+        m   = ee.Number(m).add(1)
+        d0  = ee.Date.fromYMD(yr, m, 1); d1 = d0.advance(1, "month")
+        img = s2.filterDate(d0, d1).mean()
         val = img.reduceRegion(
-            reducer   = ee.Reducer.mean(),
-            geometry  = region,
-            scale     = 1000,        # 1km — memory-safe for large basins
-            maxPixels = 1e8,
-            bestEffort= True
-        ).getInfo()
-        ndwi_v = sg(val.get("NDWI")); ndvi_v = sg(val.get("NDVI", 0.4))
-        if ndwi_v != 0 or ndvi_v != 0:
-            results.append((q_label, ndwi_v, ndvi_v))
+            reducer=ee.Reducer.mean(), geometry=buffer,
+            scale=10, maxPixels=1e7, bestEffort=True)
+        return ee.Feature(None, {"month": d0.format("YYYY-MM"),
+                                 "NDWI": val.get("NDWI"),
+                                 "NDVI": val.get("NDVI")})
 
-    if not results:
-        return {"error": "No valid S2 pixels", "NDWI": [], "NDVI": [],
+    feats = ee.FeatureCollection(ee.List.sequence(0,11).map(mo)).getInfo()["features"]
+    vals  = [(f["properties"]["month"],
+              sg(f["properties"].get("NDWI", 0)),
+              sg(f["properties"].get("NDVI", 0.4)))
+             for f in feats if f["properties"].get("NDWI") is not None]
+
+    if not vals:
+        return {"error": "No S2 data (cloud/coverage)", "NDWI": [], "NDVI": [],
                 "mean_NDWI": 0, "mean_NDVI": 0, "months": [], "n_months": 0}
 
-    ndwi = [d[1] for d in results]; ndvi = [d[2] for d in results]
+    ndwi = [d[1] for d in vals]; ndvi = [d[2] for d in vals]
     return {
-        "months":    [d[0] for d in results],
-        "NDWI":      ndwi, "NDVI": ndvi,
+        "months":    [d[0] for d in vals], "NDWI": ndwi, "NDVI": ndvi,
         "mean_NDWI": round(sum(ndwi)/max(len(ndwi),1), 4),
         "mean_NDVI": round(sum(ndvi)/max(len(ndvi),1), 4),
-        "source":    "COPERNICUS/S2_SR_HARMONIZED (quarterly 1km)",
-        "n_months":  len(results), "error": None,
+        "source":    "COPERNICUS/S2_SR_HARMONIZED (5km buffer, 10m)",
+        "n_months":  len(vals), "error": None,
     }
 
 
