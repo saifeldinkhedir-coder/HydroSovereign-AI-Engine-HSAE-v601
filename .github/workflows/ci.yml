@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'hydrosovereign/**'
-      - 'pyproject.toml'
       - 'tests/test_package.py'
       - 'tests/test_v620.py'
   pull_request:
@@ -15,9 +14,10 @@ on:
 
 jobs:
   test-package:
-    name: Test hydrosovereign package
+    name: Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
 
@@ -29,32 +29,28 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install package dependencies
+      - name: Install package + all test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pandas scipy scikit-learn pytest pytest-cov
+          pip install numpy pandas scipy scikit-learn joblib pytest pytest-cov
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e .
 
-      - name: Run package tests only
+      - name: Run package tests
         run: |
           pytest tests/test_package.py tests/test_v620.py -v --tb=short
-        continue-on-error: false
 
   build-package:
-    name: Build & validate wheel
+    name: Build wheel
     needs: test-package
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-
-      - name: Build wheel
+      - name: Build & validate
         run: |
           pip install build twine
           python -m build
-
-      - name: Validate wheel
-        run: twine check dist/*
+          twine check dist/*
