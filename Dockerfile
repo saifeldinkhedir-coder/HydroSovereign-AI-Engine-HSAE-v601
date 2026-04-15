@@ -1,41 +1,67 @@
-# ─────────────────────────────────────────────────────────────────
-# HSAE v10.0 Dockerfile
-# Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
-# ─────────────────────────────────────────────────────────────────
-FROM python:3.11-slim
+# ── Stage 1: Build ────────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
 
-LABEL maintainer="saifeldinkhedir@gmail.com" \
-      version="10.0.0" \
-      description="HydroSovereign AI Engine v10.0"
+WORKDIR /build
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ git curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy package
+COPY pyproject.toml README_PYPI.md ./
+COPY hydrosovereign/ hydrosovereign/
+
+# Install dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        numpy pandas scipy scikit-learn \
+        torch --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir fastapi uvicorn[standard] plotly requests
+
+
+# ── Stage 2: Production ───────────────────────────────────────────────────────
+FROM python:3.12-slim AS production
+
+LABEL maintainer="Seifeldin M.G. Alkedir <saifeldinkhedir@gmail.com>"
+LABEL org.opencontainers.image.title="HydroSovereign AI Engine"
+LABEL org.opencontainers.image.version="6.5.0"
+LABEL org.opencontainers.image.description="AI-powered transboundary water governance"
+LABEL org.opencontainers.image.authors="Seifeldin M.G. Alkedir (ORCID: 0000-0003-0821-2991)"
+LABEL org.opencontainers.image.source="https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
+LABEL org.opencontainers.image.licenses="GPL-3.0"
 
 WORKDIR /app
 
-# System deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl wget git gcc g++ \
-    libgdal-dev libproj-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
-# Python deps
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy application
+COPY --from=builder /build/hydrosovereign ./hydrosovereign
 
-# App source
-COPY . .
-
-# Create required directories
-RUN mkdir -p /app/HSAE_Data /app/data/grdc /app/data/glofas \
-             /app/outputs /app/logs
-
-# Expose ports
-EXPOSE 8501 8000
+# Environment
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV HOST=0.0.0.0
+ENV PORT=8000
+ENV WORKERS=2
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-    CMD curl -f http://localhost:8000/api/v9/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
 
-# Default: run both API + Streamlit
-# Override with: docker run ... streamlit run app.py
-CMD ["sh", "-c", \
-  "uvicorn api_server:app --host 0.0.0.0 --port 8000 --workers 1 & \
-   streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --server.headless=true"]
+# Expose port
+EXPOSE 8000
+
+# Create non-root user
+RUN addgroup --system hsae && adduser --system --ingroup hsae hsae
+RUN chown -R hsae:hsae /app
+USER hsae
+
+# Start server
+CMD uvicorn hydrosovereign.api_server:app \
+    --host ${HOST} \
+    --port ${PORT} \
+    --workers ${WORKERS} \
+    --log-level info
