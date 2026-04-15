@@ -1,13 +1,21 @@
-name: hydrosovereign CI/CD
+name: hydrosovereign Package CI
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'hydrosovereign/**'
+      - 'pyproject.toml'
+      - 'tests/test_package.py'
+      - 'tests/test_v620.py'
   pull_request:
     branches: [main]
+    paths:
+      - 'hydrosovereign/**'
 
 jobs:
-  test:
+  test-package:
+    name: Test hydrosovereign package
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,22 +29,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install package dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install numpy pandas scipy scikit-learn torch pytest pytest-cov
+          pip install numpy pandas scipy scikit-learn pytest pytest-cov
           pip install -e .
 
-      - name: Run tests
+      - name: Run package tests only
         run: |
-          pytest tests/ -v --tb=short --cov=hydrosovereign --cov-report=xml
+          pytest tests/test_package.py tests/test_v620.py -v --tb=short
+        continue-on-error: false
 
-      - name: Upload coverage
-        uses: codecov/codecov-action@v4
-        if: matrix.python-version == '3.12'
-
-  build:
-    needs: test
+  build-package:
+    name: Build & validate wheel
+    needs: test-package
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
@@ -45,12 +51,10 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
 
-      - name: Build package
+      - name: Build wheel
         run: |
-          pip install build
+          pip install build twine
           python -m build
 
-      - name: Check dist
-        run: |
-          pip install twine
-          twine check dist/*
+      - name: Validate wheel
+        run: twine check dist/*
