@@ -341,12 +341,12 @@ def page_v430():
         with c_map:
             st_folium(m, width=680, height=380, key="map_v430")
         with c_spec:
-        st.latex(rf"V = {basin['bathy_a']:.3f} \times A^{{{basin['bathy_b']:.2f}}}")
-        st.caption(
-            f"A = surface area (km²)  |  V = storage (BCM)\n"
-            f"Catchment: {basin['eff_cat_km2']:,} km²  |  "
-            f"Runoff coeff: {basin['runoff_c']}"
-        )
+            st.latex(rf"V = {basin['bathy_a']:.3f} \times A^{{{basin['bathy_b']:.2f}}}")
+            st.caption(
+                f"A = surface area (km²)  |  V = storage (BCM)\n"
+                f"Catchment: {basin['eff_cat_km2']:,} km²  |  "
+                f"Runoff coeff: {basin['runoff_c']}"
+            )
 
     # ══════════════════════════════════════════════════════════════════════
     # DATA MODE PANEL  — shown between controls and run button
