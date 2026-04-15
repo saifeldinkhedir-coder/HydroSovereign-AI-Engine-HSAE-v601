@@ -137,22 +137,24 @@ def fetch_gpm_gee(region, start: str, end: str, year: int) -> dict:
 
 def fetch_grace_gee(region) -> dict:
     """GRACE-FO TWS via GEE (2022-2023 range — confirmed available)."""
-    # Try multiple GRACE collections (dataset names changed in GEE)
+    # GRACE-FO: try both V04 and V03 collections
+    grace = None
     for grace_col, grace_band in [
         ("NASA/GRACE/MASS_GRIDS_V04/LAND", "lwe_thickness_csr"),
         ("NASA/GRACE/MASS_GRIDS/LAND",     "lwe_thickness_csr"),
-        ("NASA_USDA/HSL/SMAP10KM_soil_moisture", "ssm"),  # SMAP fallback
     ]:
         try:
-            grace = (ee.ImageCollection(grace_col)
-                     .filterDate("2022-01-01", "2024-06-30")
+            _coll = (ee.ImageCollection(grace_col)
+                     .filterDate("2021-01-01", "2024-12-31")
                      .filterBounds(region)
                      .select(grace_band))
-            # Test if it has data
-            n = grace.size().getInfo()
+            n = _coll.size().getInfo()
             if n > 0:
+                grace = _coll
+                print(f"  📡 GRACE: using {grace_col}, n={n}")
                 break
-        except Exception:
+        except Exception as _ge:
+            print(f"  ⚠️  GRACE {grace_col}: {_ge}")
             continue
 
     def extract_tws(img):
