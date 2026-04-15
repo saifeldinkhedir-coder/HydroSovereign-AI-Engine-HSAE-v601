@@ -430,19 +430,7 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
     except Exception as exc:
         st.session_state["_gee_fetching"] = False
         err_msg = str(exc)
-        if "earthengine" in err_msg.lower() or "not installed" in err_msg.lower():
-            st.info(
-                    "📡 **Historical data (ERA5)** loading failed temporarily. "
-                    "**Select year 2025 or 2026** for instant satellite data, "
-                    "or try again in a few seconds."
-                )
-                st.session_state["_gee_fetching"] = False
-        elif "credentials" in err_msg.lower() or "authentication" in err_msg.lower():
-            st.error("❌ GEE credentials error — check Streamlit Secrets [gee] section")
-        elif "quota" in err_msg.lower():
-            st.error("❌ GEE quota exceeded — try again later")
-        else:
-            st.warning(f"⚠️ GEE failed: {err_msg[:120]}")
+        st.warning(f"⚠️ Data fetch failed: {err_msg[:120]}. Please retry.")
         return False
 
 
