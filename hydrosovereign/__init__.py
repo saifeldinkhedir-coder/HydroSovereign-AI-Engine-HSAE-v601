@@ -5,7 +5,7 @@ Author:  Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 DOI:     10.5281/zenodo.19180160
 """
 
-__version__   = "6.4.0"
+__version__   = "6.5.0"
 __author__    = "Seifeldin M.G. Alkedir"
 __email__     = "saifeldinkhedir@gmail.com"
 __orcid__     = "0000-0003-0821-2991"
