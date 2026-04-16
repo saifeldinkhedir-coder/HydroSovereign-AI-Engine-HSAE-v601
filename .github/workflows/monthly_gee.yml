@@ -1,0 +1,51 @@
+# .github/workflows/monthly_gee.yml
+# Historical GEE pre-computation — runs once per month
+# Only fetches missing years — idempotent (safe to re-run)
+
+name: Monthly Historical GEE
+
+on:
+  schedule:
+    - cron: '0 4 1 * *'   # 1st of every month at 04:00 UTC
+  workflow_dispatch:        # Manual trigger
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  historical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90     # 10 years × 26 basins may take up to 90 min
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install earthengine-api numpy requests pandas
+
+      - name: Write GEE service account key
+        run: |
+          echo '${{ secrets.GEE_SERVICE_ACCOUNT_JSON }}' \
+          > hsae-gee-service.json
+
+      - name: Run historical pre-computation
+        run: python precompute_gee_historical.py
+
+      - name: Commit historical data to repo
+        run: |
+          git config user.name  "HSAE GEE Bot"
+          git config user.email "bot@hsae.io"
+          git add data/gee_historical.json
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes to commit"
+          else
+            git commit -m "📚 Monthly historical GEE update $(date -u +%Y-%m)"
+            git push
+          fi
