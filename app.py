@@ -206,6 +206,24 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
 @st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
+@st.cache_data(ttl=86400, show_spinner=False)
+def _load_historical(basin_id: str, year: str) -> dict | None:
+    """Load historical GEE data (2015-2024) from gee_historical.json.
+    Cached 24h — historical data never changes.
+    """
+    import json as _jh
+    from pathlib import Path as _Ph
+    hist_path = _Ph("data/gee_historical.json")
+    if not hist_path.exists():
+        return None
+    try:
+        hist = _jh.loads(hist_path.read_text())
+        basin_data = hist.get("years", {}).get(str(year), {}).get(basin_id)
+        return basin_data  # None if year/basin not available
+    except Exception:
+        return None
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def _load_precomputed(basin_id: str, year: str = "2025") -> dict | None:
     """Load pre-computed GEE data from JSON if available.
@@ -264,8 +282,9 @@ def _fetch_gee_global_state(basin_cfg: dict, basin_name: str) -> bool:
 
     # ── Try pre-computed JSON first (instant) ────────────────────────────────
     basin_id_pc = basin_cfg.get("id", "blue_nile_gerd").lower().replace(" ","_").replace("-","_")
-    _req_year = st.session_state.get("date_start", "2025-01-01")[:4]
-    precomputed = _load_precomputed(basin_id_pc, _req_year)
+    _req_year   = st.session_state.get("date_start", "2025-01-01")[:4]
+    # Check rolling cache (2025-2026) first, then historical archive (2015-2024)
+    precomputed = _load_precomputed(basin_id_pc, _req_year) or _load_historical(basin_id_pc, _req_year)
     if precomputed:
         import numpy as _np, math as _math, pandas as _pd
         # ── Extract all real satellite data from precomputed JSON ─────────────
