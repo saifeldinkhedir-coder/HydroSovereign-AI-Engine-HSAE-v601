@@ -205,7 +205,6 @@ def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
 
 
 # ── GEE Global State — fetches real data for ALL pages ───────────────────────
-@st.cache_data(ttl=86400, show_spinner=False)  # cache 24 hours
 @st.cache_data(ttl=86400, show_spinner=False)
 def _load_historical(basin_id: str, year: str) -> dict | None:
     """Load historical GEE data (2015-2024) from gee_historical.json.
