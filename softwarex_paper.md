@@ -33,7 +33,7 @@ The HydroSovereign AI Engine (HSAE) v6.01 is an open-source Python and Streamlit
 | **CI/CD** | GitHub Actions — three workflows: tests.yml, daily_gee.yml (06:00 UTC), monthly_gee.yml |
 | **Tests** | 61 Python files · full pytest suite (TDI/ATDI, NSE/KGE, HBV-96, GEE, legal) |
 | **Modules** | 61 Python files · 35 app pages · 0 syntax errors · hydrosovereign PyPI v6.5.3 |
-| **QGIS Plugin** | 9 tools + 3 Processing algorithms (ATDI + HIFD + Basin Report) |
+| **QGIS Plugin** | 9 tools + 3 Processing algorithms (ATDI + HIFD + Basin Report) · **✓ Listed in QGIS Plugin Repository** (April 2026) |
 
 ---
 
@@ -74,7 +74,7 @@ Automated UNWC 1997 compliance assessment across 33 articles using ATDI threshol
 
 ### 2.6 QGIS Plugin
 
-9 tools + 3 Processing algorithms. Compatible with QGIS ≥ 3.16. GPL-3.0.
+9 tools + 3 Processing algorithms. Compatible with QGIS ≥ 3.16. GPL-3.0. **✓ Officially listed in QGIS Plugin Repository** (approved April 16, 2026; PR #289, reviewed by T. Sutton, QGIS Project Steering Committee).
 
 ---
 
@@ -161,7 +161,7 @@ HSAE v6.01 provides the first open-source platform combining live multi-sensor G
 2. JH-1 paper targeting NSE ≥ 0.70
 3. JOSS submission April–May 2026 (all files ready)
 4. Nature Water NW-1 paper (satellite evidence of underreporting — GEE data operational)
-5. OSGeo QGIS Plugin Repository listing
+5. ✓ OSGeo QGIS Plugin Repository listing — **COMPLETED** April 16, 2026 (PR #289, T. Sutton / QGIS PSC)
 
 ---
 
