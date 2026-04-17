@@ -2,6 +2,10 @@
 
 # 🌊 HydroSovereign AI Engine — HSAE v6.01
 
+> **🎉 QGIS Plugin officially listed in the QGIS Plugin Repository — April 16, 2026**  
+> PR #289 approved by **Tim Sutton** (QGIS Project Steering Committee) and merged into master.  
+> Install: **QGIS → Plugins → Manage and Install Plugins → Search "HydroSovereign"**
+
 [![ORCID](https://img.shields.io/badge/ORCID-0000--0003--0821--2991-a6ce39?style=flat&logo=orcid&logoColor=white)](https://orcid.org/0000-0003-0821-2991)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19180160.svg)](https://doi.org/10.5281/zenodo.19180160)
 [![Email](https://img.shields.io/badge/Email-saifeldinkhedir%40gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:saifeldinkhedir@gmail.com)
