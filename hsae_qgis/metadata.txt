@@ -30,3 +30,4 @@ changelog=
     - NSE=0.63, KGE=0.74 pre-calibration metrics
     - Real dispute levels from TFDD/ICOW for all 26 basins
     - JOSS paper.md submitted (pending review): doi.org/10.5281/zenodo.19180160
+    - Full manual published: HSAE_v601_QGIS_Plugin_Manual_v3.pdf
