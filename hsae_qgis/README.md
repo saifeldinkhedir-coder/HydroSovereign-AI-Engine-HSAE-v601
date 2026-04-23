@@ -13,6 +13,24 @@
 
 ---
 
+
+## 📖 Full Documentation
+
+| Format | Link | Size |
+|--------|------|------|
+| **PDF** (recommended) | [HSAE_v601_QGIS_Plugin_Manual_v3.pdf](HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | 440 KB |
+| **Word (DOCX)** | [HSAE_v601_QGIS_Plugin_Manual_v3.docx](HSAE_v601_QGIS_Plugin_Manual_v3.docx) | 30 KB |
+
+**Manual contents:**
+- Quick Start (5-minute tutorial)
+- 13 Tools — complete reference
+- 5 Processing Algorithms
+- 26 Basin registry with ATDI/HIFD values
+- Scientific indices (ATDI, HIFD, CI, HBV-96)
+- Troubleshooting & FAQ
+- Glossary (14 terms) & All links
+
+
 ## Overview
 
 The **HydroSovereign AI Engine (HSAE) QGIS Plugin v6.01** brings AI-powered transboundary water sovereignty analysis directly into the QGIS desktop GIS environment. It provides **13 interactive tools** and **5 Processing Toolbox algorithms** for hydrological analysis, legal compliance assessment under UNWC 1997, conflict risk evaluation, and ICJ/PCA dossier export — all operating on a registry of 26 globally contested transboundary river basins.
