@@ -123,8 +123,12 @@ except Exception as e:
     import streamlit as _st
     def render_upload_real_data(): _st.error(f"upload_real_data.py not found: {e}")
 
-# ── Init DB ───────────────────────────────────────────────────────────────────
-init_db()
+# ── Init DB — cached so it only runs once per server session ────────────────
+@st.cache_resource
+def _init_db_once():
+    init_db()
+    return True
+_init_db_once()
 
 # ── Auto-simulation ───────────────────────────────────────────────────────────
 def _get_or_simulate_df(basin_cfg: dict | None = None) -> "pd.DataFrame | None":
