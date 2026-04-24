@@ -3,7 +3,7 @@ name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
 description=HSAE v6.0.3 -- Satellite-AI platform for transboundary water sovereignty. 26 basins, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), 16 tools, 5 algorithms, Leaflet map inside QGIS, UNWC 1997 (33 articles), SHA-256 audit chain, NSE=0.63 KGE=0.74
-version=6.0.3
+version=6.0.4
 author=Seifeldin M.G. Alkedir
 email=saifeldinkhedir@gmail.com
 about=HSAE v6.0.3 -- HydroSovereign AI Engine: the first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes. NEW in v6.0.3: (1) Interactive Leaflet.js basin risk map embedded inside QGIS Desktop -- all 26 basins with ATDI/HIFD/CI popups and UNWC risk colour-coding; (2) Bayesian Uncertainty Panel -- Monte Carlo n=500 with confidence intervals on ATDI/HIFD and Sobol sensitivity analysis for 6 parameters; (3) Treaty Compliance Panel -- ATCI (Alkedir Treaty Compliance Index) mapping all 10 key UNWC articles per basin. Total: 16 tools + 5 Processing algorithms. Blue Nile (GERD): ATDI=43.5 pc Art.7 UNWC, HIFD=20.0 pc, NSE=0.63, KGE=0.74, CI=0.44 HIGH, P(Neg.)=58 pc. SoftwareX SOFTX-D-26-00442 under review. Manual v6 (15 chapters, Tools 14/15/16): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
