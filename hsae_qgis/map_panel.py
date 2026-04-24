@@ -1,3 +1,5 @@
+from __future__ import annotations
+import json
 """
 HydroSovereign AI Engine v6.0.3 — Interactive Map Panel
 ========================================================
@@ -7,8 +9,6 @@ popups, risk colour-coding, and real-time updates.
 
 Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 """
-from __future__ import annotations
-import json
 from typing import Optional
 
 try:
@@ -24,18 +24,18 @@ from qgis.core import QgsMessageLog, Qgis
 
 def _atdi_colour(atdi: float) -> str:
     """Return hex colour for ATDI risk level."""
-    if atdi < 20:   return "#16a34a"   # green  — compliant
-    if atdi < 40:   return "#ca8a04"   # yellow — Art. 7
-    if atdi < 55:   return "#ea580c"   # orange — Art. 9
-    if atdi < 70:   return "#dc2626"   # red    — Art. 33
+    if atdi < 20: return "#16a34a"   # green  — compliant
+    if atdi < 40: return "#ca8a04"   # yellow — Art. 7
+    if atdi < 55: return "#ea580c"   # orange — Art. 9
+    if atdi < 70: return "#dc2626"   # red    — Art. 33
     return "#7c3aed"                    # purple — Art. 35
 
 
 def _unwc_zone(atdi: float) -> str:
-    if atdi < 20:   return "Compliant"
-    if atdi < 40:   return "Art. 7 — Notify"
-    if atdi < 55:   return "Art. 9 — Data Share"
-    if atdi < 70:   return "Art. 33 — Dispute"
+    if atdi < 20: return "Compliant"
+    if atdi < 40: return "Art. 7 — Notify"
+    if atdi < 55: return "Art. 9 — Data Share"
+    if atdi < 70: return "Art. 33 — Dispute"
     return "Art. 35 — Emergency"
 
 
@@ -44,25 +44,26 @@ def _build_html(basins: list, selected_id: Optional[str] = None) -> str:
 
     markers_js = []
     for b in basins:
-        bid    = b.get("id", "")
-        name   = b.get("name", "Unknown")
-        lat    = b.get("lat", 0)
-        lon    = b.get("lon", 0)
-        atdi   = round(float(b.get("atf_risk", b.get("tdi", 0.3) * 100)), 1)
-        hifd   = round(atdi * 0.46, 1)
-        ci_raw = 0.40 * (atdi / 100) + 0.25 * (b.get("dispute_level", 3) / 5) + 0.20 * (hifd / 100) + 0.15 * (b.get("n_countries", 3) / 6)
-        ci     = round(ci_raw, 2)
-        p_neg  = round(max(15, min(85, 95 - atdi * 0.8 - ci * 10)), 0)
-        dam    = b.get("dam", "—")
-        river  = b.get("river", "—")
+        bid = b.get("id", "")
+        name = b.get("name", "Unknown")
+        lat = b.get("lat", 0)
+        lon = b.get("lon", 0)
+        atdi = round(float(b.get("atf_risk", b.get("tdi", 0.3) * 100)), 1)
+        hifd = round(atdi * 0.46, 1)
+        ci_raw = 0.40 * (atdi / 100) + 0.25 * (b.get("dispute_level", 3) / 5) + \
+                         0.20 * (hifd / 100) + 0.15 * \
+                                 (b.get("n_countries", 3) / 6)
+        ci = round(ci_raw, 2)
+        p_neg = round(max(15, min(85, 95 - atdi * 0.8 - ci * 10)), 0)
+        dam = b.get("dam", "—")
+        river = b.get("river", "—")
         colour = _atdi_colour(atdi)
-        zone   = _unwc_zone(atdi)
-        n_c    = b.get("n_countries", 3)
-        cap    = b.get("cap_bcm", 0)
-        area   = b.get("area_km2", 0)
-        c_up   = b.get("country_up", "—")
-        arts   = ", ".join(b.get("legal_arts", [zone.split("—")[0].strip()]))
-        is_sel = "true" if bid == selected_id else "false"
+        zone = _unwc_zone(atdi)
+        n_c = b.get("n_countries", 3)
+        cap = b.get("cap_bcm", 0)
+        area = b.get("area_km2", 0)
+        c_up = b.get("country_up", "—")
+        arts = ", ".join(b.get("legal_arts", [zone.split("—")[0].strip()]))
 
         popup_html = f"""
 <div style='font-family:Arial,sans-serif;min-width:260px;max-width:320px'>
@@ -126,13 +127,12 @@ def _build_html(basins: list, selected_id: Optional[str] = None) -> str:
     weight: {3 if bid == selected_id else 1.5},
     opacity: 1,
     fillOpacity: {opacity}
-  }}).bindPopup({_json.dumps(popup_html)}, {{maxWidth: 340}})
-    .bindTooltip("<b>{name}</b><br>ATDI {atdi}% · CI {ci}", 
+  }}).bindPopup({json.dumps(popup_html)}, {{maxWidth: 340}})
+    .bindTooltip("<b>{name}</b><br>ATDI {atdi}% · CI {ci}",
       {{permanent: false, direction: "top"}})
     .addTo(map);""")
 
-    markers_str = "
-".join(markers_js)
+    markers_str = "\n".join(markers_js)
 
     html = f"""<!DOCTYPE html>
 <html>
@@ -225,8 +225,8 @@ class HSAEMapPanel(QDockWidget):
 
     def __init__(self, iface, basins: list, parent=None):
         super().__init__(self.TITLE, parent)
-        self.iface   = iface
-        self.basins  = basins
+        self.iface = iface
+        self.basins = basins
         self.browser = None
         self.setObjectName("HSAEMapPanelV603")
         self.setAllowedAreas(
@@ -237,7 +237,7 @@ class HSAEMapPanel(QDockWidget):
 
     def _build_widget(self):
         container = QWidget()
-        layout    = QVBoxLayout(container)
+        layout = QVBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
 
         if not HAS_WEBENGINE:
