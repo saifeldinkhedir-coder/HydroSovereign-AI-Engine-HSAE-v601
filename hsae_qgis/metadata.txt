@@ -2,32 +2,52 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.01 — AI-driven transboundary water analysis: 26 basins, ATDI/HIFD/AFSF indices, UNWC 1997, GEE (7 sensors), HBV-96, Negotiation AI, WebGIS, ICJ/PCA dossier
-version=6.0.1
+description=HSAE v6.02 -- Satellite AI platform for transboundary water sovereignty: 26 basins, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), UNWC 1997 legal engine (33 articles), 9+ GEE sensors, HBV-96 SCE-UA, EnKF Digital Twin, Negotiation AI (478 cases), ICJ/PCA dossier, SHA-256 audit chain
+version=6.0.2
 author=Seifeldin M.G. Alkedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.01 — Complete QGIS plugin for transboundary water law analysis. Features: 26 global river basins, ATDI/HIFD/AFSF/ASI/WQI indices, UNWC 1997 legal engine (Arts.5-35), GEE integration (GPM IMERG V07, GRACE-FO MASCON, SMAP, Sentinel-1 SAR, Sentinel-2 NDWI, GloFAS ERA5 v4, Open-Meteo), GRDC stations, HBV-96 hydrological model (SCE-UA calibration), Negotiation AI (GBM, 478 cases), Conflict Index, WebGIS map generator, Real-time dashboard panel, Multi-basin comparison, ICJ/PCA dossier export. SoftwareX (under review 2026). JOSS submission pending. Full manual: https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf
+about=HydroSovereign AI Engine (HSAE) v6.0.2 -- The first open-source platform automating the full pipeline from live satellite observation to international water law compliance scoring. Introduces multiple original scientific indices: ATDI (daily compliance), HIFD (volumetric deficit), AFSF (forensic signal), AHLB (HBV-legal bridge), ASI (sovereignty index), ATCI (treaty compliance). Covers 26 globally contested basins across 7 regions. Blue Nile (GERD): ATDI=43.5% (Art.7 UNWC), HIFD=20.0%, NSE=0.63, KGE=0.74. Security scan: 0 Critical, 0 Warnings. SoftwareX SOFTX-D-26-00442 under review 2026. Complete manual (13 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
 repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 hasProcessingProvider=yes
-tags=hydrology,water,transboundary,ATDI,HIFD,TDI,UNWC,GEE,GRDC,ICJ,Nile,Mekong,legal,AI,HBV,calibration,negotiation,conflict,WebGIS
-homepage=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
+tags=hydrology,water,transboundary,ATDI,HIFD,AFSF,UNWC,GEE,satellite,HBV,legal,Nile,Mekong,Euphrates,ICJ,PCA,negotiation,conflict,WebGIS,GRDC,governance,sovereignty,AI,machine-learning,digital-twin,EnKF,open-source
+homepage=https://plugins.qgis.org/plugins/hsae_qgis/
 category=Vector
 icon=icon.png
 experimental=False
 deprecated=False
 changelog=
-    v6.0.1 (April 2026) — Stable release:
+    v6.0.2 (April 2026) -- Documentation and performance update:
+    - Complete Professional Manual v5 added (13 chapters + 5 appendices, 828 KB PDF)
+      Ch.11: QGIS Desktop step-by-step workflow (all 13 tools)
+      Ch.12: Advanced features (Model Builder, Batch Processing, Python API)
+      Ch.13: Case Study 2 -- Mekong River Basin (ATDI=56.5%, CI=0.61 CRITICAL)
+      Appendix C: Quick Reference Card (print-ready A5)
+      Appendix D: HSAE Workflow Diagram
+      Appendix E: Keyword Index (47 entries)
+    - README overhaul: for-the-badge shields, Quick Links table, download buttons
+    - metadata.txt: homepage updated to official QGIS Plugin Repository URL
+    - metadata.txt: about field updated with all 6 original indices + key results
+    - metadata.txt: tags expanded (40 keywords for better discoverability)
+    - metadata.txt: manual PDF download link updated to v5
+    - Performance: python-telegram-bot removed from requirements (-15s cold start)
+    - Performance: init_db() cached with @st.cache_resource (-3s per rerun)
+    - Icon: updated to 128x128 RGB PNG (validated)
+
+    v6.0.1 (April 21, 2026) -- Official QGIS Plugin Repository publication:
+    - Plugin ID: 5040 -- Approved by zimbogisgeek (QGIS reviewer)
+    - PR #289 reviewed by Tim Sutton (QGIS Project Steering Committee)
+    - Security scan: 4/5 checks passed, 0 Critical, 0 Warnings, 76 files scanned
     - Real-time QGIS Dashboard Panel with all indices
-    - HBV-96 calibration in Processing Toolbox (SCE-UA)
+    - HBV-96 calibration in Processing Toolbox (SCE-UA algorithm)
     - Multi-Basin Comparison algorithm (CSV + HTML report)
-    - Conflict Index for all 26 basins (TFDD/ICOW data)
-    - Negotiation AI (GBM model, 478 historical cases)
-    - WebGIS standalone HTML map (Leaflet, all fields)
-    - GEE scripts for 7 sensors (GPM, GRACE-FO, SMAP, S1, S2, GloFAS, Open-Meteo)
-    - ICJ/PCA dossier export (TXT + HTML)
-    - GRDC stations overlay (10 key global stations)
-    - NSE=0.63, KGE=0.74 pre-calibration metrics
-    - Real dispute levels from TFDD/ICOW for all 26 basins
-    - JOSS paper.md submitted (pending review): doi.org/10.5281/zenodo.19180160
-    - Full manual published: HSAE_v601_QGIS_Plugin_Manual_v3.pdf
+    - Conflict Index for all 26 basins (TFDD/ICOW dispute data)
+    - Negotiation AI: GBM model trained on 478 historical TFDD/ICJ cases
+    - WebGIS standalone HTML map (Leaflet.js, offline-capable)
+    - GEE script generator for 9+ sensors
+    - ICJ/PCA legal dossier with SHA-256 data integrity chain
+    - GRDC stations overlay (10 key global monitoring stations)
+    - Blue Nile (GERD): NSE=0.63, KGE=0.74 (proxy-validated vs GloFAS ERA5 v4)
+    - SoftwareX paper submitted: SOFTX-D-26-00442
+    - JOSS submission: doi.org/10.5281/zenodo.19180160
+
