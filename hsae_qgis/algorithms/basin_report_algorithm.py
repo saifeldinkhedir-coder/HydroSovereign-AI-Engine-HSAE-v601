@@ -5,8 +5,7 @@ Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                         QgsProcessingParameterString,
-                        QgsProcessingParameterFileDestination,
-                        QgsProcessingOutputString)
+                        QgsProcessingParameterFileDestination)
 
 
 class BasinReportAlgorithm(QgsProcessingAlgorithm):
@@ -109,10 +108,10 @@ UN ARTICLES TRIGGERED (UNWC 1997)
 
 LEGAL ASSESSMENT
 {'-'*40}
-• {'CRITICAL concern' if atdi>=70 else 'HIGH concern' if atdi>=55 else 'MODERATE' if atdi>=40 else 'LOW'} under Art.5 Equitable Utilisation
+• {'CRITICAL concern' if atdi>=70 else 'HIGH concern' if atdi>=55 else 'MODERATE' if atdi>=40 else 'LOW'} under Art.5 Equitable Utilisation  # noqa: E501
 • HIFD of {hifd:.1f}% {'exceeds' if hifd>=25 else 'is below'} Art.20 environmental flow threshold (25%)
-• Negotiation success probability: {pneg:.0%} → {'Cooperative framework' if pneg>=0.65 else 'Mediation required' if pneg>=0.40 else 'PCA/ICJ referral recommended'}
-• Conflict Index {ci:.3f}: {'immediate intervention required' if ci>=0.6 else 'monitoring required' if ci>=0.4 else 'manageable'}
+• Negotiation success probability: {pneg:.0%} → {'Cooperative framework' if pneg>=0.65 else 'Mediation required' if pneg>=0.40 else 'PCA/ICJ referral recommended'}  # noqa: E501
+• Conflict Index {ci:.3f}: {'immediate intervention required' if ci>=0.6 else 'monitoring required' if ci>=0.4 else 'manageable'}  # noqa: E501
 
 RECOMMENDATIONS
 {'-'*40}
