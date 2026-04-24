@@ -22,7 +22,7 @@
 | Resource | Link |
 |----------|------|
 | 🔌 **QGIS Plugin Repository** | [plugins.qgis.org/plugins/hsae_qgis/](https://plugins.qgis.org/plugins/hsae_qgis/) — Plugin ID: **5040** |
-| 🌐 **Live Streamlit App** | [HSAE v6.01 on Streamlit](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app) |
+| 🌐 **Live Streamlit App** | [HSAE v6.0.3 on Streamlit](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app) |
 | 🐍 **Python Package** | [pypi.org/project/hydrosovereign/](https://pypi.org/project/hydrosovereign/) — `pip install hydrosovereign` |
 | 📦 **GitHub (Main App)** | [HydroSovereign-AI-Engine-HSAE-v601](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601) |
 | 🏛️ **Zenodo DOI** | [10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160) |
@@ -35,9 +35,9 @@
 
 | Format | Download | Size | Contents |
 |--------|----------|------|----------|
-| 📕 **PDF Manual v5** | [⬇️ Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf) | ~830 KB | Complete guide — 13 chapters + 5 appendices |
-| 📘 **DOCX Manual v5** | [⬇️ Download DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.docx) | ~60 KB | Editable Word format |
-| 🌐 **Online Viewer** | [View on GitHub](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf) | — | Preview in browser |
+| 📕 **DOCX Manual v6** | [⬇️ Download Manual v6 DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx) | ~830 KB | Complete guide — 15 chapters + 5 appendices (Tools 14/15/16 added) |
+| 📘 **DOCX Manual v6** | [⬇️ Download DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx) | ~60 KB | Editable Word format |
+| 🌐 **Online Viewer** | [View on GitHub](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx) | — | Preview in browser |
 
 **Manual includes:**
 - ⚡ Quick Start (5-minute tutorial)
@@ -48,7 +48,13 @@
 - 🖥️ QGIS Desktop operating guide (Ch. 11)
 - 🔧 Advanced Features: Model Builder, Batch Processing, Python API (Ch. 12)
 - 🌏 Case Study 2: Mekong Basin (Ch. 13)
-- 🆘 Troubleshooting & FAQ (16 common errors)
+- 🗺️ Tool 14: Basin Risk Map inside QGIS (Leaflet)
+- 📉 Tool 15: Bayesian Uncertainty + Sobol
+- ⚖️ Tool 16: Treaty Analysis (ATCI)
+- 🆘 Troubleshooting & FAQ + Error Codes
+- 📐 Equations Index (8 formulas)
+- ⚖️ Legal Disclaimers
+- 🕐 Version Changelog & Timeline
 - 📚 Glossary (23 terms) + Keyword Index (47 entries)
 - 🖨️ Quick Reference Card (print-ready A5)
 
@@ -66,7 +72,7 @@ QGIS → Plugins → Manage and Install Plugins
 > Approved by: *zimbogisgeek (QGIS reviewer) · PR #289 — Tim Sutton, QGIS PSC*
 
 ### Method 2 — Install from ZIP
-1. Download: [HSAE_v602_QGIS_Plugin.zip](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v602_QGIS_Plugin.zip)
+1. Download: [HSAE_v603_QGIS_Plugin.zip](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v603_QGIS_Plugin.zip)
 2. QGIS → Plugins → Manage and Install Plugins → **Install from ZIP** tab
 3. Browse to the ZIP file → Install Plugin
 
@@ -78,8 +84,8 @@ QGIS → Plugins → Manage and Install Plugins
 
 | Component | Count | Access |
 |-----------|-------|--------|
-| Toolbar Tools | **13 tools** | HydroSovereign AI Engine v6.01 menu + toolbar |
-| Processing Algorithms | **5 algorithms** | Processing Toolbox → HydroSovereign AI Engine v6.01 |
+| Toolbar Tools | **16 tools (+3 new in v6.0.3)** | HydroSovereign AI Engine v6.0.3 menu + toolbar |
+| Processing Algorithms | **5 algorithms** | Processing Toolbox → HydroSovereign AI Engine v6.0.3 |
 | Basin Registry | **26 basins** | Built-in — 7 world regions |
 | GEE Satellite Scripts | **7 sensors** | Tool 5 generates GEE JavaScript |
 | GRDC Stations | **10 stations** | Tool 4 loads as point layer |
@@ -133,7 +139,7 @@ QGIS → Plugins → Manage and Install Plugins
 ```bibtex
 @software{alkedir2026hsae,
   author    = {Alkedir, Seifeldin M.G.},
-  title     = {{HydroSovereign AI Engine (HSAE) v6.01}},
+  title     = {{HydroSovereign AI Engine (HSAE) v6.03}},
   year      = {2026},
   publisher = {QGIS Plugin Repository + PyPI + Zenodo},
   version   = {6.0.1},
