@@ -2,6 +2,7 @@
 
 <div align="center">
 
+[![Version](https://img.shields.io/badge/Version-6.0.2-orange?style=for-the-badge)](https://plugins.qgis.org/plugins/hsae_qgis/)
 [![QGIS Plugin](https://img.shields.io/badge/QGIS_Plugin-ID_5040-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/hsae_qgis/)
 [![PyPI](https://img.shields.io/badge/PyPI-hydrosovereign_v6.5.3-3775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/hydrosovereign/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19180160-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.19180160)
@@ -65,7 +66,7 @@ QGIS → Plugins → Manage and Install Plugins
 > Approved by: *zimbogisgeek (QGIS reviewer) · PR #289 — Tim Sutton, QGIS PSC*
 
 ### Method 2 — Install from ZIP
-1. Download: [HSAE_v601_QGIS_Plugin_FINAL_v2.zip](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_FINAL_v2.zip)
+1. Download: [HSAE_v602_QGIS_Plugin.zip](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v602_QGIS_Plugin.zip)
 2. QGIS → Plugins → Manage and Install Plugins → **Install from ZIP** tab
 3. Browse to the ZIP file → Install Plugin
 
