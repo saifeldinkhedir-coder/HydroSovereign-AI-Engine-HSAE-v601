@@ -24,18 +24,21 @@ class HSAEMainDialog(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        # ── Header ────────────────────────────────────────────────────────────
+        # ── Header ───────────────────────────────────────────────────────────
         header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.0")
         header.setAlignment(Qt.AlignCenter)
-        font = QFont(); font.setPointSize(14); font.setBold(True)
+        font = QFont()
+        font.setPointSize(14)
+        font.setBold(True)
         header.setFont(font)
         layout.addWidget(header)
 
-        sub = QLabel("26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991")
+        sub = QLabel(
+            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991") # noqa: E501
         sub.setAlignment(Qt.AlignCenter)
         layout.addWidget(sub)
 
-        # ── Tabs ──────────────────────────────────────────────────────────────
+        # ── Tabs ─────────────────────────────────────────────────────────────
         tabs = QTabWidget()
 
         # Tab 1 — Basin Registry
@@ -49,15 +52,17 @@ class HSAEMainDialog(QDialog):
 
         layout.addWidget(tabs)
 
-        # ── Buttons ───────────────────────────────────────────────────────────
+        # ── Buttons ──────────────────────────────────────────────────────────
         btn_layout = QHBoxLayout()
 
         btn_app = QPushButton("🚀 Open Live App")
-        btn_app.clicked.connect(lambda: webbrowser.open("https://hsae-v600.streamlit.app"))
+        btn_app.clicked.connect(lambda: webbrowser.open(
+            "https://hsae-v600.streamlit.app"))
         btn_layout.addWidget(btn_app)
 
         btn_github = QPushButton("📦 GitHub Repo")
-        btn_github.clicked.connect(lambda: webbrowser.open("https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"))
+        btn_github.clicked.connect(lambda: webbrowser.open(
+            "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"))
         btn_layout.addWidget(btn_github)
 
         btn_close = QPushButton("✖ Close")
@@ -72,24 +77,39 @@ class HSAEMainDialog(QDialog):
         layout = QVBoxLayout()
 
         table = QTableWidget(len(self.basins), 6)
-        table.setHorizontalHeaderLabels(["Name", "Region", "Upstream", "Downstream", "TDI %", "Risk"])
+        table.setHorizontalHeaderLabels(
+            ["Name", "Region", "Upstream", "Downstream", "TDI %", "Risk"])
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         RISK_COLORS = {
-            "HIGH":    QColor("#FADBD8"),
-            "MEDIUM":  QColor("#FDEBD0"),
-            "LOW":     QColor("#FEF9E7"),
+            "HIGH": QColor("#FADBD8"),
+            "MEDIUM": QColor("#FDEBD0"),
+            "LOW": QColor("#FEF9E7"),
             "MINIMAL": QColor("#EAFAF1"),
         }
 
         for i, b in enumerate(self.basins):
             tdi_pct = round(b.get("tdi", 0) * 100, 1)
-            if tdi_pct >= 55:   risk = "HIGH"
-            elif tdi_pct >= 40: risk = "MEDIUM"
-            elif tdi_pct >= 25: risk = "LOW"
-            else:               risk = "MINIMAL"
+            if tdi_pct >= 55:
+                risk = "HIGH"
+            elif tdi_pct >= 40:
+                risk = "MEDIUM"
+            elif tdi_pct >= 25:
+                risk = "LOW"
+            else:
+                risk = "MINIMAL"
 
-            row_data = [b["name"], b["region"], b.get("country_up",""), b.get("country_dn",""), f"{tdi_pct}%", risk]
+            row_data = [
+                b["name"],
+                b["region"],
+                b.get(
+                    "country_up",
+                    ""),
+                b.get(
+                    "country_dn",
+                    ""),
+                f"{tdi_pct}%",
+                risk]
             for j, val in enumerate(row_data):
                 item = QTableWidgetItem(str(val))
                 item.setBackground(RISK_COLORS.get(risk, QColor("white")))
@@ -106,10 +126,10 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
 
-        high   = [b for b in self.basins if b.get("tdi",0)*100 >= 55]
-        medium = [b for b in self.basins if 40 <= b.get("tdi",0)*100 < 55]
-        low    = [b for b in self.basins if 25 <= b.get("tdi",0)*100 < 40]
-        minimal= [b for b in self.basins if b.get("tdi",0)*100 < 25]
+        high = [b for b in self.basins if b.get("tdi", 0) * 100 >= 55]
+        medium = [b for b in self.basins if 40 <= b.get("tdi", 0) * 100 < 55]
+        low = [b for b in self.basins if 25 <= b.get("tdi", 0) * 100 < 40]
+        minimal = [b for b in self.basins if b.get("tdi", 0) * 100 < 25]
 
         html = f"""
         <h2>📊 TDI Summary — 26 Basins</h2>
