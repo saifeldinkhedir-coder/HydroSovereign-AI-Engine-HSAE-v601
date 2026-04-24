@@ -75,8 +75,8 @@ class HSAEPlugin:
         from .hsae_processing_provider import HSAEProcessingProvider
         self.provider = HSAEProcessingProvider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-        self.toolbar = self.iface.addToolBar("HSAE v6.01")
-        self.toolbar.setObjectName("HSAEv601Toolbar")
+        self.toolbar = self.iface.addToolBar("HSAE v6.03")
+        self.toolbar.setObjectName("HSAEv603Toolbar")
 
         self._add("🌊 Load Basin Registry",    self.load_basins,    "Load 26 transboundary basins as point layer", True)
         self._add("📊 TDI/ATDI Visualiser",    self.apply_tdi,      "Apply TDI/ATDI graduated colour map",         True)
@@ -90,7 +90,10 @@ class HSAEPlugin:
         self._add("🗺️  WebGIS Map",             self.webgis_map,     "Generate standalone Leaflet WebGIS HTML map", True)
         self._add("📊 Basin Panel",             self.toggle_panel,   "Toggle real-time HSAE dashboard panel",       True)
         self._add("🏛️  ICJ/PCA Dossier",        self.icj_export,     "Export complete ICJ/PCA legal dossier",       False)
-        self._add("ℹ️  About HSAE v6.01",       self.about,          "About HSAE v6.01",                            False)
+        self._add("🗺️  Basin Risk Map",        self.open_map_panel,       "Interactive Leaflet.js basin map inside QGIS",           toolbar=False)
+        self._add("📉 Uncertainty Analysis",    self.open_uncertainty,     "Bayesian CI + Sobol sensitivity on ATDI/HIFD",           toolbar=False)
+        self._add("⚖️  Treaty Analysis (ATCI)", self.open_treaty_analysis, "ATCI — Alkedir Treaty Compliance Index for all articles",  toolbar=False)
+        self._add("ℹ️  About HSAE v6.0.3",       self.about,          "About HSAE v6.01",                            False)
 
     def _add(self, text, cb, tip, toolbar=False):
         a = QAction(text, self.iface.mainWindow())
@@ -228,7 +231,10 @@ class HSAEPlugin:
 
     def toggle_panel(self):
         try:
-            from .dashboard_panel import HSAEDashboardPanel
+            from .dashboard_panel     import HSAEDashboardPanel
+from .map_panel           import HSAEMapPanel
+from .uncertainty_panel   import HSAEUncertaintyPanel
+from .treaty_panel        import HSAETreatyPanel
             if self.panel is None:
                 self.panel = HSAEDashboardPanel(self.iface, self.iface.mainWindow())
                 self.iface.addDockWidget(0x2, self.panel)
@@ -619,6 +625,49 @@ tr:nth-child(even){{background:#161b22}}
 <a href="{JOSS_URL}" style="color:#58a6ff">JOSS 2026</a> ·
 <a href="https://doi.org/{DOI}" style="color:#58a6ff">{DOI}</a></p>
 </body></html>""")
+
+    def open_map_panel(self):
+        """Open interactive Leaflet.js basin risk map inside QGIS."""
+        try:
+            if not hasattr(self, '_map_panel') or self._map_panel is None:
+                self._map_panel = HSAEMapPanel(self.iface, self._basins())
+                self.iface.mainWindow().addDockWidget(
+                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.BottomDockWidgetArea,
+                    self._map_panel)
+            self._map_panel.show()
+            self._map_panel.raise_()
+        except Exception as e:
+            self.iface.messageBar().pushWarning("HSAE", f"Map panel error: {e}")
+
+    def open_uncertainty(self):
+        """Open Bayesian uncertainty + Sobol sensitivity panel."""
+        try:
+            basins = self._basins()
+            basin  = basins[0] if basins else {}
+            if not hasattr(self, '_unc_panel') or self._unc_panel is None:
+                self._unc_panel = HSAEUncertaintyPanel(self.iface)
+                self.iface.mainWindow().addDockWidget(
+                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.RightDockWidgetArea,
+                    self._unc_panel)
+            self._unc_panel.update_basin(basin)
+            self._unc_panel.show()
+            self._unc_panel.raise_()
+        except Exception as e:
+            self.iface.messageBar().pushWarning("HSAE", f"Uncertainty panel error: {e}")
+
+    def open_treaty_analysis(self):
+        """Open ATCI Treaty Compliance Analysis panel."""
+        try:
+            basins = self._basins()
+            if not hasattr(self, '_treaty_panel') or self._treaty_panel is None:
+                self._treaty_panel = HSAETreatyPanel(self.iface, basins)
+                self.iface.mainWindow().addDockWidget(
+                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.RightDockWidgetArea,
+                    self._treaty_panel)
+            self._treaty_panel.show()
+            self._treaty_panel.raise_()
+        except Exception as e:
+            self.iface.messageBar().pushWarning("HSAE", f"Treaty panel error: {e}")
 
     def about(self):
         QMessageBox.about(None, f"About HSAE v{VERSION}", f"""
