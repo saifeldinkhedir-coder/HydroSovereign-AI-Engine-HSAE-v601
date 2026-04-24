@@ -341,7 +341,7 @@ Map.setOptions('HYBRID');
             from qgis.core import (QgsVectorLayer, QgsProject, QgsField,
                                     QgsFeature, QgsGeometry, QgsPointXY,
                                     QgsSingleSymbolRenderer, QgsMarkerSymbol)
-            from qgis.PyQt.QtCore import QVariant
+            from qgis.PyQt.QtCore import Qt, QVariant
             stations = [
                 ("1040250","Blue Nile/GERD",       10.53, 35.09,1500,"Ethiopia/Sudan"),
                 ("1040220","Roseires Dam",           11.85, 34.38,1200,"Sudan"),
@@ -632,7 +632,7 @@ tr:nth-child(even){{background:#161b22}}
             if not hasattr(self, '_map_panel') or self._map_panel is None:
                 self._map_panel = HSAEMapPanel(self.iface, self._basins())
                 self.iface.mainWindow().addDockWidget(
-                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.BottomDockWidgetArea,
+                    Qt.BottomDockWidgetArea,
                     self._map_panel)
             self._map_panel.show()
             self._map_panel.raise_()
@@ -647,7 +647,7 @@ tr:nth-child(even){{background:#161b22}}
             if not hasattr(self, '_unc_panel') or self._unc_panel is None:
                 self._unc_panel = HSAEUncertaintyPanel(self.iface)
                 self.iface.mainWindow().addDockWidget(
-                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.RightDockWidgetArea,
+                    Qt.RightDockWidgetArea,
                     self._unc_panel)
             self._unc_panel.update_basin(basin)
             self._unc_panel.show()
@@ -662,7 +662,7 @@ tr:nth-child(even){{background:#161b22}}
             if not hasattr(self, '_treaty_panel') or self._treaty_panel is None:
                 self._treaty_panel = HSAETreatyPanel(self.iface, basins)
                 self.iface.mainWindow().addDockWidget(
-                    __import__('qgis.PyQt.QtCore', fromlist=['Qt']).Qt.RightDockWidgetArea,
+                    Qt.RightDockWidgetArea,
                     self._treaty_panel)
             self._treaty_panel.show()
             self._treaty_panel.raise_()
