@@ -4,21 +4,21 @@ HIFD: Human-Induced Flow Deficit
 Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
-                        QgsProcessingOutputNumber)
+                       QgsProcessingOutputNumber)
 
 
 class HIFDAlgorithm(QgsProcessingAlgorithm):
 
-    RC   = 'RC'
-    CAP  = 'CAP'
-    NC   = 'NC'
+    RC = 'RC'
+    CAP = 'CAP'
+    NC = 'NC'
     DISP = 'DISP'
-    OUT  = 'HIFD'
+    OUT = 'HIFD'
 
-    def name(self):        return 'hifdcalculator'
+    def name(self): return 'hifdcalculator'
     def displayName(self): return 'HIFD Calculator'
-    def group(self):       return 'HSAE Indices'
-    def groupId(self):     return 'hsaeindices'
+    def group(self): return 'HSAE Indices'
+    def groupId(self): return 'hsaeindices'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterNumber(
@@ -38,12 +38,12 @@ class HIFDAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputNumber(self.OUT, 'HIFD (%)'))
 
     def processAlgorithm(self, parameters, context, feedback):
-        rc   = self.parameterAsDouble(parameters, self.RC, context)
-        cap  = self.parameterAsDouble(parameters, self.CAP, context)
-        nc   = self.parameterAsInt(parameters, self.NC, context)
+        rc = self.parameterAsDouble(parameters, self.RC, context)
+        cap = self.parameterAsDouble(parameters, self.CAP, context)
+        nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        hifd = min(80.0, max(5.0,
-            8 + min(cap/3, 15) + (1-rc)*12 + disp*5 + (nc-2)*3))
+        hifd = min(80.0, max(5.0, 8 + min(cap / 3, 15) +
+                   (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
         feedback.pushInfo(f'HIFD = {hifd:.2f}%')
         return {self.OUT: hifd}
 
