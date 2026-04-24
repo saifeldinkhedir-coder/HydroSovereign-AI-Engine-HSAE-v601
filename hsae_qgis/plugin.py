@@ -94,7 +94,7 @@ class HSAEPlugin:
         from .hsae_processing_provider import HSAEProcessingProvider
         self.provider = HSAEProcessingProvider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-        self.toolbar = self.iface.addToolBar("HSAE v6.03")
+        self.toolbar = self.iface.addToolBar("HSAE v6.04")
         self.toolbar.setObjectName("HSAEv603Toolbar")
 
         self._add("🌊 Load Basin Registry", self.load_basins,
@@ -527,7 +527,10 @@ Map.setOptions('HYBRID');
                 None, "Save WebGIS Map", "HSAE_WebGIS_v601", "HTML (*.html)")
             if not path:
                 return
-            html = self._build_webgis(self._basins())
+            if HAS_WEBGIS_V2:
+                html = build_webgis_v2(self._basins(), self._compute)
+            else:
+                html = self._build_webgis(self._basins())
             with open(path, 'w', encoding='utf-8') as f:
                 f.write(html)
             import webbrowser
