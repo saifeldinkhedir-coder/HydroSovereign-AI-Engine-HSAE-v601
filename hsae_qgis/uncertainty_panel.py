@@ -5,11 +5,11 @@ Displays Bayesian confidence intervals on ATDI/HIFD indices
 and Sobol sensitivity indices as an embedded HTML panel.
 """
 from __future__ import annotations
-import random, math
+import random
 
 try:
     from qgis.PyQt.QtWidgets import QDockWidget, QWidget, QVBoxLayout
-    from qgis.PyQt.QtCore import Qt, QUrl
+    from qgis.PyQt.QtCore import QUrl
     from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
     HAS_WEBENGINE = True
 except ImportError:
@@ -17,9 +17,9 @@ except ImportError:
 
 
 def _build_uncertainty_html(basin: dict) -> str:
-    name   = basin.get("name", "Basin")
-    atdi   = float(basin.get("atf_risk", basin.get("tdi", 0.4) * 100))
-    hifd   = round(atdi * 0.46, 1)
+    name = basin.get("name", "Basin")
+    atdi = float(basin.get("atf_risk", basin.get("tdi", 0.4) * 100))
+    hifd = round(atdi * 0.46, 1)
 
     # Monte Carlo CI (500 samples, ±parameter uncertainty)
     rng = random.Random(42)
@@ -29,7 +29,7 @@ def _build_uncertainty_html(basin: dict) -> str:
     def ci95(samples):
         s = sorted(samples)
         n = len(s)
-        return round(s[int(n*0.025)], 1), round(s[int(n*0.975)], 1)
+        return round(s[int(n * 0.025)], 1), round(s[int(n * 0.975)], 1)
 
     atdi_lo, atdi_hi = ci95(atdi_samples)
     hifd_lo, hifd_hi = ci95(hifd_samples)
@@ -37,23 +37,23 @@ def _build_uncertainty_html(basin: dict) -> str:
     # Sobol first-order indices (simplified analytical)
     sobol = [
         ("Runoff Coefficient (RC)", 0.312),
-        ("Dam Capacity (BCM)",      0.228),
-        ("Dispute Level",           0.187),
-        ("n_countries",             0.143),
-        ("ET Uncertainty",          0.082),
-        ("Residual",                0.048),
+        ("Dam Capacity (BCM)", 0.228),
+        ("Dispute Level", 0.187),
+        ("n_countries", 0.143),
+        ("ET Uncertainty", 0.082),
+        ("Residual", 0.048),
     ]
 
     bars = ""
     for label, si in sobol:
-        pct  = int(si * 100)
-        col  = "#0B3D8E" if si > 0.2 else "#0E6B6A" if si > 0.1 else "#CBD5E0"
+        pct = int(si * 100)
+        col = "#0B3D8E" if si > 0.2 else "#0E6B6A" if si > 0.1 else "#CBD5E0"
         bars += f"""
       <tr>
         <td style='padding:4px 8px;font-size:12px;white-space:nowrap'>{label}</td>
         <td style='padding:4px 8px;width:55%'>
           <div style='background:#EDF2F7;border-radius:4px;height:16px'>
-            <div style='background:{col};border-radius:4px;height:16px;width:{pct*3}px'></div>
+            <div style='background:{col};border-radius:4px;height:16px;width:{pct * 3}px'></div>
           </div>
         </td>
         <td style='padding:4px 8px;font-size:12px;font-weight:700;color:{col}'>{si:.3f}</td>
@@ -85,17 +85,17 @@ def _build_uncertainty_html(basin: dict) -> str:
   <h3>95% Confidence Intervals (Monte Carlo n=500)</h3>
   <h4>ATDI = {atdi:.1f}%</h4>
   <div class="ci-bar">
-    <div class="ci-fill" style="left:{max(0,atdi_lo/100*100)}%;
-         width:{(atdi_hi-atdi_lo)/100*100}%"></div>
-    <div class="ci-point" style="left:{atdi/100*100}%"></div>
+    <div class="ci-fill" style="left:{max(0, atdi_lo / 100 * 100)}%;
+         width:{(atdi_hi - atdi_lo) / 100 * 100}%"></div>
+    <div class="ci-point" style="left:{atdi / 100 * 100}%"></div>
     <span class="ci-label" style="left:4px">CI [{atdi_lo}% — {atdi_hi}%]</span>
   </div>
 
   <h4 style='margin-top:14px'>HIFD = {hifd:.1f}%</h4>
   <div class="ci-bar">
-    <div class="ci-fill" style="left:{max(0,hifd_lo/100*100)}%;
-         width:{(hifd_hi-hifd_lo)/100*100}%" ></div>
-    <div class="ci-point" style="left:{hifd/100*100}%"></div>
+    <div class="ci-fill" style="left:{max(0, hifd_lo / 100 * 100)}%;
+         width:{(hifd_hi - hifd_lo) / 100 * 100}%" ></div>
+    <div class="ci-point" style="left:{hifd / 100 * 100}%"></div>
     <span class="ci-label" style="left:4px">CI [{hifd_lo}% — {hifd_hi}%]</span>
   </div>
 
@@ -126,14 +126,14 @@ class HSAEUncertaintyPanel(QDockWidget):
 
     def __init__(self, iface, parent=None):
         super().__init__(self.TITLE, parent)
-        self.iface   = iface
+        self.iface = iface
         self.browser = None
         self.setObjectName("HSAEUncertaintyPanelV603")
         self._build()
 
     def _build(self):
         container = QWidget()
-        layout    = QVBoxLayout(container)
+        layout = QVBoxLayout(container)
         layout.setContentsMargins(0, 0, 0, 0)
         if HAS_WEBENGINE:
             self.browser = QWebEngineView()
