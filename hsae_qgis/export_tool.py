@@ -3,7 +3,7 @@ export_tool.py — HSAE v6.01
 Export Basin Data to Shapefile / GeoJSON / CSV
 Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 """
-import json, os
+import json
 
 
 def export_basins(basins: list, path: str) -> bool:
@@ -26,24 +26,31 @@ def _export_geojson(basins: list, path: str) -> bool:
         lon = float(b.get('lon', 0))
         if not lat or not lon:
             continue
-        clist = (', '.join(b.get('country',[])) if isinstance(b.get('country'),list)
-                 else b.get('country_up',''))
+        clist = (
+            ', '.join(
+                b.get(
+                    'country',
+                    [])) if isinstance(
+                b.get('country'),
+                list) else b.get(
+                    'country_up',
+                ''))
         features.append({
             "type": "Feature",
             "geometry": {"type": "Point", "coordinates": [lon, lat]},
             "properties": {
-                "id":        b.get('id',''),
-                "name":      b.get('name',''),
-                "river":     b.get('river',''),
-                "dam":       b.get('dam',''),
-                "continent": b.get('continent', b.get('region','')),
+                "id": b.get('id', ''),
+                "name": b.get('name', ''),
+                "river": b.get('river', ''),
+                "dam": b.get('dam', ''),
+                "continent": b.get('continent', b.get('region', '')),
                 "countries": clist,
-                "treaty":    b.get('treaty',''),
-                "legal_arts":b.get('legal_arts',''),
+                "treaty": b.get('treaty', ''),
+                "legal_arts": b.get('legal_arts', ''),
                 "storage_bcm": float(b.get('cap', b.get('cap_bcm', 0))),
-                "area_km2":  float(b.get('eff_cat_km2', b.get('area_km2', 0))),
-                "runoff_c":  float(b.get('runoff_c', 0.3)),
-                "context":   b.get('context',''),
+                "area_km2": float(b.get('eff_cat_km2', b.get('area_km2', 0))),
+                "runoff_c": float(b.get('runoff_c', 0.3)),
+                "context": b.get('context', ''),
             }
         })
     with open(path, 'w', encoding='utf-8') as f:
@@ -57,22 +64,29 @@ def _export_csv(basins: list, path: str) -> bool:
         f.write("id,name,river,dam,continent,countries,treaty,legal_arts,"
                 "storage_bcm,area_km2,runoff_c,lat,lon,context\n")
         for b in basins:
-            clist = (', '.join(b.get('country',[])) if isinstance(b.get('country'),list)
-                     else b.get('country_up',''))
-            f.write(f"{b.get('id','')},"
-                    f"{b.get('name','')},"
-                    f"{b.get('river','')},"
-                    f"{b.get('dam','')},"
-                    f"{b.get('continent', b.get('region',''))},"
+            clist = (
+                ', '.join(
+                    b.get(
+                        'country',
+                        [])) if isinstance(
+                    b.get('country'),
+                    list) else b.get(
+                    'country_up',
+                    ''))
+            f.write(f"{b.get('id', '')},"
+                    f"{b.get('name', '')},"
+                    f"{b.get('river', '')},"
+                    f"{b.get('dam', '')},"
+                    f"{b.get('continent', b.get('region', ''))},"
                     f"\"{clist}\","
-                    f"{b.get('treaty','')},"
-                    f"{b.get('legal_arts','')},"
+                    f"{b.get('treaty', '')},"
+                    f"{b.get('legal_arts', '')},"
                     f"{float(b.get('cap', b.get('cap_bcm', 0)))},"
                     f"{float(b.get('eff_cat_km2', b.get('area_km2', 0)))},"
                     f"{float(b.get('runoff_c', 0.3))},"
                     f"{float(b.get('lat', 0))},"
                     f"{float(b.get('lon', 0))},"
-                    f"\"{b.get('context','')[:100]}\"\n")
+                    f"\"{b.get('context', '')[:100]}\"\n")
     return True
 
 
