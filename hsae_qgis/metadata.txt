@@ -6,7 +6,7 @@ description=HSAE v6.0.3 -- First open-source platform: satellite to water law in
 version=6.0.3
 author=Seifeldin M.G. Alkedir
 email=saifeldinkhedir@gmail.com
-about=HSAE v6.0.3 -- HydroSovereign AI Engine: the first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes. NEW in v6.0.3: (1) Interactive Leaflet.js basin risk map embedded inside QGIS Desktop -- all 26 basins with ATDI/HIFD/CI popups and UNWC risk colour-coding; (2) Bayesian uncertainty panel -- 95% CI on ATDI/HIFD via Monte Carlo + Sobol sensitivity analysis; (3) Treaty Analysis panel -- ATCI (Alkedir Treaty Compliance Index) mapping all 10 key UNWC articles per basin. Total: 16 tools + 5 Processing algorithms. Blue Nile (GERD): ATDI=43.5% Art.7 UNWC, HIFD=20.0%, NSE=0.63, KGE=0.74, CI=0.44 HIGH, P(Neg.)=58%. SoftwareX SOFTX-D-26-00442 under review. Manual v5 (13 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf
+about=HSAE v6.0.3 -- HydroSovereign AI Engine: the first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes. NEW in v6.0.3: (1) Interactive Leaflet.js basin risk map embedded inside QGIS Desktop -- all 26 basins with ATDI/HIFD/CI popups and UNWC risk colour-coding; (2) Bayesian uncertainty panel -- 95% CI on ATDI/HIFD via Monte Carlo + Sobol sensitivity analysis; (3) Treaty Analysis panel -- ATCI (Alkedir Treaty Compliance Index) mapping all 10 key UNWC articles per basin. Total: 16 tools + 5 Processing algorithms. Blue Nile (GERD): ATDI=43.5% Art.7 UNWC, HIFD=20.0%, NSE=0.63, KGE=0.74, CI=0.44 HIGH, P(Neg.)=58%. SoftwareX SOFTX-D-26-00442 under review. Manual v6 (15 chapters, Tools 14/15/16): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
 repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 hasProcessingProvider=yes
@@ -37,6 +37,9 @@ changelog=
     [NEW] Tools count: 13 toolbar + 3 menu-only = 16 total (was 13)
     [FIX] Version strings unified to 6.0.3 across all files
     [FIX] About dialog updated to v6.0.3 with correct links
+    [NEW] Manual v6: 15 chapters, Equations Index, Error Codes, Legal Disclaimers,
+          Arabic Quick Start, Changelog Timeline, all XML schema issues fixed
+          77 KB (up from 41 KB), 2702 paragraphs, OOXML-validated
 
     v6.0.2 (April 2026) -- Documentation and performance update:
     - Complete Professional Manual v5 (13 chapters + 5 appendices, 828 KB)
