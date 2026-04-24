@@ -2,11 +2,30 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.3 -- Satellite-AI platform for transboundary water sovereignty. 26 basins, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), 16 tools, 5 algorithms, Leaflet map inside QGIS, UNWC 1997 (33 articles), SHA-256 audit chain, NSE=0.63 KGE=0.74
+description=HSAE v6.0.4 -- Satellite-AI for transboundary water law. 26 basins, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), 16 tools, 5 algorithms, WebGIS Map v2, Leaflet map inside QGIS, UNWC 1997, SHA-256 audit chain
 version=6.0.4
 author=Seifeldin M.G. Alkedir
 email=saifeldinkhedir@gmail.com
-about=HSAE v6.0.3 -- HydroSovereign AI Engine: the first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes. NEW in v6.0.3: (1) Interactive Leaflet.js basin risk map embedded inside QGIS Desktop -- all 26 basins with ATDI/HIFD/CI popups and UNWC risk colour-coding; (2) Bayesian Uncertainty Panel -- Monte Carlo n=500 with confidence intervals on ATDI/HIFD and Sobol sensitivity analysis for 6 parameters; (3) Treaty Compliance Panel -- ATCI (Alkedir Treaty Compliance Index) mapping all 10 key UNWC articles per basin. Total: 16 tools + 5 Processing algorithms. Blue Nile (GERD): ATDI=43.5 pc Art.7 UNWC, HIFD=20.0 pc, NSE=0.63, KGE=0.74, CI=0.44 HIGH, P(Neg.)=58 pc. SoftwareX SOFTX-D-26-00442 under review. Manual v6 (15 chapters, Tools 14/15/16): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
+about=HydroSovereign AI Engine (HSAE) v6.0.4 -- The first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes.
+
+NEW in v6.0.4:
+- WebGIS Map v2: Search, Layer Toggle (ATDI/HIFD/CI/ATCI), Basemap Switcher (Dark/Light/Satellite/OSM), Risk Filter, Chart.js popup charts, Basin Rankings sidebar
+- Tool 14: Interactive Leaflet.js basin risk map embedded inside QGIS Desktop
+- Tool 15: Bayesian Uncertainty Panel (Monte Carlo n=500, Sobol sensitivity)
+- Tool 16: Treaty Compliance Panel (ATCI -- Alkedir Treaty Compliance Index, 10 UNWC articles)
+- Flake8: 1220 issues reduced to under 30 (97.5 percent improvement)
+
+Key Results (Blue Nile / GERD):
+- ATDI = 43.5 percent -- Article 7 UNWC No-Significant-Harm zone
+- HIFD = 20.0 percent -- 20 percent of natural flow withheld
+- NSE = 0.63, KGE = 0.74 -- Satisfactory (proxy-validated vs GloFAS ERA5 v4)
+- CI = 0.44 HIGH -- Conflict Index
+- P(Negotiation) = 58 percent -- Article 17 Mediation recommended
+- ATCI = 70 percent -- 7 of 10 UNWC articles triggered
+
+Total: 16 tools + 5 Processing algorithms + 26 basins + 9 GEE sensors
+SoftwareX paper: SOFTX-D-26-00442 (under review)
+Manual v6 (15 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
 repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 hasProcessingProvider=yes
@@ -17,43 +36,35 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
-    v6.0.3 (April 2026) -- Interactive map + uncertainty + treaty analysis:
-    [NEW] Interactive Leaflet.js basin risk map embedded inside QGIS Desktop
-          - All 26 basins with ATDI/HIFD/CI/P(Neg.) popup cards
-          - Dark CARTO basemap with UNWC risk colour-coding
-          - Circle size proportional to ATDI risk level
-          - Legend + attribution panel (DOI + ORCID)
-          - Basin highlighting when selected from other tools
-    [NEW] Bayesian Uncertainty Panel (ATDI/HIFD confidence intervals)
-          - Monte Carlo n=500 parameter samples
-          - Confidence intervals displayed as visual bar overlay
-          - Sobol first-order sensitivity indices for 6 parameters
-          - Proxy validation disclaimer per basin
-    [NEW] Treaty Compliance Panel (ATCI -- Alkedir Treaty Compliance Index)
-          - Automated assessment of 10 key UNWC 1997 articles
-          - Per-article triggered/compliant status with thresholds
-          - ATCI score = triggered articles / total x 100
-          - Colour-coded table with legal threshold details
-    [NEW] Tools count: 13 toolbar + 3 menu-only = 16 total (was 13)
-    [NEW] Manual v6: 15 chapters, Equations Index, Error Codes, Legal Disclaimers,
-          Arabic Quick Start, Changelog Timeline, OOXML-validated (77 KB, 2702 paragraphs)
-    [FIX] Version strings unified to 6.0.3 across all 29 files
-    [FIX] About dialog updated to v6.0.3 with correct links
-    [FIX] metadata.txt: all percent signs replaced with 'pc' for configparser compatibility
+    v6.0.4 (April 2026) -- WebGIS Map v2 + Flake8 cleanup:
+    [NEW] WebGIS Map v2: Search box, Layer Toggle (ATDI/HIFD/CI/ATCI),
+          Basemap Switcher (Dark CARTO/Light CARTO/ESRI Satellite/OSM),
+          Risk Filter (Critical/High/Art.33/Art.7/Compliant),
+          Chart.js bar charts inside popups, Basin Rankings sidebar
+    [FIX] Flake8: 1220 issues reduced (autopep8 applied to all 20 Python files)
+    [FIX] F401 unused imports removed from 8 files
+    [FIX] E741 ambiguous variable names fixed
+    [FIX] F821 undefined name errors fixed
+    [FIX] Metadata description improved (no ambiguous 'pc' abbreviations)
 
-    v6.0.2 (April 2026) -- Documentation and performance update:
-    - Complete Professional Manual v5 (13 chapters + 5 appendices)
-    - README overhaul with for-the-badge shields and Quick Links
-    - metadata.txt: homepage set to official QGIS Plugin Repository URL
-    - tags expanded for better discoverability
-    - Performance: python-telegram-bot removed (-15s cold start)
-    - Performance: init_db() cached with @st.cache_resource (-3s/rerun)
+    v6.0.3 (April 2026) -- Interactive map + uncertainty + treaty analysis:
+    [NEW] Tool 14: Interactive Leaflet.js basin risk map inside QGIS Desktop
+    [NEW] Tool 15: Bayesian Uncertainty Panel (Monte Carlo + Sobol sensitivity)
+    [NEW] Tool 16: Treaty Compliance Panel (ATCI -- 10 UNWC articles)
+    [NEW] Tools count: 16 total (was 13 in v6.0.1)
+    [NEW] Manual v6: 15 chapters, Equations Index, Error Codes, Legal Disclaimers
+    [FIX] metadata.txt percent signs fixed for configparser compatibility
+
+    v6.0.2 (April 2026) -- Documentation and performance:
+    - Manual v5 complete (13 chapters + 5 appendices)
+    - Performance: telegram-bot removed (-15s cold start)
+    - Performance: init_db() cached with @st.cache_resource
     - Icon updated to 128x128 RGB PNG
 
     v6.0.1 (April 21, 2026) -- Official QGIS Plugin Repository publication:
     - Plugin ID: 5040 -- Approved by zimbogisgeek (QGIS reviewer)
     - PR #289 reviewed by Tim Sutton (QGIS Project Steering Committee)
-    - Security scan: 0 Critical, 0 Warnings, 76 files
+    - Security scan: 0 Critical, 0 Warnings
     - 13 toolbar tools + 5 Processing algorithms
     - Blue Nile (GERD): NSE=0.63, KGE=0.74 (proxy vs GloFAS ERA5 v4)
     - SoftwareX SOFTX-D-26-00442 submitted
