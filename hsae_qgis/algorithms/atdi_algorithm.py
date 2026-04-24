@@ -4,21 +4,21 @@ ATDI: Alkedir Transparency Deficit Index
 Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
-                        QgsProcessingOutputNumber)
+                       QgsProcessingOutputNumber)
 
 
 class ATDIAlgorithm(QgsProcessingAlgorithm):
 
-    RC   = 'RC'
-    CAP  = 'CAP'
-    NC   = 'NC'
+    RC = 'RC'
+    CAP = 'CAP'
+    NC = 'NC'
     DISP = 'DISP'
-    OUT  = 'ATDI'
+    OUT = 'ATDI'
 
-    def name(self):        return 'atdicalculator'
+    def name(self): return 'atdicalculator'
     def displayName(self): return 'ATDI Calculator'
-    def group(self):       return 'HSAE Indices'
-    def groupId(self):     return 'hsaeindices'
+    def group(self): return 'HSAE Indices'
+    def groupId(self): return 'hsaeindices'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterNumber(
@@ -38,12 +38,12 @@ class ATDIAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputNumber(self.OUT, 'ATDI (%)'))
 
     def processAlgorithm(self, parameters, context, feedback):
-        rc   = self.parameterAsDouble(parameters, self.RC, context)
-        cap  = self.parameterAsDouble(parameters, self.CAP, context)
-        nc   = self.parameterAsInt(parameters, self.NC, context)
+        rc = self.parameterAsDouble(parameters, self.RC, context)
+        cap = self.parameterAsDouble(parameters, self.CAP, context)
+        nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        atdi = min(95.0, max(5.0,
-            15 + disp*12 + min(cap/2, 20) + (nc-2)*8 + (1-rc)*10))
+        atdi = min(95.0, max(5.0, 15 + disp * 12 +
+                   min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
         feedback.pushInfo(f'ATDI = {atdi:.2f}%')
         return {self.OUT: atdi}
 
