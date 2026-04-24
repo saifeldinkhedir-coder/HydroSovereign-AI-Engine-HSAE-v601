@@ -34,9 +34,9 @@
 
 | Format | Download | Size | Contents |
 |--------|----------|------|----------|
-| 📕 **PDF Manual v5** | [⬇️ Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | ~830 KB | Complete guide — 13 chapters + 5 appendices |
-| 📘 **DOCX Manual v5** | [⬇️ Download DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.docx) | ~60 KB | Editable Word format |
-| 🌐 **Online Viewer** | [View on GitHub](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | — | Preview in browser |
+| 📕 **PDF Manual v5** | [⬇️ Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf) | ~830 KB | Complete guide — 13 chapters + 5 appendices |
+| 📘 **DOCX Manual v5** | [⬇️ Download DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.docx) | ~60 KB | Editable Word format |
+| 🌐 **Online Viewer** | [View on GitHub](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v5.pdf) | — | Preview in browser |
 
 **Manual includes:**
 - ⚡ Quick Start (5-minute tutorial)
