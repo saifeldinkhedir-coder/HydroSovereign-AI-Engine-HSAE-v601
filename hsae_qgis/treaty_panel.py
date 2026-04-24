@@ -7,18 +7,24 @@ comparing current treaty status against UNWC 1997 obligations.
 from __future__ import annotations
 
 try:
-    from qgis.PyQt.QtWidgets import (QDockWidget, QWidget, QVBoxLayout,
-                                      QComboBox, QPushButton, QHBoxLayout, QLabel)
-    from qgis.PyQt.QtCore import Qt, QUrl
+    from qgis.PyQt.QtWidgets import (
+        QDockWidget,
+        QWidget,
+        QVBoxLayout,
+        QComboBox,
+        QPushButton,
+        QHBoxLayout,
+        QLabel)
+    from qgis.PyQt.QtCore import QUrl
     from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
     HAS_WEBENGINE = True
 except ImportError:
     HAS_WEBENGINE = False
 
 ARTICLES = [
-    (5,  "Equitable and Reasonable Utilization", "HIFD > 25%"),
-    (7,  "Obligation Not to Cause Significant Harm", "ATDI > 20%"),
-    (9,  "Regular Exchange of Data and Information", "ATDI > 40%"),
+    (5, "Equitable and Reasonable Utilization", "HIFD > 25%"),
+    (7, "Obligation Not to Cause Significant Harm", "ATDI > 20%"),
+    (9, "Regular Exchange of Data and Information", "ATDI > 40%"),
     (11, "Information Concerning Planned Measures", "ATDI > 35%"),
     (12, "Notification Concerning Planned Measures", "ATDI > 45%"),
     (17, "Consultations and Negotiations", "ATDI > 50%"),
@@ -44,8 +50,8 @@ def _build_treaty_html(basin: dict) -> str:
         if is_triggered:
             triggered += 1
         status_text = "⚡ TRIGGERED" if is_triggered else "✅ Compliant"
-        status_col  = "#dc2626" if is_triggered else "#16a34a"
-        row_bg      = "#FFF5F5" if is_triggered else "#F0FFF4"
+        status_col = "#dc2626" if is_triggered else "#16a34a"
+        row_bg = "#FFF5F5" if is_triggered else "#F0FFF4"
         rows += f"""
       <tr style='background:{row_bg}'>
         <td style='padding:6px 10px;font-weight:700;color:#0B3D8E;
@@ -114,8 +120,8 @@ class HSAETreatyPanel(QDockWidget):
 
     def __init__(self, iface, basins: list, parent=None):
         super().__init__(self.TITLE, parent)
-        self.iface   = iface
-        self.basins  = basins
+        self.iface = iface
+        self.basins = basins
         self.browser = None
         self.setObjectName("HSAETreatyPanelV603")
         self._build()
@@ -154,7 +160,7 @@ class HSAETreatyPanel(QDockWidget):
                 _build_treaty_html(basin), QUrl("about:blank"))
 
     def update_basin(self, basin: dict):
-        idx = next((i for i,b in enumerate(self.basins)
+        idx = next((i for i, b in enumerate(self.basins)
                     if b.get("id") == basin.get("id")), -1)
         if idx >= 0:
             self.combo.setCurrentIndex(idx)
