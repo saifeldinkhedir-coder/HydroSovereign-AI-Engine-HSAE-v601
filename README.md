@@ -2,27 +2,19 @@
 
 # 🌊 HydroSovereign AI Engine — HSAE v6.01
 
-> **🎉 QGIS Plugin officially listed in the QGIS Plugin Repository — April 16, 2026**  
+> **🎉 QGIS Plugin officially listed in the QGIS Plugin Repository — April 21, 2026**  
 > PR #289 approved by **Tim Sutton** (QGIS Project Steering Committee) and merged into master.  
 > Install: **QGIS → Plugins → Manage and Install Plugins → Search "HydroSovereign"**
 
-[![ORCID](https://img.shields.io/badge/ORCID-0000--0003--0821--2991-a6ce39?style=flat&logo=orcid&logoColor=white)](https://orcid.org/0000-0003-0821-2991)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19180160.svg)](https://doi.org/10.5281/zenodo.19180160)
-[![Email](https://img.shields.io/badge/Email-saifeldinkhedir%40gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:saifeldinkhedir@gmail.com)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Seifeldin%20Alkedir-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/seifelden-alkhedir-6b730985/)
-[![Zenodo](https://img.shields.io/badge/Zenodo-DOI%20Records-1682D4?style=flat&logo=zenodo&logoColor=white)](https://zenodo.org/search?q=0000-0003-0821-2991)
-[![YouTube](https://img.shields.io/badge/YouTube-Channel-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/@seifeldinalkedir)
-[![QGIS](https://img.shields.io/badge/QGIS-Plugin%20v6.01-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
-[![Download QGIS Plugin](https://img.shields.io/badge/⬇️_Download-QGIS_Plugin_FINAL-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/HSAE_v601_QGIS_Plugin_FINAL.zip)
-[![CV](https://img.shields.io/badge/CV-Download-6366F1?style=flat&logo=read-the-docs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf)
-[![Live App](https://img.shields.io/badge/Live_App-HSAE_v6.01-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
-[![License](https://img.shields.io/badge/License-GPL--3.0-blue?style=flat)](LICENSE)
+[![QGIS Plugin](https://img.shields.io/badge/QGIS_Plugin-ID_5040-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/hsae_qgis/)
+[![PyPI](https://img.shields.io/badge/PyPI-hydrosovereign_v6.5.3-3775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/hydrosovereign/)
+[![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19180160-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.19180160)
+[![SoftwareX](https://img.shields.io/badge/SoftwareX-SOFTX--D--26--00442-005A8E?style=for-the-badge)](https://doi.org/10.5281/zenodo.19180160)
+[![License](https://img.shields.io/badge/License-GPL_3.0-blue?style=for-the-badge)](LICENSE)
+[![ORCID](https://img.shields.io/badge/ORCID-0000--0003--0821--2991-a6ce39?style=for-the-badge&logo=orcid&logoColor=white)](https://orcid.org/0000-0003-0821-2991)
 [![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.38-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
-[![GEE](https://img.shields.io/badge/Google%20Earth%20Engine-7%20Sensors-4285F4?style=flat&logo=google&logoColor=white)](https://earthengine.google.com)
-[![Tests](https://img.shields.io/badge/Tests-37%20passing-brightgreen?style=flat&logo=pytest&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/tests)
-[![Docs](https://img.shields.io/badge/Docs-6%20files-blue?style=flat&logo=readthedocs&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/docs)
-[![Release](https://img.shields.io/badge/Release-v6.0.1-orange?style=flat&logo=github&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/releases)
+[![Tests](https://img.shields.io/badge/Tests-56_passing-brightgreen?style=flat&logo=pytest)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/actions)
 
 **26 basins · 7 geographic regions · 49 Python modules · 33 Streamlit pages · 0 syntax errors**
 
@@ -45,6 +37,22 @@ Ten original scientific contributions are introduced — including the **Alkedir
 Implemented as a **49-module Python application** (31,273 lines · 33 pages · zero syntax errors), with a companion **QGIS Desktop Plugin** (13 tools + 5 Processing algorithms), HSAE v6.01 represents a novel contribution to the fields of hydro-diplomacy, satellite hydrology, and AI-driven water governance.
 
 **Keywords:** transboundary water management · remote sensing · Google Earth Engine · machine learning · UN Watercourses Convention · decision support system · hydro-diplomacy · SSP climate scenarios · Digital Twin · Streamlit · QGIS · open-source hydrology
+
+---
+
+## 🔗 Quick Links
+
+| Resource | Link | Description |
+|----------|------|-------------|
+| 🔌 **QGIS Plugin** | [plugins.qgis.org/plugins/hsae_qgis/](https://plugins.qgis.org/plugins/hsae_qgis/) | Plugin ID: 5040 · Approved April 21, 2026 |
+| 🐍 **PyPI Package** | [pypi.org/project/hydrosovereign/](https://pypi.org/project/hydrosovereign/) | `pip install hydrosovereign` |
+| 🌐 **Live Streamlit App** | [HSAE v6.01](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app) | 26 basins · 7 GEE sensors |
+| 📦 **GitHub (App)** | [HydroSovereign-AI-Engine-HSAE-v601](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601) | Main application |
+| 📦 **GitHub (Package)** | [hydrosovereign](https://github.com/saifeldinkhedir-coder/hydrosovereign) | Python package |
+| 🏛️ **Zenodo DOI** | [10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160) | Permanent archive |
+| 📄 **SoftwareX Paper** | SOFTX-D-26-00442 | Under Review 2026 · Elsevier |
+| 📖 **Manual PDF** | [⬇️ Download Manual v5](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | Complete QGIS Plugin Guide |
+| 🐛 **Bug Reports** | [Issues](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues) | GitHub Issues tracker |
 
 ---
 
@@ -75,6 +83,29 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 | 📦 **Zenodo** | [DOI Records & Datasets](https://zenodo.org/search?q=0000-0003-0821-2991) |
 | 🎬 **YouTube** | [HSAE Video Channel](https://www.youtube.com/@seifeldinalkedir) |
 | 📄 **CV** | [Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf) |
+
+---
+
+## 📖 Documentation & Manual
+
+| Format | Download | Size | Contents |
+|--------|----------|------|----------|
+| 📕 **PDF Manual v5** | [⬇️ Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | ~830 KB | Complete guide — 13 chapters + 5 appendices |
+| 📘 **DOCX Manual v5** | [⬇️ Download DOCX](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.docx) | ~60 KB | Editable Word format |
+| 🌐 **Online Viewer** | [View on GitHub](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/blob/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v3.pdf) | — | Preview in browser |
+
+**Manual includes:**
+- ⚡ Quick Start (5-minute tutorial)
+- 🛠️ All 13 Tools — step-by-step with screenshots
+- ⚙️ 5 Processing Algorithms — complete reference
+- 🗺️ 26 Basin registry with ATDI/HIFD values
+- 📊 Scientific indices (ATDI, HIFD, CI, HBV-96, NSE, KGE)
+- 🖥️ QGIS Desktop operating guide (Ch. 11)
+- 🔧 Advanced Features: Model Builder, Batch Processing, Python API (Ch. 12)
+- 🌏 Case Study 2: Mekong Basin (Ch. 13)
+- 🆘 Troubleshooting & FAQ (16 common errors)
+- 📚 Glossary (23 terms) + Keyword Index (47 entries)
+- 🖨️ Quick Reference Card (print-ready A5)
 
 ---
 
