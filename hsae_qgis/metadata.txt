@@ -3,7 +3,7 @@ name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
 description=HSAE v6.0.4 -- Satellite-AI for transboundary water law. 26 basins, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), 16 tools, 5 algorithms, WebGIS Map v2, Leaflet map inside QGIS, UNWC 1997, SHA-256 audit chain
-version=6.0.4
+version=6.0.5
 author=Seifeldin M.G. Alkedir
 email=saifeldinkhedir@gmail.com
 about=HydroSovereign AI Engine (HSAE) v6.0.4 -- The first open-source platform automating the full pipeline from live satellite observation to international water law compliance in under 2 minutes.
@@ -36,6 +36,11 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    v6.0.5 (April 2026) -- Metadata fix + description update:
+    [FIX] metadata.txt: description updated to v6.0.4 content (ZIP had v6.0.3 text)
+    [FIX] Removed ambiguous "pc" abbreviation from description/about
+    [FIX] Professional description with full feature list
+
     v6.0.4 (April 2026) -- WebGIS Map v2 + Flake8 cleanup:
     [NEW] WebGIS Map v2: Search box, Layer Toggle (ATDI/HIFD/CI/ATCI),
           Basemap Switcher (Dark CARTO/Light CARTO/ESRI Satellite/OSM),
