@@ -14,7 +14,7 @@ Sensors:
   • GloFAS ERA5  — River discharge reanalysis (m³/s)
 
 Project: zinc-arc-484714-j8
-Author:  Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
