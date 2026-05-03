@@ -1,6 +1,6 @@
 """
 dashboard_panel.py — HSAE v6.01 Real-Time QGIS Dashboard Panel
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
     QDockWidget,
@@ -149,7 +149,7 @@ class HSAEDashboardPanel(QDockWidget):
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(
-                "Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991",
+                "Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991",
                 f"color:{GRAY};font-size:9px"))
 
         # Basin selector
@@ -348,7 +348,7 @@ class HSAEDashboardPanel(QDockWidget):
                 f"Date:   {
                     datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n")
             f.write(
-                f"Author: Seifeldin M.G. Alkedir | ORCID: 0000-0003-0821-2991\n\n")
+                f"Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991\n\n")
             f.write(f"ATDI={d['atdi']:.1f}% | HIFD={d['hifd']:.1f}% | "
                     f"NSE={d['nse']} | KGE={d['kge']} | CI={d['ci']:.3f}\n")
             f.write(f"Risk: {d['risk_txt']} | P(Neg)={d['pneg']:.0%}\n")
