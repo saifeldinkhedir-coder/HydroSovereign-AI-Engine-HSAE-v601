@@ -4,7 +4,7 @@ treaty_diff.py — HSAE v9.0.0  Treaty Compliance Scoring Engine
 Compares any bilateral/multilateral water treaty against the
 UN Watercourses Convention 1997 and scores compliance 0–100%.
 
-Scientific contribution: Alkedir Treaty Compliance Index (ATCI)
+Scientific contribution: Alkhedir Treaty Compliance Index (ATCI)
   ATCI = Σ(wᵢ × sᵢ) / Σ(wᵢ) × 100
   where i = each of 17 assessed UN 1997 articles
 
@@ -14,7 +14,7 @@ Sources:
   OSU Transboundary Freshwater Dispute Database (TFDD)
   UN Treaty Collection
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -854,7 +854,7 @@ TREATY_DATABASE = {
 # ── ATCI Calculation ──────────────────────────────────────────────────────────
 def compute_atci(treaty: dict) -> dict:
     """
-    Compute Alkedir Treaty Compliance Index (ATCI) for a treaty vs UN 1997.
+    Compute Alkhedir Treaty Compliance Index (ATCI) for a treaty vs UN 1997.
 
     Returns dict with:
       atci_score       — overall score 0–100
@@ -1040,7 +1040,7 @@ td{{padding:8px;border-bottom:1px solid #21262d}}
       padding:16px 24px;display:inline-block;margin:6px;text-align:center}}
 .num{{font-size:2em;font-weight:bold}}.lbl{{color:#8b949e;font-size:11px}}
 </style></head><body>
-<h1>⚖️ Alkedir Treaty Compliance Index (ATCI)</h1>
+<h1>⚖️ Alkhedir Treaty Compliance Index (ATCI)</h1>
 <p style='color:#8b949e'>{result['treaty_name']} · {result['year']} ·
 Parties: {', '.join(result['parties'])}</p>
 
@@ -1072,7 +1072,7 @@ Parties: {', '.join(result['parties'])}</p>
 
 <p style='margin-top:20px;font-size:11px;color:#8b949e'>
 Sources: UN Watercourses Convention 1997 · FAO FAOLEX ·
-OSU TFDD · Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+OSU TFDD · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
 </body></html>"""
 
 
