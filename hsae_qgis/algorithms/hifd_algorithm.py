@@ -15,10 +15,17 @@ class HIFDAlgorithm(QgsProcessingAlgorithm):
     DISP = 'DISP'
     OUT = 'HIFD'
 
-    def name(self): return 'hifdcalculator'
-    def displayName(self): return 'HIFD Calculator'
-    def group(self): return 'HSAE Indices'
-    def groupId(self): return 'hsaeindices'
+    def name(self):
+        return 'hifdcalculator'
+
+    def displayName(self):
+        return 'HIFD Calculator'
+
+    def group(self):
+        return 'HSAE Indices'
+
+    def groupId(self):
+        return 'hsaeindices'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterNumber(
