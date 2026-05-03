@@ -15,10 +15,14 @@ class ATDIAlgorithm(QgsProcessingAlgorithm):
     DISP = 'DISP'
     OUT = 'ATDI'
 
-    def name(self): return 'atdicalculator'
-    def displayName(self): return 'ATDI Calculator'
-    def group(self): return 'HSAE Indices'
-    def groupId(self): return 'hsaeindices'
+    def name(self):
+        return 'atdicalculator'
+    def displayName(self):
+        return 'ATDI Calculator'
+    def group(self):
+        return 'HSAE Indices'
+    def groupId(self):
+        return 'hsaeindices'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterNumber(
