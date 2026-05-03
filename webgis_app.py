@@ -17,7 +17,7 @@ Features:
   • Real-time search bar
   • UN article trigger indicators
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -218,7 +218,7 @@ body {{ font-family:'Segoe UI',sans-serif; background:#0d1117; color:#e6edf3; he
 <div id="header">
   <div>
     <h1>🌊 HydroSovereign AI Engine — WebGIS</h1>
-    <p>v9.0.0 · {n_basins} Basins · Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+    <p>v9.0.0 · {n_basins} Basins · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
   </div>
   <div class="stat-pill">🔴 Critical: <span id="n-crit">{n_critical}</span></div>
   <div class="stat-pill">🟠 High: <span id="n-high">{n_high}</span></div>
