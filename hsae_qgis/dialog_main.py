@@ -34,7 +34,7 @@ class HSAEMainDialog(QDialog):
         layout.addWidget(header)
 
         sub = QLabel(
-            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991") # noqa: E501
+            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991")  # noqa: E501
         sub.setAlignment(Qt.AlignCenter)
         layout.addWidget(sub)
 
