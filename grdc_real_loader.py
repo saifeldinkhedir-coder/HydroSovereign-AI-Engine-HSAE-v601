@@ -12,7 +12,7 @@ Available real stations (1978-1980):
 For post-1990 Blue Nile data: GloFAS reanalysis is used.
 GRDC request pending for Khartoum/Sennar/Roseires stations.
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
