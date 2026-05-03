@@ -17,7 +17,7 @@ References:
   - Churchill (1948) TN 2168, U.S. Corps of Engineers
   - Batuca & Jordaan (2000) ISBN:90-5809-052-3
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import math
