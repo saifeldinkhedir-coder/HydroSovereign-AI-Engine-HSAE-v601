@@ -44,7 +44,7 @@ print(result["legal"]["articles"])  # [Art.5, Art.7, Art.9, Art.20]
 
 ```bibtex
 @software{alkedir2026hydrosovereign,
-  author    = {Alkedir, Seifeldin M.G.},
+  author    = {Alkhedir, Seifeldin M.G.},
   title     = {hydrosovereign: HydroSovereign AI Engine v6.5.0},
   year      = {2026},
   doi       = {10.5281/zenodo.19180160},
