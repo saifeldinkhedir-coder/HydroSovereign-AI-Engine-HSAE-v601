@@ -12,7 +12,7 @@ Methods:
   2. Morris — Elementary effects screening (Saltelli 2010)
   3. Sobol — First-order and total-order sensitivity indices (pure-Python)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -384,7 +384,7 @@ td{{padding:8px;border-bottom:1px solid #21262d}}
 <h1>🎯 ATDI Sensitivity Analysis — {report['basin_name']}</h1>
 <p style='color:#8b949e'>Current ATDI: <b>{report['current_atdi']:.3f}</b> ·
 Methods: OAT + Morris + Sobol (Saltelli 2010) ·
-Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
 
 <h2>One-at-a-Time (OAT) — Parameter Influence on ATDI</h2>
 <p style='color:#8b949e;font-size:12px'>Percentage change in ATDI when each
