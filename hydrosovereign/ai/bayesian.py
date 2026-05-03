@@ -9,7 +9,7 @@ As recommended by Gemini review:
    a probability of conflict based on weather forecasts and geopolitical
    sentiment analysis."
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
