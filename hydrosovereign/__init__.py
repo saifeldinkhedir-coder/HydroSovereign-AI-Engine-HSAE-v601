@@ -1,12 +1,12 @@
 """
 HydroSovereign AI Engine (HSAE) v6.2.0
 ========================================
-Author:  Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 DOI:     10.5281/zenodo.19180160
 """
 
 __version__   = "6.5.0"
-__author__    = "Seifeldin M.G. Alkedir"
+__author__    = "Seifeldin M.G. Alkhedir"
 __email__     = "saifeldinkhedir@gmail.com"
 __orcid__     = "0000-0003-0821-2991"
 __doi__       = "10.5281/zenodo.19180160"
