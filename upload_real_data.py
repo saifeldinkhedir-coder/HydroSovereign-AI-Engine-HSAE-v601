@@ -7,7 +7,7 @@ Allows users to upload real discharge data from any source:
 - Generic CSV (date + discharge columns)
 - WaterML2 CSV exports
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 import streamlit as st
