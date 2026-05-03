@@ -10,7 +10,7 @@ about=HydroSovereign AI Engine (HSAE) v6.0.6 automates the full pipeline from li
     Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
     Key results for Blue Nile (GERD): ATDI = 43.5 percent (Art.7 UNWC), HIFD = 20.0 percent, NSE = 0.63, KGE = 0.74, CI = 0.44 HIGH, P(Negotiation) = 58 percent, ATCI = 70 percent.
     15 tools plus 5 Processing Algorithms. Plugin ID: 5040. Approved by QGIS PSC (0 Critical, 0 Warnings).
-    Peer-reviewed publication: Elsevier SoftwareX SOFTX-D-26-00442 (under review). Preprint: https://doi.org/10.2139/ssrn.6661396
+    Peer-reviewed publication: Elsevier SoftwareX SOFTX-D-26-00442 (under review). Preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
     Archive DOI: https://doi.org/10.5281/zenodo.19180160
     Manual v6 (15 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
@@ -27,7 +27,7 @@ changelog=
     Corrected author name spelling to Alkhedir throughout all files.
     Removed JOSS link (paper under revision -- will resubmit Oct 2026).
     Updated publication reference to SoftwareX SOFTX-D-26-00442 (under peer review).
-    Added SSRN preprint DOI: https://doi.org/10.2139/ssrn.6661396
+    Added SSRN preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
     Added Zenodo archive DOI: https://doi.org/10.5281/zenodo.19180160
     Corrected tool count: 15 tools plus 5 Processing Algorithms (About dialog is not a tool).
 
