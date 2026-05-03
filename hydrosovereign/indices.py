@@ -4,7 +4,7 @@ indices.py — HSAE v6.2.0 Core Scientific Indices
 Calibrated ATDI/HIFD (RMSE < 5%), WQI with physicochemical params,
 recalibrated NegotiationAI weights.
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 DOI:    10.5281/zenodo.19180160
 """
 
@@ -32,7 +32,7 @@ _WQI_LIMITS = {
 
 
 def compute_atdi(runoff_c, cap_bcm, n_countries, dispute_level):
-    """ATDI — Alkedir Transparency Deficit Index (calibrated, RMSE=4.1%).
+    """ATDI — Alkhedir Transparency Deficit Index (calibrated, RMSE=4.1%).
     Examples: compute_atdi(0.38, 74.0, 3, 4) → ~53.5 (GERD)"""
     if not (0 < runoff_c <= 1): raise ValueError(f"runoff_c must be in (0,1], got {runoff_c}")
     if cap_bcm < 0:             raise ValueError(f"cap_bcm must be >=0, got {cap_bcm}")
