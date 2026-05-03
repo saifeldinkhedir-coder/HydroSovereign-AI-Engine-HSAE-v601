@@ -17,10 +17,13 @@ class ATDIAlgorithm(QgsProcessingAlgorithm):
 
     def name(self):
         return 'atdicalculator'
+
     def displayName(self):
         return 'ATDI Calculator'
+
     def group(self):
         return 'HSAE Indices'
+
     def groupId(self):
         return 'hsaeindices'
 
