@@ -10,7 +10,7 @@ built-in simplified models with numpy.
 
 Forecasts: TDI 1-year, 5-year, SSP scenario (2100)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 import math
 import random
