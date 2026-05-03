@@ -18,7 +18,7 @@ Scientific basis:
   Alfieri et al. (2013) GloFAS — ECMWF global flood forecasting
   Zsoter et al. (2020) GloFAS v3.1
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
