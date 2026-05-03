@@ -43,10 +43,17 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
     OUT_CSV = 'OUTPUT_CSV'
     OUT_HTML = 'OUTPUT_HTML'
 
-    def name(self): return 'multibasincomparison'
-    def displayName(self): return 'Multi-Basin Comparison'
-    def group(self): return 'HSAE Analysis'
-    def groupId(self): return 'hsaeanalysis'
+    def name(self):
+        return 'multibasincomparison'
+
+    def displayName(self):
+        return 'Multi-Basin Comparison'
+
+    def group(self):
+        return 'HSAE Analysis'
+
+    def groupId(self):
+        return 'hsaeanalysis'
 
     def initAlgorithm(self, config=None):
         self.addParameter(
