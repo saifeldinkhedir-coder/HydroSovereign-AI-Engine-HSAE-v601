@@ -4,7 +4,7 @@ qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
 description=HSAE v6.0.5: Transboundary water sovereignty. 26 basins, 16 tools, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), WebGIS Map v2, Leaflet inside QGIS, UNWC 1997, SHA-256 chain
 version=6.0.5
-author=Seifeldin M.G. Alkedir
+author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
 about=HydroSovereign AI Engine (HSAE) v6.0.5 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes. First open-source platform of its kind.
     NEW in v6.0.5 / v6.0.4: WebGIS Map v2 with Search, Layer Toggle (ATDI/HIFD/CI/ATCI), Basemap Switcher (Dark/Light/Satellite/OSM), Risk Filter, Chart.js popup charts, Basin Rankings sidebar.
