@@ -5,7 +5,7 @@ tests/test_v620.py — hydrosovereign v6.2.0 Complete Test Suite
 
 Run: pytest tests/test_v620.py -v
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 import sys, os, json, asyncio
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
