@@ -44,7 +44,7 @@ Outputs:
   • key_factors  — top factors driving outcome
   • art33_path   — recommended UN Art.33 dispute resolution pathway
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -1036,7 +1036,7 @@ td{{padding:8px;border-bottom:1px solid #21262d}}
 <h1>🤝 Negotiation Success Prediction — {result['basin_name']}</h1>
 <p style='color:#8b949e'>Scenario: {ssp} · {result['scenario'].title()} ·
 GBM model trained on 200+ historical negotiations ·
-Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
 
 <div class='card'>
   <div class='num' style='color:{c}'>{result['P_success_pct']:.1f}%</div>
