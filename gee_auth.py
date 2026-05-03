@@ -6,7 +6,7 @@ Supports three authentication modes:
   2. Local dev        — reads from .streamlit/secrets.toml
   3. Personal creds   — falls back to earthengine authenticate
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import json
