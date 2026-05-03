@@ -4,7 +4,7 @@ basins.py — HSAE v6.01 Basin Registry
 26 transboundary river basins with geopolitical, physical,
 and legal data. Source: TFDD, ICOW, GRDC, FAO AQUASTAT.
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
