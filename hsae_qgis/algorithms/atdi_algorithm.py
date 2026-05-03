@@ -1,7 +1,7 @@
 """
 atdi_algorithm.py — HSAE v6.01 QGIS Processing Algorithm
-ATDI: Alkedir Transparency Deficit Index
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+ATDI: Alkhedir Transparency Deficit Index
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingOutputNumber)
