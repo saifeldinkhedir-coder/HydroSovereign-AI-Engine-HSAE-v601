@@ -28,7 +28,7 @@ Processing Algorithms:
 Author:  Seifeldin M.G. Alkhedir
 ORCID:   0000-0003-0821-2991
 DOI:     10.5281/zenodo.19180160
-JOSS:    https://joss.theoj.org/papers/d6c37d0e07d1325e96c00d0844871a35
+Preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
 App:     https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app
 """
 from .map_panel import HSAEMapPanel
@@ -45,7 +45,7 @@ VERSION = "6.0.3"
 AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
-JOSS_URL = "https://joss.theoj.org/papers/d6c37d0e07d1325e96c00d0844871a35"
+SSRN_URL = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396"
 LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"
 GITHUB = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
 
@@ -608,7 +608,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
   <div>
     <h1>🌊 HSAE v6.0.3 — WebGIS Global Basin Network</h1>
     <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
-       DOI: 10.5281/zenodo.19180160 · JOSS 2026</p>
+       DOI: 10.5281/zenodo.19180160 · Preprint: SSRN 2026</p>
   </div>
 </div>
 <div id="main">
@@ -687,7 +687,7 @@ function showPanel(p){{
         with open(path, 'w', encoding='utf-8') as f:
             f.write(f"HSAE v{VERSION} — ICJ/PCA LEGAL DOSSIER\n{'=' * 60}\n")
             f.write(f"Author: {AUTHOR} | ORCID: {ORCID}\n")
-            f.write(f"DOI: {DOI}\nJOSS: {JOSS_URL}\n")
+            f.write(f"DOI: {DOI}\nPreprint: {SSRN_URL}\n")
             f.write(
                 f"Generated: {
                     datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n\n")
@@ -769,7 +769,7 @@ tr:nth-child(even){{background:#161b22}}
 <th>Dispute</th><th>P(Neg)</th><th>UN Articles</th><th>Context</th>
 </tr></thead><tbody>{rows}</tbody></table>
 <p class="ft">HSAE v{VERSION} · UNWC 1997 · TFDD/ICOW ·
-<a href="{JOSS_URL}" style="color:#58a6ff">JOSS 2026</a> ·
+<a href="{SSRN_URL}" style="color:#58a6ff">Preprint (SSRN)</a> ·
 <a href="https://doi.org/{DOI}" style="color:#58a6ff">{DOI}</a></p>
 </body></html>""")
 
@@ -827,7 +827,7 @@ tr:nth-child(even){{background:#161b22}}
 <b>Author:</b> {AUTHOR}<br>
 <b>ORCID:</b> {ORCID}<br>
 <b>DOI:</b> {DOI}<br>
-<b>JOSS:</b> <a href="{JOSS_URL}">joss.theoj.org</a><br>
+<b>Preprint:</b> <a href="{SSRN_URL}">papers.ssrn.com</a><br>
 <b>GitHub:</b> <a href="{GITHUB}">{GITHUB}</a><br>
 <b>Live App:</b> <a href="{LIVE_APP}">Streamlit Cloud</a><br><br>
 <b>13 Tools:</b><br>
@@ -840,5 +840,5 @@ ATDI · HIFD · Basin Legal Report · HBV-96 Calibration · Multi-Basin Comparis
 <b>Data:</b> 26 basins · TFDD/ICOW · UNWC 1997 · GEE<br>
 <b>Model:</b> HBV-96 + SCE-UA · GBM Negotiation AI (478 cases)<br>
 <b>Metrics:</b> NSE=0.63 · KGE=0.74 (pre-calibration)<br><br>
-<i>SoftwareX 2026 · JOSS 2026 · University of Khartoum</i>
+<i>SoftwareX 2026 (under review) · Preprint: SSRN · University of Khartoum</i>
 """)
