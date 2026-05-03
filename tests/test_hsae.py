@@ -5,7 +5,7 @@ pytest suite covering all core HSAE indices, HBV-96 model,
 data validation, and QGIS plugin functions.
 
 Run: pytest tests/ -v --tb=short
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 import sys, os, math
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
