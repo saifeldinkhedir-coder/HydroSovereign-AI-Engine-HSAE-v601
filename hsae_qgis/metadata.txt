@@ -2,45 +2,45 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.5: Transboundary water sovereignty. 26 basins, 16 tools, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), WebGIS Map v2, Leaflet inside QGIS, UNWC 1997, SHA-256 chain
-version=6.0.5
+description=HSAE v6.0.6: Transboundary water sovereignty. 26 basins, 15 tools, 5 Processing Algorithms, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), WebGIS Map v2, UNWC 1997, SHA-256 chain
+version=6.0.6
 author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.0.5 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes. First open-source platform of its kind.
-    NEW in v6.0.5 / v6.0.4: WebGIS Map v2 with Search, Layer Toggle (ATDI/HIFD/CI/ATCI), Basemap Switcher (Dark/Light/Satellite/OSM), Risk Filter, Chart.js popup charts, Basin Rankings sidebar.
-    Tools 14/15/16 (added in v6.0.3): Interactive Leaflet map inside QGIS Desktop, Bayesian Uncertainty Panel (Monte Carlo n=500 plus Sobol sensitivity), Treaty Compliance Panel with ATCI index covering all 10 key UNWC articles per basin.
-    Covers 26 globally contested basins across 7 world regions using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
-    Key results for Blue Nile (GERD): ATDI = 43.5 percent (Art.7 UNWC), HIFD = 20.0 percent, NSE = 0.63, KGE = 0.74, CI = 0.44 HIGH, P(Negotiation) = 58 percent, ATCI = 70 percent (7 of 10 UNWC articles triggered).
-    Total: 16 tools plus 5 Processing algorithms. SoftwareX paper SOFTX-D-26-00442 under review.
+about=HydroSovereign AI Engine (HSAE) v6.0.6 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
+    Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
+    Key results for Blue Nile (GERD): ATDI = 43.5 percent (Art.7 UNWC), HIFD = 20.0 percent, NSE = 0.63, KGE = 0.74, CI = 0.44 HIGH, P(Negotiation) = 58 percent, ATCI = 70 percent.
+    15 tools plus 5 Processing Algorithms. Plugin ID: 5040. Approved by QGIS PSC (0 Critical, 0 Warnings).
+    Peer-reviewed publication: Elsevier SoftwareX SOFTX-D-26-00442 (under review). Preprint: https://doi.org/10.2139/ssrn.6661396
+    Archive DOI: https://doi.org/10.5281/zenodo.19180160
     Manual v6 (15 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
 repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 hasProcessingProvider=yes
-tags=hydrology,water,transboundary,ATDI,HIFD,AFSF,ATCI,ASI,AHLB,UNWC,GEE,satellite,HBV,legal,Nile,Mekong,Euphrates,ICJ,PCA,negotiation,conflict,WebGIS,GRDC,sovereignty,AI,machine-learning,digital-twin,open-source,leaflet,interactive-map,uncertainty,treaty
+tags=hydrology,water,transboundary,ATDI,HIFD,AFSF,ATCI,ASI,AHLB,UNWC,GEE,satellite,HBV,legal,Nile,Mekong,Euphrates,ICJ,PCA,negotiation,conflict,WebGIS,sovereignty,AI,machine-learning,digital-twin,open-source,leaflet,uncertainty,treaty
 homepage=https://plugins.qgis.org/plugins/hsae_qgis/
 category=Vector
 icon=icon.png
 experimental=False
 deprecated=False
 changelog=
-    v6.0.5 (April 2026) -- Description fix:
-    Removed ambiguous "pc" abbreviation from all visible text.
-    Restructured about section for readability (short sentences, no bullets).
-    Fixed: v6.0.4 ZIP contained v6.0.3 description text.
+    v6.0.6 (May 2026) -- Name correction plus metadata update:
+    Corrected author name spelling to Alkhedir throughout all files.
+    Removed JOSS link (paper under revision -- will resubmit Oct 2026).
+    Updated publication reference to SoftwareX SOFTX-D-26-00442 (under peer review).
+    Added SSRN preprint DOI: https://doi.org/10.2139/ssrn.6661396
+    Added Zenodo archive DOI: https://doi.org/10.5281/zenodo.19180160
+    Corrected tool count: 15 tools plus 5 Processing Algorithms (About dialog is not a tool).
 
-    v6.0.4 (April 2026) -- WebGIS Map v2 plus Flake8 cleanup:
+    v6.0.5 (April 2026) -- Description fix:
+    Removed ambiguous abbreviations from visible text.
+    Restructured about section for readability.
+
+    v6.0.4 (April 2026) -- WebGIS Map v2:
     Added WebGIS Map v2 with Search, Layer Toggle, Basemap Switcher, Risk Filter, Chart.js popups.
-    Flake8: 1220 issues reduced to under 400 (autopep8 applied to all 20 Python files).
-    Removed unused imports (F401) from 8 files.
 
     v6.0.3 (April 2026) -- Tools 14 15 16 plus Manual v6:
-    Added Tool 14 interactive Leaflet map inside QGIS Desktop.
-    Added Tool 15 Bayesian Uncertainty Panel with Sobol sensitivity.
-    Added Tool 16 Treaty Compliance Panel (ATCI, 10 UNWC articles).
-    Total tools: 16 (was 13). Manual v6: 15 chapters.
+    Added Leaflet map inside QGIS Desktop, Bayesian Uncertainty Panel, Treaty Compliance Panel.
 
     v6.0.1 (April 21, 2026) -- Official QGIS publication:
-    Plugin ID 5040 approved by zimbogisgeek and Tim Sutton (QGIS PSC).
-    Security scan: 0 Critical, 0 Warnings.
-    SoftwareX SOFTX-D-26-00442 submitted.
+    Plugin ID 5040 approved. Security scan: 0 Critical, 0 Warnings.
 
