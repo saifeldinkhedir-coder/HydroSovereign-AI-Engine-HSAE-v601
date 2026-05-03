@@ -16,7 +16,7 @@ Scientific justification:
   Record: 1912–2023 · Mean Q: 1,454 m³/s · Natural Q: 1,580 m³/s
   Reference: Wheeler et al. (2020) Nature Communications 11, 5222
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -438,7 +438,7 @@ def generate_case_study_html() -> str:
 <div class='header'>
   <h1>🌊 GERD / Blue Nile Case Study</h1>
   <p style='color:#94A3B8'>HydroSovereign AI Engine (HSAE) v8.0 · GRDC Station 1763100 (El Diem)</p>
-  <p style='color:#94A3B8'>Period: 2010–2026 · Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+  <p style='color:#94A3B8'>Period: 2010–2026 · Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
   <p style='color:#94A3B8'>Generated: {date_str}</p>
 </div>
 
@@ -499,7 +499,7 @@ def generate_case_study_html() -> str:
 </div>
 
 <div class='footer'>
-  HSAE v8.0 · MIT License · Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991<br>
+  HSAE v8.0 · MIT License · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991<br>
   Data: GRDC (2023), Koblenz, Germany · Wheeler et al. (2020) Nature Communications
 </div>
 </body></html>"""
