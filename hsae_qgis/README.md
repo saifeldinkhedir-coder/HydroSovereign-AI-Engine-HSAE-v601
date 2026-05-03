@@ -13,7 +13,7 @@
 [![Security](https://img.shields.io/badge/Security_Scan-0_Critical-brightgreen?style=for-the-badge)](https://plugins.qgis.org/plugins/hsae_qgis/)
 [![QGIS](https://img.shields.io/badge/QGIS-%E2%89%A5_3.16_LTR-589632?style=flat)](https://qgis.org)
 
-**Author:** Seifeldin M.G. Alkedir · [ORCID 0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991) · University of Khartoum
+**Author:** Seifeldin M.G. Alkhedir · [ORCID 0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991) · University of Khartoum
 
 > *The first open-source platform to automate the complete pipeline from live satellite observation to international water law compliance — in under 2 minutes per basin.*
 
@@ -98,7 +98,7 @@ QGIS → Plugins → Manage and Install Plugins
 | 12 | 🏛️ ICJ/PCA Dossier | Export complete legal dossier (SHA-256 chain) | Menu |
 | 13 | 🗺️ Basin Risk Map | Interactive Leaflet.js basin map **inside QGIS Desktop** | ✅ |
 | 14 | 📉 Uncertainty Analysis | Bayesian CI + Monte Carlo (n=500) + Sobol sensitivity | ✅ |
-| 15 | ⚖️ Treaty Analysis (ATCI) | Alkedir Treaty Compliance Index — all 10 UNWC articles | ✅ |
+| 15 | ⚖️ Treaty Analysis (ATCI) | Alkhedir Treaty Compliance Index — all 10 UNWC articles | ✅ |
 
 ---
 
@@ -106,7 +106,7 @@ QGIS → Plugins → Manage and Install Plugins
 
 | # | Algorithm | Description |
 |---|-----------|-------------|
-| 1 | 📐 **ATDI Calculator** | Compute Alkedir Transparency Deficit Index for any basin |
+| 1 | 📐 **ATDI Calculator** | Compute Alkhedir Transparency Deficit Index for any basin |
 | 2 | 📐 **HIFD Calculator** | Compute Human-Induced Flow Deficit |
 | 3 | 📋 **Basin Legal Report** | Generate full UNWC compliance report as PDF/HTML |
 | 4 | ⚙️ **HBV-96 Calibration** | SCE-UA calibration of HBV-96 model — outputs NSE/KGE |
@@ -152,12 +152,12 @@ QGIS → Plugins → Manage and Install Plugins
 
 | Index | Full Name | Description |
 |-------|-----------|-------------|
-| **ATDI** | Alkedir Transparency Deficit Index | Daily satellite-based Art.7 UNWC compliance |
+| **ATDI** | Alkhedir Transparency Deficit Index | Daily satellite-based Art.7 UNWC compliance |
 | **HIFD** | Human-Induced Flow Deficit | Annual volumetric downstream flow reduction |
-| **AFSF** | Alkedir Forensic Signal Factor | Anthropogenic vs natural signal separator |
-| **AHLB** | Alkedir HBV-Legal Bridge | HBV-96 physics → UNWC article flags |
-| **ASI** | Alkedir Sovereignty Index | Composite water governance metric |
-| **ATCI** | Alkedir Treaty Compliance Index | Triggered UNWC articles / total × 100% |
+| **AFSF** | Alkhedir Forensic Signal Factor | Anthropogenic vs natural signal separator |
+| **AHLB** | Alkhedir HBV-Legal Bridge | HBV-96 physics → UNWC article flags |
+| **ASI** | Alkhedir Sovereignty Index | Composite water governance metric |
+| **ATCI** | Alkhedir Treaty Compliance Index | Triggered UNWC articles / total × 100% |
 
 ---
 
@@ -226,7 +226,7 @@ Covers all 7 world regions across all inhabited continents:
 
 ```bibtex
 @software{alkedir2026hsae,
-  author    = {Alkedir, Seifeldin M.G.},
+  author    = {Alkhedir, Seifeldin M.G.},
   title     = {{HydroSovereign AI Engine (HSAE) v6.0.6:
                 An Open-Source Satellite and AI Platform
                 for Transboundary Water Sovereignty Analysis}},
@@ -256,5 +256,5 @@ Covers all 7 world regions across all inhabited continents:
 
 ---
 
-*Plugin ID: 5040 · GPL-3.0 · April 2026 · Seifeldin M.G. Alkedir · University of Khartoum*
+*Plugin ID: 5040 · GPL-3.0 · April 2026 · Seifeldin M.G. Alkhedir · University of Khartoum*
 *ORCID: [0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991) · DOI: [10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160)*
