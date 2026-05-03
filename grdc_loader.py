@@ -22,7 +22,7 @@ References:
   Vörösmarty et al. (2010). Nature, 467(7315), 555-561.
   UN-Water (2021). Integrated Monitoring of SDG 6.
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -938,7 +938,7 @@ def get_tdi_documented(basin_id: str, n_countries: int,
         "tdi_ref":      rec["tdi_ref"],
         "source":       rec["source"],
         "notes":        rec.get("notes", ""),
-        "provenance":   "GRDC discharge-derived (Alkedir 2026c)",
+        "provenance":   "GRDC discharge-derived (Alkhedir 2026c)",
     })
     return result
 
