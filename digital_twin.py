@@ -28,7 +28,7 @@ print(f"NSE={report['NSE']:.3f}, AHIFD={report['AHIFD']:.1f}%")
 dt = DigitalTwin("blue_nile_gerd")
 report = dt.run(n_sim=200, use_real_api=True)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
@@ -537,7 +537,7 @@ td{{padding:7px 8px;border-bottom:1px solid #334155}}
   <b>Forcing:</b> {report.get('forcing_source','ERA5 synthetic')} · 
   <b>Model:</b> {report.get('model','HBV')} · 
   <b>Period:</b> {report.get('n_days',0)} days · 
-  <b>Author:</b> Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+  <b>Author:</b> Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 </div>
 
 </body></html>"""
