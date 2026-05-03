@@ -8,7 +8,7 @@ Fetches and displays live satellite rasters via GEE:
   - MODIS LST (land surface temperature)
   - MODIS NDVI (vegetation)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 import os, json, tempfile
 from typing import Optional, Dict
