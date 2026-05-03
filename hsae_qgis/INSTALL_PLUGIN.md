@@ -33,5 +33,5 @@ HydroSovereign → Calculate ATDI / HIFD / Basin Report
 - No additional Python packages needed
 
 ## Author
-Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991  
+Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991  
 https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
