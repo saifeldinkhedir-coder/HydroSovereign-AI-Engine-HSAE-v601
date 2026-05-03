@@ -13,7 +13,7 @@ Output:
     - NSE / KGE metrics
     - Basin summary table (CSV)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 import numpy as np
@@ -60,7 +60,7 @@ df = pd.DataFrame({
 print(f"   Shape: {df.shape} · Columns: {list(df.columns)}")
 
 # ── 3. Compute ATDI ────────────────────────────────────────────
-print("\n⚖️  Computing ATDI (Alkedir Transparency Deficit Index)...")
+print("\n⚖️  Computing ATDI (Alkhedir Transparency Deficit Index)...")
 
 from hsae_tdi import compute_atdi, tdi_legal_status, add_tdi_to_df, TDI_ALPHA, TDI_EPSILON
 print(f"   Formula: ATDI = clip((I_adj - Q_out) / (I_adj + ε), 0, 1) × 100")
