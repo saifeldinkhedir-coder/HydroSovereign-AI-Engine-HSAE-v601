@@ -4,7 +4,7 @@ negotiation.py — HSAE v6.3.0 NegotiationAI
 Trained on REAL TFDD/ICOW historical cases.
 Sources: Wolf 2003 (TFDD), Hensel 2006 (ICOW).
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import csv, logging
