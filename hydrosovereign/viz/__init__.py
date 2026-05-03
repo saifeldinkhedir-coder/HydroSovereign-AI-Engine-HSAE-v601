@@ -9,7 +9,7 @@ As recommended by ChatGPT review:
 
 Requires: pip install hydrosovereign[viz]
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from .plots import (
