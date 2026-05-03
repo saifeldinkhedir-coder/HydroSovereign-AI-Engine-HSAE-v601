@@ -4,7 +4,7 @@ models/hbv.py — HBVModel class (OOP wrapper)
 Object-oriented interface to HBV-96 + SCE-UA calibration.
 As requested by ChatGPT review: 'from hydrosovereign.models import HBVModel'
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
