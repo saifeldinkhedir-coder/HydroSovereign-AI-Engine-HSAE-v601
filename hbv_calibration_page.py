@@ -10,7 +10,7 @@ Full calibration workflow:
   6. Compare with published calibrations (8 basins)
   7. Export calibrated parameters + report
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import math
