@@ -23,11 +23,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # ── Stage 2: Production ───────────────────────────────────────────────────────
 FROM python:3.12-slim AS production
 
-LABEL maintainer="Seifeldin M.G. Alkedir <saifeldinkhedir@gmail.com>"
+LABEL maintainer="Seifeldin M.G. Alkhedir <saifeldinkhedir@gmail.com>"
 LABEL org.opencontainers.image.title="HydroSovereign AI Engine"
 LABEL org.opencontainers.image.version="6.5.0"
 LABEL org.opencontainers.image.description="AI-powered transboundary water governance"
-LABEL org.opencontainers.image.authors="Seifeldin M.G. Alkedir (ORCID: 0000-0003-0821-2991)"
+LABEL org.opencontainers.image.authors="Seifeldin M.G. Alkhedir (ORCID: 0000-0003-0821-2991)"
 LABEL org.opencontainers.image.source="https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
 LABEL org.opencontainers.image.licenses="GPL-3.0"
 
