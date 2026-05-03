@@ -9,7 +9,7 @@ Export HSAE results in professional scientific formats:
   5. CSV       — universal fallback
   6. HTML      — standalone report (already in pdf_exporter)
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import io
@@ -93,12 +93,12 @@ def export_netcdf(
         ds.institution      = "University of Khartoum"
         ds.source           = "HydroSovereign AI Engine v10.0"
         ds.history          = f"Created {datetime.datetime.utcnow().isoformat()} by HSAE v10.0"
-        ds.references       = "Alkedir (2026) doi:PENDING_RELEASE"
+        ds.references       = "Alkhedir (2026) doi:PENDING_RELEASE"
         ds.basin_id         = basin_id
         ds.basin_name       = str(basin.get("_name", basin_id))
         ds.basin_river      = str(basin.get("river", ""))
         ds.basin_cap_BCM    = float(basin.get("cap", 0))
-        ds.creator_name     = "Seifeldin M.G. Alkedir"
+        ds.creator_name     = "Seifeldin M.G. Alkhedir"
         ds.creator_orcid    = "0000-0003-0821-2991"
         ds.geospatial_lat   = float(basin.get("lat", 0))
         ds.geospatial_lon   = float(basin.get("lon", 0))
@@ -130,7 +130,7 @@ def export_netcdf(
             "Effective_Area": {"long_name": "Water surface area (fused)", "units": "km2"},
             "Q_obs":          {"long_name": "Observed discharge",         "units": "m3 s-1"},
             "Q_sim":          {"long_name": "Simulated discharge",        "units": "m3 s-1"},
-            "atdi":           {"long_name": "Alkedir Transboundary Dependency Index", "units": "1"},
+            "atdi":           {"long_name": "Alkhedir Transboundary Dependency Index", "units": "1"},
         }
 
         for vname in variables:
