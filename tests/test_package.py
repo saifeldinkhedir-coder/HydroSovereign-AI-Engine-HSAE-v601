@@ -4,7 +4,7 @@ tests/test_package.py — hydrosovereign package test suite
 Comprehensive pytest suite covering all package modules.
 Run: pytest tests/ -v
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
