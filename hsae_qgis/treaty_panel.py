@@ -1,7 +1,7 @@
 """
 HSAE v6.0.3 — Treaty Analysis Panel
 =====================================
-Displays ATCI (Alkedir Treaty Compliance Index) for any basin,
+Displays ATCI (Alkhedir Treaty Compliance Index) for any basin,
 comparing current treaty status against UNWC 1997 obligations.
 """
 from __future__ import annotations
@@ -79,7 +79,7 @@ def _build_treaty_html(basin: dict) -> str:
 <body>
 <div class="hdr">
   <b>⚖️ Treaty Compliance Analysis — ATCI</b><br>
-  <span style='font-size:11px;opacity:0.8'>{name} · Alkedir Treaty Compliance Index · UNWC 1997</span>
+  <span style='font-size:11px;opacity:0.8'>{name} · Alkhedir Treaty Compliance Index · UNWC 1997</span>
   <div style='margin-top:10px'>
     <div class="metric">
       <div class="mv" style='color:{atci_col}'>{atci}%</div>
@@ -107,8 +107,8 @@ def _build_treaty_html(basin: dict) -> str:
   {rows}
 </table>
 <p style='font-size:10px;color:#4A5568;margin:0 12px 12px'>
-  ATCI (Alkedir Treaty Compliance Index) = triggered articles / total articles × 100.
-  Higher ATCI = more UNWC obligations breached. Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+  ATCI (Alkhedir Treaty Compliance Index) = triggered articles / total articles × 100.
+  Higher ATCI = more UNWC obligations breached. Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 </p>
 </body></html>"""
 
