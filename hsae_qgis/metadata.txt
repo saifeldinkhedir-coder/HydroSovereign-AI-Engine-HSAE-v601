@@ -24,7 +24,7 @@ experimental=False
 deprecated=False
 changelog=
     v6.0.7 (May 2026) -- Publication links update:
-    Replaced JOSS link with SSRN preprint (under revision for Oct 2026 resubmission).
+    Replaced publication link with SSRN preprint (SoftwareX under review, Oct 2026 JOSS resubmission planned).
     Preprint now at: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
     Corrected author name spelling: Alkhedir throughout all files.
     SoftwareX SOFTX-D-26-00442 confirmed under peer review (1 review completed).
