@@ -6,7 +6,7 @@ ORCID:   0000-0003-0821-2991
 Email:   saifeldinkhedir@gmail.com
 GitHub:  https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 DOI:     10.5281/zenodo.19180160
-JOSS:    https://joss.theoj.org/papers/d6c37d0e07d1325e96c00d0844871a35
+Preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
 App:     https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app
 """
 
