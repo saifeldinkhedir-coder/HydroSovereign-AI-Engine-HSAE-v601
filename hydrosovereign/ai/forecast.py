@@ -11,7 +11,7 @@ As recommended by Gemini v6.4.0:
   "A PyTorch LSTM processing (batch, seq_len, 4_features) will yield
    vastly superior discharge forecasts compared to just P and T."
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import logging
