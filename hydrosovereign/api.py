@@ -4,7 +4,7 @@ api.py — HSAE v6.2.0 Unified High-Level API
 Single-call basin analysis as recommended by ChatGPT review:
   "Add a clear entry point: analyze_basin(data)"
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import logging
