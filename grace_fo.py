@@ -14,7 +14,7 @@ Flow:
   build_hbv_input(basin_id)          ← merges all sources → HBV-ready dict
   validate_real_vs_synthetic(report) ← compares NSE real vs 0.78 synthetic
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
