@@ -2,7 +2,7 @@
 tdi_page.py  ─  HSAE v6.01
 ============================
 Canonical TDI / ATDI / AFSF Interactive Page
-Symbols standardized per Alkedir (2026) RSE-2 canonical definition.
+Symbols standardized per Alkhedir (2026) RSE-2 canonical definition.
 
 ε = 0.001 BCM/day  ·  α = 0.30  ·  k = 30 days
 """
@@ -37,7 +37,7 @@ def render_tdi_page(basin: dict):
         📐  Canonical TDI · ATDI · AFSF  Index Engine
       </h2>
       <p style='color:#90CAF9;margin:0.3rem 0 0;font-size:0.85rem'>
-        Single Source of Truth — Alkedir (2026) · RSE-2 canonical formulation
+        Single Source of Truth — Alkhedir (2026) · RSE-2 canonical formulation
       </p>
     </div>
     """, unsafe_allow_html=True)
@@ -51,7 +51,7 @@ def render_tdi_page(basin: dict):
         col1, col2 = st.columns([3, 2])
         with col1:
             st.markdown(r"""
-**Canonical Formulation (Alkedir, 2026 — RSE-2)**
+**Canonical Formulation (Alkhedir, 2026 — RSE-2)**
 
 $$I_{\text{adj},t} = \max\!\left(0,\; I_{\text{in},t} - \alpha\cdot(ET_{0,t} + ET_{\text{MODIS},t})\right)$$
 
@@ -193,9 +193,9 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
         st.subheader("📊 Results")
         m1, m2, m3, m4, m5 = st.columns(5)
         m1.metric("ATDI", f"{atdi_val:.1f}%",
-                  help="Alkedir Transparency Deficit Index — annual mean")
+                  help="Alkhedir Transparency Deficit Index — annual mean")
         m2.metric("AFSF", f"{afsf_val:.1f}%",
-                  help=f"Alkedir Forensic Signal Factor — {roll}-day peak rolling TDI")
+                  help=f"Alkhedir Forensic Signal Factor — {roll}-day peak rolling TDI")
         m3.metric("Art.7 Days",
                   f"{summ.get('art7_days', 0)}",
                   help="Days TDI ≥ 40% (no significant harm threshold)")
@@ -354,7 +354,7 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
 
         st.caption(
             f"ε = {eps} BCM/day · α = {alpha} · k = {roll} days · "
-            f"Canonical formula: Alkedir (2026) · HSAE v6.01"
+            f"Canonical formula: Alkhedir (2026) · HSAE v6.01"
         )
 
     # ── Legal Pathway ──────────────────────────────────────────────────────
@@ -381,4 +381,4 @@ All flow columns in **BCM/day** (Billion Cubic Meters per day).""")
                    "Within acceptable range. Continue monitoring.")
 
     st.caption("Legal thresholds: Art.5 ≥ 25% · Art.7 ≥ 40% · Art.9 ≥ 55% "
-               "| Per Alkedir (2026) RSE-2 canonical formulation")
+               "| Per Alkhedir (2026) RSE-2 canonical formulation")
