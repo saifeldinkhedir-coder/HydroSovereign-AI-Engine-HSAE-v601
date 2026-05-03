@@ -4,7 +4,7 @@ hbv.py — HSAE v6.01 HBV-96 Hydrological Model
 Physics-based rainfall-runoff model (Bergström, 1992)
 with true SCE-UA calibration (Duan et al., 1992).
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 DOI:    10.5281/zenodo.19180160
 """
 
