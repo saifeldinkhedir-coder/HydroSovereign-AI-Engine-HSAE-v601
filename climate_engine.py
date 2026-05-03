@@ -24,7 +24,7 @@ Scientific basis:
   Schewe et al. (2014) Nature CC — Multi-model global water scarcity
   Munia et al. (2020) Earth's Future — Transboundary water dependence
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -379,7 +379,7 @@ tr:hover td{{background:#161b22}}
 </style></head><body>
 <h1>🌡️ HSAE Climate Projections — {ssp} · {year}</h1>
 <p style='color:#8b949e'>IPCC AR6 WGI regional deltas applied to 26 transboundary basins
- · Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+ · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
 
 <h2>Summary Statistics</h2>
 <div class='stat'><div class='stat-num'>{risk_agg['total_affected_million']:.0f}M</div>
