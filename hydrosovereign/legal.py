@@ -3,7 +3,7 @@ legal.py — HSAE v6.01 UN Watercourses Convention 1997 Legal Engine
 ====================================================================
 Automated UNWC Article triggering and legal assessment.
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
