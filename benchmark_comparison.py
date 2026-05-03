@@ -46,7 +46,7 @@ Performance rating thresholds
     Satisfactory: NSE > 0.50  and  |PBIAS| < 25 %
     Unsatisfactory: otherwise
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 Date:   2026-03-11
 """
 from __future__ import annotations
@@ -1139,7 +1139,7 @@ def generate_benchmark_table_html(basin_results: Optional[List[Dict]] = None) ->
   baseline exists. See LITERATURE_BENCHMARKS['basin_id'] for gap explanations.
 </div>
 <p style="font-size:11px;color:#6e7681;margin-top:20px">
-  HSAE v9.3 · Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991 ·
+  HSAE v9.3 · Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
   saifeldinkhedir@gmail.com
 </p>
 </body></html>"""
