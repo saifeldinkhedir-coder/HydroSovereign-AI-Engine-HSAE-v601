@@ -7,7 +7,7 @@ Install: pip install hydrosovereign[api]
 Run:     uvicorn hydrosovereign.api_server:app --host 0.0.0.0 --port 8000
 Docs:    http://localhost:8000/docs
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
@@ -77,7 +77,7 @@ app = FastAPI(
     description = (
         "REST API for hydrosovereign v6.5.0 — "
         "Transboundary Water Analysis & Governance\n\n"
-        "Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991\n"
+        "Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991\n"
         "DOI: 10.5281/zenodo.19180160"
     ),
     version     = "6.5.0",
@@ -102,7 +102,7 @@ def root():
     return {
         "package":     "hydrosovereign",
         "version":     "6.5.0",
-        "author":      "Seifeldin M.G. Alkedir",
+        "author":      "Seifeldin M.G. Alkhedir",
         "orcid":       "0000-0003-0821-2991",
         "doi":         "10.5281/zenodo.19180160",
         "endpoints": {
