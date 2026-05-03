@@ -2,11 +2,11 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.6: Transboundary water sovereignty. 26 basins, 15 tools, 5 Processing Algorithms, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), WebGIS Map v2, UNWC 1997, SHA-256 chain
+description=HSAE v6.0.7: Transboundary water sovereignty. 26 basins, 15 tools, 5 Processing Algorithms, 6 original indices (ATDI/HIFD/AFSF/AHLB/ASI/ATCI), WebGIS Map v2, UNWC 1997, SHA-256 chain
 version=6.0.7
 author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.0.6 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
+about=HydroSovereign AI Engine (HSAE) v6.0.7 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
     Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
     Key results for Blue Nile (GERD): ATDI = 43.5 percent (Art.7 UNWC), HIFD = 20.0 percent, NSE = 0.63, KGE = 0.74, CI = 0.44 HIGH, P(Negotiation) = 58 percent, ATCI = 70 percent.
     15 tools plus 5 Processing Algorithms. Plugin ID: 5040. Approved by QGIS PSC (0 Critical, 0 Warnings).
