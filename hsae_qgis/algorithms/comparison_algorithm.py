@@ -1,7 +1,7 @@
 """
 comparison_algorithm.py — HSAE v6.01 QGIS Processing Algorithm
 Multi-Basin Comparison Tool (CSV + HTML report)
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterString,
                        QgsProcessingParameterFileDestination)
@@ -176,7 +176,7 @@ td{{padding:6px 5px;border:1px solid #21262d;vertical-align:top}}
 tr:nth-child(even){{background:#161b22}}
 </style></head><body>
 <h1>🌊 HSAE v6.01 — Multi-Basin Comparison Report</h1>
-<h2>Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991 ·
+<h2>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
     DOI: 10.5281/zenodo.19180160 ·
     Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</h2>
 <table><thead><tr>
