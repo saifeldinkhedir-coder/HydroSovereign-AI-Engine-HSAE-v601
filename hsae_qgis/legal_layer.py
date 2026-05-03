@@ -11,16 +11,16 @@ from qgis.PyQt.QtCore import QVariant
 
 
 UN_ARTICLES = {
-    "HIGH":   ["Art. 5 — Equitable Use", "Art. 7 — No Significant Harm", "Art. 9 — Data Exchange"],
+    "HIGH": ["Art. 5 — Equitable Use", "Art. 7 — No Significant Harm", "Art. 9 — Data Exchange"],
     "MEDIUM": ["Art. 5 — Equitable Use", "Art. 7 — No Significant Harm"],
-    "LOW":    ["Art. 5 — Equitable Use"],
+    "LOW": ["Art. 5 — Equitable Use"],
     "MINIMAL": [],
 }
 
 RISK_COLORS = {
-    "HIGH":    "#C0392B",
-    "MEDIUM":  "#E67E22",
-    "LOW":     "#F1C40F",
+    "HIGH": "#C0392B",
+    "MEDIUM": "#E67E22",
+    "LOW": "#F1C40F",
     "MINIMAL": "#27AE60",
 }
 
@@ -32,11 +32,11 @@ def load_legal_layer(iface, basins):
     provider = layer.dataProvider()
 
     provider.addAttributes([
-        QgsField("name",       QVariant.String),
-        QgsField("region",     QVariant.String),
-        QgsField("tdi_pct",    QVariant.Double),
-        QgsField("risk",       QVariant.String),
-        QgsField("articles",   QVariant.String),
+        QgsField("name", QVariant.String),
+        QgsField("region", QVariant.String),
+        QgsField("tdi_pct", QVariant.Double),
+        QgsField("risk", QVariant.String),
+        QgsField("articles", QVariant.String),
         QgsField("country_up", QVariant.String),
         QgsField("country_dn", QVariant.String),
     ])
@@ -73,9 +73,9 @@ def load_legal_layer(iface, basins):
     categories = []
     for risk, color in RISK_COLORS.items():
         symbol = QgsMarkerSymbol.createSimple({
-            "name":          "triangle",
-            "color":         color,
-            "size":          "5",
+            "name": "triangle",
+            "color": color,
+            "size": "5",
             "outline_color": "white",
             "outline_width": "0.4",
         })
