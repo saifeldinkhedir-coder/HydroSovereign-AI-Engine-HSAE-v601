@@ -1,5 +1,5 @@
 # hsae_science.py  –  HSAE Scientific Enhancement Module
-# Updated: 2026-02-26  |  Author: Seifeldin M. G. Alkedir
+# Updated: 2026-02-26  |  Author: Seifeldin M. G. Alkhedir
 # Covers:
 #   1. Sentinel-2 Water Mask overlay (folium ImageOverlay)
 #   2. Penman-Monteith Evapotranspiration
@@ -582,7 +582,7 @@ def render_science_page(df: pd.DataFrame, basin: dict) -> None:
         _mc[0].metric("P mean",  f"{_P.mean():.2f} mm/day",   help="GPM IMERG V07")
         _mc[1].metric("NSE",     f"{_NSE_v:.2f}",              help="Nash-Sutcliffe")
         _mc[2].metric("KGE",     f"{_KGE_v:.2f}",              help="Kling-Gupta")
-        _mc[3].metric("ATDI",    f"{_ATDI.mean():.1f}%",       help="Alkedir TDI")
+        _mc[3].metric("ATDI",    f"{_ATDI.mean():.1f}%",       help="Alkhedir TDI")
         _mc[4].metric("HIFD",    f"{_HIFD_v:.1f}%",            help="Human-Induced Flow Deficit")
         _mc[5].metric("TWS",     f"{_tws.mean():.1f} cm",      help="GRACE-FO MASCON")
 
