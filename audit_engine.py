@@ -15,7 +15,7 @@ Legal basis:
   UN 1997 Art. 9, Annex Art. 6 & 11 & 14
   ILC 2001 Art. 31 — evidence admissibility
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import hashlib
@@ -219,7 +219,7 @@ class AuditLog:
 ICJ_ADMISSIBILITY_CHECKLIST = [
     ("Data provenance documented", True,  "SHA-256 hash of each simulation run stored in audit trail"),
     ("Chain of custody intact",    None,  "Verify with verify_integrity() before submission"),
-    ("Methodology peer-reviewed",  True,  "HBV: Bergström (1992); ATDI/AHIFD: Alkedir (2026a, J.Hydrology)"),
+    ("Methodology peer-reviewed",  True,  "HBV: Bergström (1992); ATDI/AHIFD: Alkhedir (2026a, J.Hydrology)"),
     ("Independent verification",   False, "Upload GRDC observed CSV to achieve Tier-1 status"),
     ("Author credentials cited",   True,  "ORCID: 0000-0003-0821-2991 — saifeldinkhedir@gmail.com"),
     ("UN 1997 articles mapped",    True,  "Arts. 5, 7, 9, 11, 12, 20, 21 violations flagged per basin"),
@@ -352,13 +352,13 @@ def build_dossier_html(
     # Methodology section
     methods = """
     <ul>
-      <li><b>ATDI</b> — Alkedir Transboundary Dependency Index:
+      <li><b>ATDI</b> — Alkhedir Transboundary Dependency Index:
           ATDI = 0.40·FRD + 0.20·SRI + 0.25·DI + 0.15·IPI
           (FRD=Flow Reduction Degree; SRI=Storage Regulation Index;
            DI=Dependency Index; IPI=International Pressure Index)</li>
-      <li><b>AHIFD</b> — Alkedir Hydrological Impact of Flow Deficits:
+      <li><b>AHIFD</b> — Alkhedir Hydrological Impact of Flow Deficits:
           AHIFD = (Q_nat − Q_obs) / Q_nat × 100% · computed from GRDC gauge data</li>
-      <li><b>ATCI</b> — Alkedir Treaty Compliance Index:
+      <li><b>ATCI</b> — Alkhedir Treaty Compliance Index:
           ATCI = Σ(wᵢ·sᵢ) / Σ(wᵢ) × 100  (74 real water treaties)</li>
       <li><b>HBV</b> — Hydrological model: Bergström (1992) · calibrated with GRDC data</li>
       <li><b>Discharge validation</b> — GRDC Tier-1 (43 basins) + GloFAS Tier-2 (7 basins;
@@ -419,7 +419,7 @@ def build_dossier_html(
   <div><div class="label">Region</div><div class="value">{basin.get('region','N/A')}</div></div>
   <div><div class="label">Countries</div><div class="value">{', '.join(basin.get('countries', ['N/A']))}</div></div>
   <div><div class="label">Generated</div><div class="value">{date_str}</div></div>
-  <div><div class="label">Author</div><div class="value">Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</div></div>
+  <div><div class="label">Author</div><div class="value">Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</div></div>
   <div><div class="label">Admissibility</div><div class="value">{admiss_pct}% criteria met</div></div>
 </div>
 <div class="admiss-bar"><div class="admiss-fill" style="width:{admiss_pct}%"></div></div>
@@ -464,7 +464,7 @@ This satisfies the ILC 2001 Art. 31 standard for admissibility in international 
   <li>UN General Assembly (1997). Convention on the Law of the Non-Navigational Uses of
       International Watercourses. A/RES/51/229.</li>
   <li>ILC (2001). Draft Articles on Responsibility of States for Internationally Wrongful Acts.</li>
-  <li>Alkedir, S.M.G. (2026a). HydroSovereign AI Engine (HSAE) v9.1.0 [Software].
+  <li>Alkhedir, S.M.G. (2026a). HydroSovereign AI Engine (HSAE) v9.1.0 [Software].
       Zenodo. doi: 10.5281/zenodo.PENDING</li>
   <li>Bergström, S. (1992). The HBV model. SMHI Reports Hydrology No. 4.</li>
   <li>Harrigan et al. (2020). GloFAS v2.2 operational global hydrological reanalysis.
@@ -476,7 +476,7 @@ This satisfies the ILC 2001 Art. 31 standard for admissibility in international 
 
 <div class="footer">
   HSAE v9.1.0 QGIS Plugin · GPL-3.0 License · https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-<br>
-  Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991 · saifeldinkhedir@gmail.com<br>
+  Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 · saifeldinkhedir@gmail.com<br>
   Generated: {date_str} · This dossier is admissible in ICJ/PCA/ITLOS proceedings when chain integrity = VERIFIED.
 </div>
 </div></body></html>"""
