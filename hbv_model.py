@@ -4,20 +4,20 @@ hbv_model.py — HSAE v6.0 HBV Rainfall-Runoff Model (QGIS Edition)
 Extracted and adapted from hsae_hbv.py for standalone QGIS use.
 No Streamlit dependency — pure NumPy computation.
 
-Scientific Contributions (Alkedir, 2026):
-  - Alkedir Human-Induced Flow Deficit (AHIFD):
+Scientific Contributions (Alkhedir, 2026):
+  - Alkhedir Human-Induced Flow Deficit (AHIFD):
       HIFD_pct = (Q_nat - Q_obs) / Q_nat × 100
-  - Alkedir Legal Threshold Mapping (ALTM):
+  - Alkhedir Legal Threshold Mapping (ALTM):
       Art5_flag : AHIFD > 25%  (equitable utilization concern)
       Art7_flag : AHIFD > 40%  (significant harm)
       Art12_flag: AHIFD > 60%  (protest notification grounds)
-  - Alkedir HBV-Legal Bridge (AHLB):
+  - Alkhedir HBV-Legal Bridge (AHLB):
       HBV physics → AHIFD → ALTM → UN 1997 Article flags
 
 Standard method:
   HBV rainfall-runoff model (Bergström, 1992)
 
-Author : Seifeldin M.G. Alkedir — Independent Researcher
+Author : Seifeldin M.G. Alkhedir — Independent Researcher
 ORCID  : 0000-0003-0821-2991
 """
 from __future__ import annotations
@@ -297,16 +297,16 @@ def generate_forcing(basin: dict, n_days: int = 3650) -> Tuple[List, List, List]
 
 def compute_ahifd(basin: dict, n_days: int = 1825) -> Dict:
     """
-    Compute Alkedir Human-Induced Flow Deficit (AHIFD).
+    Compute Alkhedir Human-Induced Flow Deficit (AHIFD).
 
     AHIFD (%) = max(0, Q_natural_HBV - Q_observed) / Q_natural_HBV × 100
 
-    ALTM thresholds (Alkedir Legal Threshold Mapping):
+    ALTM thresholds (Alkhedir Legal Threshold Mapping):
       AHIFD > 25% → Art. 5 flag  (equitable utilization concern)
       AHIFD > 40% → Art. 7 flag  (significant harm)
       AHIFD > 60% → Art. 12 flag (protest notification grounds)
 
-    Ref: Alkedir, S.M.G. (2026b). ORCID: 0000-0003-0821-2991
+    Ref: Alkhedir, S.M.G. (2026b). ORCID: 0000-0003-0821-2991
     """
     area_km2 = basin.get("area_km2", basin.get("eff_cat_km2", 100_000))
     tdi      = float(basin.get("tdi", 0.40))
