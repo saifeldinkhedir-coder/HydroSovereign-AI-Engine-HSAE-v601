@@ -24,18 +24,26 @@ from qgis.core import QgsMessageLog, Qgis
 
 def _atdi_colour(atdi: float) -> str:
     """Return hex colour for ATDI risk level."""
-    if atdi < 20: return "#16a34a"   # green  — compliant
-    if atdi < 40: return "#ca8a04"   # yellow — Art. 7
-    if atdi < 55: return "#ea580c"   # orange — Art. 9
-    if atdi < 70: return "#dc2626"   # red    — Art. 33
+    if atdi < 20:
+        return "#16a34a"   # green  — compliant
+    if atdi < 40:
+        return "#ca8a04"   # yellow — Art. 7
+    if atdi < 55:
+        return "#ea580c"   # orange — Art. 9
+    if atdi < 70:
+        return "#dc2626"   # red    — Art. 33
     return "#7c3aed"                    # purple — Art. 35
 
 
 def _unwc_zone(atdi: float) -> str:
-    if atdi < 20: return "Compliant"
-    if atdi < 40: return "Art. 7 — Notify"
-    if atdi < 55: return "Art. 9 — Data Share"
-    if atdi < 70: return "Art. 33 — Dispute"
+    if atdi < 20:
+        return "Compliant"
+    if atdi < 40:
+        return "Art. 7 — Notify"
+    if atdi < 55:
+        return "Art. 9 — Data Share"
+    if atdi < 70:
+        return "Art. 33 — Dispute"
     return "Art. 35 — Emergency"
 
 
@@ -51,8 +59,8 @@ def _build_html(basins: list, selected_id: Optional[str] = None) -> str:
         atdi = round(float(b.get("atf_risk", b.get("tdi", 0.3) * 100)), 1)
         hifd = round(atdi * 0.46, 1)
         ci_raw = 0.40 * (atdi / 100) + 0.25 * (b.get("dispute_level", 3) / 5) + \
-                         0.20 * (hifd / 100) + 0.15 * \
-                                 (b.get("n_countries", 3) / 6)
+            0.20 * (hifd / 100) + 0.15 * \
+            (b.get("n_countries", 3) / 6)
         ci = round(ci_raw, 2)
         p_neg = round(max(15, min(85, 95 - atdi * 0.8 - ci * 10)), 0)
         dam = b.get("dam", "—")
@@ -113,8 +121,8 @@ def _build_html(basins: list, selected_id: Optional[str] = None) -> str:
     🔑 ID: <b>{{bid}}</b> · Upstream: <b>{{c_up}}</b>
   </div>
 </div>""".format(name=name, dam=dam, river=river, atdi=atdi, zone=zone,
-                  hifd=hifd, ci=ci, p_neg=p_neg, n_c=n_c, cap=cap,
-                  area=area, c_up=c_up, arts=arts, bid=bid, colour=colour)
+                 hifd=hifd, ci=ci, p_neg=p_neg, n_c=n_c, cap=cap,
+                 area=area, c_up=c_up, arts=arts, bid=bid, colour=colour)
 
         radius = max(6, min(18, int(atdi / 5)))
         opacity = "0.95" if bid == selected_id else "0.82"
@@ -231,7 +239,7 @@ class HSAEMapPanel(QDockWidget):
         self.setObjectName("HSAEMapPanelV603")
         self.setAllowedAreas(
             Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea |
-            Qt.TopDockWidgetArea  | Qt.BottomDockWidgetArea
+            Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea
         )
         self._build_widget()
 
