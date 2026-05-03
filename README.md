@@ -32,7 +32,7 @@ The system integrates **seven Google Earth Engine (GEE) satellite sensors** — 
 
 Legal analysis is embedded through automated cross-referencing of **33 articles of the UN Watercourses Convention 1997**, enabling treaty compliance scoring, negotiation outcome prediction, ICJ/PCA/ITLOS dossier generation, and auto-generated diplomatic protest notes at the basin level. The platform incorporates a physics-based **HBV-96 catchment model** with SCE-UA calibration (NSE=0.63, KGE=0.74 pre-calibration), Monte Carlo uncertainty quantification, Sobol sensitivity analysis, MODFLOW groundwater module, Penman-Monteith ET₀, Muskingum routing, MUSLE sediment transport, water quality indicators (WQI), and a **Telegram-based real-time alert system** with four severity levels.
 
-Ten original scientific contributions are introduced — including the **Alkedir Transparency Deficit Index (ATDI)**, the **Alkedir Human-Induced Flow Deficit (AHIFD)**, and the **Alkedir Water Sovereignty Risk Matrix (AWSRM)** — all documented in this repository as a timestamped scientific priority record pending peer-reviewed publication.
+Ten original scientific contributions are introduced — including the **Alkhedir Transparency Deficit Index (ATDI)**, the **Alkhedir Human-Induced Flow Deficit (AHIFD)**, and the **Alkhedir Water Sovereignty Risk Matrix (AWSRM)** — all documented in this repository as a timestamped scientific priority record pending peer-reviewed publication.
 
 Implemented as a **49-module Python application** (31,273 lines · 33 pages · zero syntax errors), with a companion **QGIS Desktop Plugin** (13 tools + 5 Processing algorithms), HSAE v6.01 represents a novel contribution to the fields of hydro-diplomacy, satellite hydrology, and AI-driven water governance.
 
@@ -60,13 +60,13 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 
 > **HydroSovereign AI Engine (HSAE v6.01): An Open-Source Platform Integrating Multi-Sensor Satellite Earth Observation, Machine Learning, and the UN Watercourses Convention 1997 for Transboundary River Basin Sovereignty Analysis**
 >
-> *Seifeldin M.G. Alkedir — Institute of Environmental Studies, University of Khartoum · ORCID: 0000-0003-0821-2991*
+> *Seifeldin M.G. Alkhedir — Institute of Environmental Studies, University of Khartoum · ORCID: 0000-0003-0821-2991*
 
 ---
 
 ## 👤 Author
 
-**Seifeldin M.G. Alkedir** — سيف الدين محمد قسم الله الخضر
+**Seifeldin M.G. Alkhedir** — سيف الدين محمد قسم الله الخضر
 
 | | |
 |--|--|
@@ -82,7 +82,7 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 | 💼 **LinkedIn** | [seifelden-alkhedir](https://www.linkedin.com/in/seifelden-alkhedir-6b730985/) |
 | 📦 **Zenodo** | [DOI Records & Datasets](https://zenodo.org/search?q=0000-0003-0821-2991) |
 | 🎬 **YouTube** | [HSAE Video Channel](https://www.youtube.com/@seifeldinalkedir) |
-| 📄 **CV** | [Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkedir.pdf) |
+| 📄 **CV** | [Download PDF](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/CV_Seifeldin_Alkhedir.pdf) |
 
 ---
 
@@ -241,22 +241,22 @@ Ten original indices and frameworks introduced in HSAE, documented here to estab
 
 | Symbol | Full Name | Formula | Module |
 |--------|-----------|---------|--------|
-| **ATDI** | Alkedir Transparency Deficit Index | `clip((I_adj − Q_out) / (I_adj + ε), 0, 1)` · ε=0.001 | hsae_tdi.py |
-| **AHIFD** | Alkedir Human-Induced Flow Deficit | `(Q_nat − Q_obs) / Q_nat × 100` | hsae_hbv.py |
-| **AFSF** | Alkedir Forensic Signal Factor | `max(rolling_30(TDI)) × 100` | hsae_tdi.py |
-| **ASI** | Alkedir Sovereignty Index | `0.35·E + 0.25·ADTS + 0.25·F + 0.15·(1−D/5)` | hsae_opsroom.py |
-| **ADTS** | Alkedir Digital Transparency Score | `max(0, 100 − ATDI)` | hsae_opsroom.py |
-| **α = 0.30** | Alkedir MODIS ET Correction Coefficient | `I_adj = max(0, I_in − 0.30 × (ET_PM + ET_MODIS))` | hsae_tdi.py |
+| **ATDI** | Alkhedir Transparency Deficit Index | `clip((I_adj − Q_out) / (I_adj + ε), 0, 1)` · ε=0.001 | hsae_tdi.py |
+| **AHIFD** | Alkhedir Human-Induced Flow Deficit | `(Q_nat − Q_obs) / Q_nat × 100` | hsae_hbv.py |
+| **AFSF** | Alkhedir Forensic Signal Factor | `max(rolling_30(TDI)) × 100` | hsae_tdi.py |
+| **ASI** | Alkhedir Sovereignty Index | `0.35·E + 0.25·ADTS + 0.25·F + 0.15·(1−D/5)` | hsae_opsroom.py |
+| **ADTS** | Alkhedir Digital Transparency Score | `max(0, 100 − ATDI)` | hsae_opsroom.py |
+| **α = 0.30** | Alkhedir MODIS ET Correction Coefficient | `I_adj = max(0, I_in − 0.30 × (ET_PM + ET_MODIS))` | hsae_tdi.py |
 
 ### Group B — Frameworks & Architectures
 
 | Symbol | Full Name | Description | Module |
 |--------|-----------|-------------|--------|
-| **ALTM** | Alkedir Legal Threshold Mapping | ATDI → UN 1997 Arts. 5/7/9/12/33 | hsae_tdi.py |
-| **ASCAF** | Alkedir Satellite-Calibrated Anomaly Framework | SAR + NDWI + IsolationForest | hsae_v430.py |
-| **AWSRM** | Alkedir Water Sovereignty Risk Matrix | 5×5 risk matrix: hydro × legal | hsae_opsroom.py |
-| **AHLB** | Alkedir Hydrological-Legal Bridge | Q_obs → ATDI → UNWC article trigger | hsae_hbv.py |
-| **ATCI** | Alkedir Treaty Compliance Index | Article-level scoring across 15 treaties | treaty_diff.py |
+| **ALTM** | Alkhedir Legal Threshold Mapping | ATDI → UN 1997 Arts. 5/7/9/12/33 | hsae_tdi.py |
+| **ASCAF** | Alkhedir Satellite-Calibrated Anomaly Framework | SAR + NDWI + IsolationForest | hsae_v430.py |
+| **AWSRM** | Alkhedir Water Sovereignty Risk Matrix | 5×5 risk matrix: hydro × legal | hsae_opsroom.py |
+| **AHLB** | Alkhedir Hydrological-Legal Bridge | Q_obs → ATDI → UNWC article trigger | hsae_hbv.py |
+| **ATCI** | Alkhedir Treaty Compliance Index | Article-level scoring across 15 treaties | treaty_diff.py |
 
 ### Standard Methods (credited to original authors)
 
@@ -522,7 +522,7 @@ Tests cover: ATDI · HIFD · NSE · KGE · Conflict Index · HBV-96 · Legal thr
 
 ```bibtex
 @software{alkedir2026hsae,
-  author    = {Alkedir, Seifeldin M.G.},
+  author    = {Alkhedir, Seifeldin M.G.},
   title     = {{HydroSovereign AI Engine (HSAE) v6.01}},
   year      = {2026},
   publisher = {Zenodo},
@@ -557,6 +557,6 @@ This project is licensed under the **GNU General Public License v3.0** — see [
 [![QGIS](https://img.shields.io/badge/QGIS-Plugin-589632?style=flat&logo=qgis&logoColor=white)](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/tree/main/hsae_qgis)
 [![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 
-*HydroSovereign AI Engine v6.01 · Seifeldin M.G. Alkedir · University of Khartoum · 2026*
+*HydroSovereign AI Engine v6.01 · Seifeldin M.G. Alkhedir · University of Khartoum · 2026*
 
 </div>
