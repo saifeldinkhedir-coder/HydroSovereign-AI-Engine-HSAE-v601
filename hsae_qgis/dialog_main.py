@@ -34,7 +34,7 @@ class HSAEMainDialog(QDialog):
         layout.addWidget(header)
 
         sub = QLabel(
-            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991") # noqa: E501
+            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991") # noqa: E501
         sub.setAlignment(Qt.AlignCenter)
         layout.addWidget(sub)
 
@@ -160,7 +160,7 @@ class HSAEMainDialog(QDialog):
         text.setReadOnly(True)
         text.setHtml("""
         <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.0</h2>
-        <p><b>Author:</b> Seifeldin M.G. Alkedir — سيف الدين محمد قسم الله الخضر</p>
+        <p><b>Author:</b> Seifeldin M.G. Alkhedir — سيف الدين محمد قسم الله الخضر</p>
         <p><b>ORCID:</b> 0000-0003-0821-2991</p>
         <p><b>Email:</b> saifeldinkhedir@gmail.com</p>
         <p><b>Institution:</b> University of Khartoum · Institute of Environmental Studies</p>
