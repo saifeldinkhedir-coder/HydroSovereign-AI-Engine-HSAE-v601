@@ -12,7 +12,7 @@ Provides:
   6. Taylor Diagram coordinates (portable)
   7. HTML validation report generator
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 Ref: Moriasi et al. (2007) Trans. ASABE 50(3):885–900
 """
 from __future__ import annotations
@@ -335,6 +335,6 @@ annexes to diplomatic negotiations or arbitral submissions under
 Articles 9 (data exchange) and Annex Article 6 (fact-finding) of the
 UN 1997 Watercourses Convention.</p>
 <div class="footer">
-HSAE v7.0.0 QGIS Plugin · Author: Seifeldin M.G. Alkedir ·
+HSAE v7.0.0 QGIS Plugin · Author: Seifeldin M.G. Alkhedir ·
 ORCID: 0000-0003-0821-2991 · MIT License
 </div></body></html>"""
