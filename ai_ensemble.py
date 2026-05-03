@@ -18,7 +18,7 @@ Outputs per basin × timestep:
   • feature_importance — Which satellite/climate input drives TDI
   • forecast_7d  — 7-day probabilistic discharge forecast
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 
 from __future__ import annotations
@@ -510,7 +510,7 @@ td{{padding:8px 10px;border-bottom:1px solid #21262d}}
 </style></head><body>
 <h1>🤖 HSAE AI Ensemble — {basin_name}</h1>
 <p style='color:#8b949e'>Backend: {lib} · Models: RF + MLP + GBM + IsolationForest
-<br>Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991</p>
+<br>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991</p>
 
 <h2>Model Performance (Test Set)</h2>
 <div class='card'><div class='num' style='color:#3fb950'>
