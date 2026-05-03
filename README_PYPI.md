@@ -33,7 +33,7 @@ print(f"Strategy: {result['negotiation']['strategy']}")
 
 ## Features
 
-- **ATDI** — Alkedir Transparency Deficit Index
+- **ATDI** — Alkhedir Transparency Deficit Index
 - **HIFD** — Human-Induced Flow Deficit
 - **HBV-96** — Rainfall-runoff model with SCE-UA calibration
 - **26 basins** — Full transboundary basin registry
@@ -84,7 +84,7 @@ print(assessment["recommendation"])
 
 ## Author
 
-**Seifeldin M.G. Alkedir** — University of Khartoum  
+**Seifeldin M.G. Alkhedir** — University of Khartoum  
 ORCID: [0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991)  
 DOI: [10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160)
 
