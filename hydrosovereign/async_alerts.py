@@ -5,7 +5,7 @@ Asyncio-based concurrent monitoring of multiple basins simultaneously.
 Addresses Gemini review: "Implement asyncio for alerts to monitor
 hundreds of basins simultaneously without performance bottlenecks."
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import asyncio
