@@ -1,6 +1,6 @@
 # HSAE Indices — Mathematical Formulas
 
-## 1. ATDI — Alkedir Transparency Deficit Index
+## 1. ATDI — Alkhedir Transparency Deficit Index
 
 Measures cumulative water allocation inequity across a transboundary basin.
 
@@ -76,7 +76,7 @@ $$P_{neg} = \max\left(0.2, \min\left(0.9, 0.7 - \frac{ATDI}{300} - \frac{HIFD}{2
 
 ## References
 
-- Alkedir, S.M.G. (2026). HSAE v6.01. DOI: 10.5281/zenodo.19180160
+- Alkhedir, S.M.G. (2026). HSAE v6.01. DOI: 10.5281/zenodo.19180160
 - Bergström, S. (1992). The HBV model — its structure and applications. SMHI Reports Hydrology No. 4
 - Nash, J.E. & Sutcliffe, J.V. (1970). River flow forecasting. Journal of Hydrology, 10(3), 282-290
 - Kling, H. et al. (2012). Runoff conditions in the upper Danube. Journal of Hydrology
