@@ -1,7 +1,7 @@
 """
 HydroSovereign AI Engine (HSAE) v6.0.5 — QGIS Plugin
 =====================================================
-Author:  Seifeldin M.G. Alkedir
+Author:  Seifeldin M.G. Alkhedir
 ORCID:   0000-0003-0821-2991
 Email:   saifeldinkhedir@gmail.com
 GitHub:  https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
