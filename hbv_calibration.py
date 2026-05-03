@@ -13,7 +13,7 @@ Flow:
   3. Validate on held-out period (30% of data)
   4. Report NSE / KGE / PBIAS for publication
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
