@@ -158,9 +158,9 @@ class HSAEPlugin:
             "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
-            "🔄  Multi-Basin Comparison",
+            "ℹ️  About HSAE",
             self.about,
-            "Multi-Basin Comparison",
+            "About HSAE",
             False)
 
     def _add(self, text, cb, tip, toolbar=False):
