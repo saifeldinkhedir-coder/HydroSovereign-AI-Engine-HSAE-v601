@@ -19,10 +19,17 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
     TREATY = 'TREATY'
     OUTPUT = 'OUTPUT'
 
-    def name(self): return 'basinreport'
-    def displayName(self): return 'Basin Legal Report'
-    def group(self): return 'HSAE Reports'
-    def groupId(self): return 'hsaereports'
+    def name(self):
+        return 'basinreport'
+
+    def displayName(self):
+        return 'Basin Legal Report'
+
+    def group(self):
+        return 'HSAE Reports'
+
+    def groupId(self):
+        return 'hsaereports'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterString(
