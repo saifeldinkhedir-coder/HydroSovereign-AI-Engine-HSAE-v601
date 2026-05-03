@@ -25,7 +25,7 @@ Processing Algorithms:
   4. HBV-96 Calibration (SCE-UA)
   5. Multi-Basin Comparison
 
-Author:  Seifeldin M.G. Alkedir
+Author:  Seifeldin M.G. Alkhedir
 ORCID:   0000-0003-0821-2991
 DOI:     10.5281/zenodo.19180160
 JOSS:    https://joss.theoj.org/papers/d6c37d0e07d1325e96c00d0844871a35
@@ -42,7 +42,7 @@ import json
 
 PLUGIN_DIR = Path(__file__).parent
 VERSION = "6.0.3"
-AUTHOR = "Seifeldin M.G. Alkedir"
+AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
 JOSS_URL = "https://joss.theoj.org/papers/d6c37d0e07d1325e96c00d0844871a35"
@@ -155,7 +155,7 @@ class HSAEPlugin:
         self._add(
             "⚖️  Treaty Analysis (ATCI)",
             self.open_treaty_analysis,
-            "ATCI — Alkedir Treaty Compliance Index for all articles",
+            "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
             "ℹ️  About HSAE v6.0.3",
@@ -346,7 +346,7 @@ class HSAEPlugin:
     def gee_scripts(self):
         scripts = """// ============================================================
 // HSAE v6.0.3 — GEE Script Generator (7 Satellite Sensors)
-// Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+// Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 // GEE Project: zinc-arc-484714-j8
 // ============================================================
 
@@ -607,7 +607,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <div id="hdr">
   <div>
     <h1>🌊 HSAE v6.0.3 — WebGIS Global Basin Network</h1>
-    <p>Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991 ·
+    <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
        DOI: 10.5281/zenodo.19180160 · JOSS 2026</p>
   </div>
 </div>
@@ -624,7 +624,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <script>
 var map=L.map('map',{{center:[20,30],zoom:2,preferCanvas:true}});
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'© CartoDB · HSAE v6.0.3 · Seifeldin M.G. Alkedir'}}).addTo(map);
+  {{attribution:'© CartoDB · HSAE v6.0.3 · Seifeldin M.G. Alkhedir'}}).addTo(map);
 var data={geo};
 data.features.forEach(function(f){{
   var p=f.properties,c=f.geometry.coordinates;
