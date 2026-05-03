@@ -15,7 +15,7 @@ tags:
   - water sovereignty
 
 authors:
-  - name: Seifeldin M.G. Alkedir
+  - name: Seifeldin M.G. Alkhedir
     orcid: 0000-0003-0821-2991
     affiliation: 1
 
@@ -41,10 +41,10 @@ physics-based hydrological models, five machine learning algorithms, and
 automated legal analysis of 33 articles of the UN Watercourses Convention
 1997 [@ilc2001] across 26 globally contested transboundary river basins.
 
-HSAE introduces five original quantitative indices: the **Alkedir
-Transparency Deficit Index** (ATDI), the **Alkedir Human-Induced Flow
-Deficit** (AHIFD), the **Alkedir Forensic Signal Factor** (AFSF), the
-**Alkedir Sovereignty Index** (ASI), and the **Alkedir Treaty Compliance
+HSAE introduces five original quantitative indices: the **Alkhedir
+Transparency Deficit Index** (ATDI), the **Alkhedir Human-Induced Flow
+Deficit** (AHIFD), the **Alkhedir Forensic Signal Factor** (AFSF), the
+**Alkhedir Sovereignty Index** (ASI), and the **Alkhedir Treaty Compliance
 Index** (ATCI). These indices bridge the gap between hydrological
 observations and legal obligations under international water law, enabling
 automated generation of treaty compliance reports, ICJ/PCA/ITLOS legal
