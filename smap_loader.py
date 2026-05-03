@@ -11,7 +11,7 @@ Data source hierarchy:
 Product: SPL3SMP v9 (SMAP L3 Radiometer Global Daily 36km)
 DOI:     10.5067/OMHVSRGFX38O   (O'Neill et al. 2021)
 
-Author:  Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 
