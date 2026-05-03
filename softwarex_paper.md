@@ -1,6 +1,6 @@
 # HydroSovereign AI Engine (HSAE) v6.01: An Open-Source Satellite and AI Platform for Transboundary Water Sovereignty Analysis
 
-**Author:** Seifeldin M.G. Alkedir  
+**Author:** Seifeldin M.G. Alkhedir  
 **ORCID:** [0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991)  
 **Affiliation:** Institute of Environmental Studies, University of Khartoum (Formerly); Independent Water Resources Researcher, Madinah, Saudi Arabia  
 **Journal:** SoftwareX (Elsevier) — Submitted April 2026  
@@ -38,7 +38,7 @@ Counted (abstract + running text + captions): **2,976 words** ✅
 | Field | Details |
 |---|---|
 | Software name | HydroSovereign AI Engine (HSAE) v6.01 |
-| Developer | Seifeldin M.G. Alkedir · [ORCID 0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991) · University of Khartoum |
+| Developer | Seifeldin M.G. Alkhedir · [ORCID 0000-0003-0821-2991](https://orcid.org/0000-0003-0821-2991) · University of Khartoum |
 | Version | 6.01 |
 | Language | Python 3.12 · Streamlit 1.38 |
 | License | GPL-3.0 |
@@ -114,7 +114,7 @@ HSAE uniquely provides end-to-end satellite-to-legal automation, benchmarked aga
 
 ## 6. Novelty, Innovation and Intellectual Contribution
 
-HSAE v6.01 introduces five original scientific indices (Alkedir, 2024–2025): (1) ATDI — daily fraction of natural downstream entitlement withheld; maps to UNWC Arts. 7/9; (2) AHIFD — cumulative volumetric flow reduction; (3) AFSF — forensic signal from GRACE-FO TWS and Sentinel-1 SAR; (4) ASI — composite governance metric (0–100); (5) ATCI — maps all indices to 33 UNWC 1997 articles. Scientific priority established by timestamped GitHub commits (2024) and Zenodo DOI 10.5281/zenodo.19180160. GPL-3.0.
+HSAE v6.01 introduces five original scientific indices (Alkhedir, 2024–2025): (1) ATDI — daily fraction of natural downstream entitlement withheld; maps to UNWC Arts. 7/9; (2) AHIFD — cumulative volumetric flow reduction; (3) AFSF — forensic signal from GRACE-FO TWS and Sentinel-1 SAR; (4) ASI — composite governance metric (0–100); (5) ATCI — maps all indices to 33 UNWC 1997 articles. Scientific priority established by timestamped GitHub commits (2024) and Zenodo DOI 10.5281/zenodo.19180160. GPL-3.0.
 
 Two novel architectures: (1) Direct GEE Parallel Multi-Source Fetching pipeline (sub-second response, not replicated in SWAT+/WEAP/HEC-HMS/HydroSHEDS); (2) Integrated Hydro-Legal Digital Twin (HBV-96 + EnKF + satellite assimilation + legal compliance indices). HSAE v6.01 is the first open-source platform to achieve end-to-end automation from live multi-sensor satellite observation to UNWC treaty compliance assessment.
 
@@ -167,4 +167,4 @@ The author acknowledges GRDC (Koblenz), ECMWF, NASA NSIDC, NASA JPL, and the QGI
 [18] Breiman, L. (2001). Machine Learning, 45(1), 5–32.  
 [19] Evensen, G. (2003). Ocean Dynamics, 53(4), 343–367.  
 [20] Duan, Q. et al. (1993). WRR, 28(4), 1015–1031.  
-[24] Alkedir, S.M.G. (2026). hydrosovereign v6.5.3. PyPI. doi:10.5281/zenodo.19180160  
+[24] Alkhedir, S.M.G. (2026). hydrosovereign v6.5.3. PyPI. doi:10.5281/zenodo.19180160  
