@@ -744,7 +744,7 @@ function showPanel(p){{
                      f"<td>{d['hifd']:.1f}%</td>"
                      f"<td>{d['nse']}</td><td>{d['kge']}</td>"
                      f"<td>{d['ci']:.3f}</td>"
-                     f"<td>{'🔴' if d['dlvl'] == 'CRITICAL' else '🟠' if d['dlvl'] == 'HIGH' else '🟡' if d['dlvl'] == 'MEDIUM' else '🟢'} {d['dlvl']}</td>" # noqa: E501
+                     f"<td>{'🔴' if d['dlvl'] == 'CRITICAL' else '🟠' if d['dlvl'] == 'HIGH' else '🟡' if d['dlvl'] == 'MEDIUM' else '🟢'} {d['dlvl']}</td>"  # noqa: E501
                      f"<td>{d['pneg']:.0%}</td>"
                      f"<td style='font-size:10px'>{', '.join(d['arts'])}</td>"
                      f"<td style='font-size:10px'>{b.get('context', '—')[:60]}</td></tr>")
