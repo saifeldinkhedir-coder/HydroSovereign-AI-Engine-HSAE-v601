@@ -25,7 +25,6 @@ deprecated=False
 changelog=
     v6.0.6 (May 2026) -- Name correction plus metadata update:
     Corrected author name spelling to Alkhedir throughout all files.
-    Removed JOSS link (paper under revision -- will resubmit Oct 2026).
     Updated publication reference to SoftwareX SOFTX-D-26-00442 (under peer review).
     Added SSRN preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
     Added Zenodo archive DOI: https://doi.org/10.5281/zenodo.19180160
