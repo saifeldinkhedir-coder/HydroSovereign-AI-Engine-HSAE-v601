@@ -19,10 +19,17 @@ class HBV96Algorithm(QgsProcessingAlgorithm):
     OUT_KGE = 'KGE'
     OUT_CSV = 'OUTPUT_CSV'
 
-    def name(self): return 'hbv96calibration'
-    def displayName(self): return 'HBV-96 Calibration (SCE-UA)'
-    def group(self): return 'HSAE Hydrology'
-    def groupId(self): return 'hsaehydrology'
+    def name(self):
+        return 'hbv96calibration'
+
+    def displayName(self):
+        return 'HBV-96 Calibration (SCE-UA)'
+
+    def group(self):
+        return 'HSAE Hydrology'
+
+    def groupId(self):
+        return 'hsaehydrology'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterNumber(
