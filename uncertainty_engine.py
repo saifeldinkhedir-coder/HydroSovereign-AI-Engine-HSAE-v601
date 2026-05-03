@@ -14,7 +14,7 @@ Theory:
   - GLUE: Beven & Binley (1992) Hydrological Processes 6:279-298
   - Bootstrap: Efron & Tibshirani (1993) ISBN:0-412-04231-2
 
-Author: Seifeldin M.G. Alkedir · ORCID: 0000-0003-0821-2991
+Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
 import math
