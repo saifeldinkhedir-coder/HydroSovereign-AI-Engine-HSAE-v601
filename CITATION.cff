@@ -10,7 +10,7 @@ abstract: >
   and a 30-endpoint REST API. 26 global basins, 74 treaties, 478 TFDD
   negotiation cases, 240 tests (Groups A-Z).
 authors:
-  - family-names: Alkedir
+  - family-names: Alkhedir
     given-names: Seifeldin M. G.
     orcid: "https://orcid.org/0000-0003-0821-2991"
     email: saifeldinkhedir@gmail.com
