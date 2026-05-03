@@ -83,6 +83,6 @@ peer-reviewed publications via DOI + table/figure number. See
 
 ## Contact
 
-Seifeldin M. G. Alkedir  
+Seifeldin M. G. Alkhedir  
 saifeldinkhedir@gmail.com  
 ORCID: 0000-0003-0821-2991
