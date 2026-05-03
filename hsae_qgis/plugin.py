@@ -1,7 +1,7 @@
 """
-plugin.py — HSAE v6.0.3 QGIS Plugin (Complete — April 2026)
+plugin.py — HSAE v6.0.7 QGIS Plugin (Complete — May 2026)
 ===========================================================
-13 Tools + Real-Time Dashboard Panel + 5 Processing Algorithms
+15 Tools + 5 Processing Algorithms
 
 Tools:
   1.  Load Basin Registry
@@ -16,7 +16,7 @@ Tools:
   10. WebGIS Map Generator
   11. Dashboard Panel (real-time)
   12. ICJ/PCA Dossier Export
-  13. About
+  15. Multi-Basin Comparison
 
 Processing Algorithms:
   1. ATDI Calculator
@@ -41,7 +41,7 @@ from pathlib import Path
 import json
 
 PLUGIN_DIR = Path(__file__).parent
-VERSION = "6.0.3"
+VERSION = "6.0.7"
 AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
@@ -85,7 +85,7 @@ class HSAEPlugin:
         self.iface = iface
         self.provider = None
         self.actions = []
-        self.menu = "&HydroSovereign AI Engine v6.0.3"
+        self.menu = "&HydroSovereign AI Engine v6.0.7"
         self.toolbar = None
         self.panel = None
 
@@ -158,9 +158,9 @@ class HSAEPlugin:
             "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
-            "ℹ️  About HSAE v6.0.3",
+            "🔄  Multi-Basin Comparison",
             self.about,
-            "About HSAE v6.0.3",
+            "Multi-Basin Comparison",
             False)
 
     def _add(self, text, cb, tip, toolbar=False):
@@ -345,7 +345,7 @@ class HSAEPlugin:
 
     def gee_scripts(self):
         scripts = """// ============================================================
-// HSAE v6.0.3 — GEE Script Generator (7 Satellite Sensors)
+// HSAE v6.0.7 — GEE Script Generator (7 Satellite Sensors)
 // Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 // GEE Project: zinc-arc-484714-j8
 // ============================================================
@@ -430,7 +430,7 @@ Map.setCenter(35.09, 10.53, 7);
 Map.setOptions('HYBRID');
 """
         self._txt_dlg(
-            "HSAE v6.0.3 — GEE Script Generator (7 Sensors)",
+            "HSAE v6.0.7 — GEE Script Generator (7 Sensors)",
             scripts, w=780, h=560,
             save_name="HSAE_GEE_Scripts.js")
 
@@ -454,7 +454,7 @@ Map.setOptions('HYBRID');
             ]
             lyr = QgsVectorLayer(
                 "Point?crs=EPSG:4326",
-                "GRDC Stations (HSAE v6.0.3)",
+                "GRDC Stations (HSAE v6.0.7)",
                 "memory")
             pr = lyr.dataProvider()
             pr.addAttributes([QgsField("grdc_id", QVariant.String),
@@ -497,7 +497,7 @@ Map.setOptions('HYBRID');
                                 risk:<12} {
                                     d['dlvl']}")
         self._txt_dlg(
-            "HSAE v6.0.3 — Conflict Index (26 Basins · TFDD/ICOW)",
+            "HSAE v6.0.7 — Conflict Index (26 Basins · TFDD/ICOW)",
             "\n".join(rows), w=700, h=520,
             save_name="HSAE_Conflict_Index.csv")
 
@@ -517,7 +517,7 @@ Map.setOptions('HYBRID');
             rows.append(f"{b.get('name', '')[:38]:<38} {d['pneg']:>8.0%}"
                         f"  [{bar}] {strat:<16} {path}")
         self._txt_dlg(
-            "HSAE v6.0.3 — Negotiation AI (GBM Model · 478 Historical Cases)",
+            "HSAE v6.0.7 — Negotiation AI (GBM Model · 478 Historical Cases)",
             "\n".join(rows), w=720, h=520,
             save_name="HSAE_Negotiation_AI.csv")
 
@@ -578,7 +578,7 @@ Map.setOptions('HYBRID');
         geo = _j.dumps({"type": "FeatureCollection", "features": features})
         return f"""<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
-<title>HSAE v6.0.3 — WebGIS Global Basin Network</title>
+<title>HSAE v6.0.7 — WebGIS Global Basin Network</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -606,7 +606,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 </style></head><body>
 <div id="hdr">
   <div>
-    <h1>🌊 HSAE v6.0.3 — WebGIS Global Basin Network</h1>
+    <h1>🌊 HSAE v6.0.7 — WebGIS Global Basin Network</h1>
     <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
        DOI: 10.5281/zenodo.19180160 · Preprint: SSRN 2026</p>
   </div>
@@ -624,7 +624,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <script>
 var map=L.map('map',{{center:[20,30],zoom:2,preferCanvas:true}});
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'© CartoDB · HSAE v6.0.3 · Seifeldin M.G. Alkhedir'}}).addTo(map);
+  {{attribution:'© CartoDB · HSAE v6.0.7 · Seifeldin M.G. Alkhedir'}}).addTo(map);
 var data={geo};
 data.features.forEach(function(f){{
   var p=f.properties,c=f.geometry.coordinates;
@@ -830,11 +830,11 @@ tr:nth-child(even){{background:#161b22}}
 <b>Preprint:</b> <a href="{SSRN_URL}">papers.ssrn.com</a><br>
 <b>GitHub:</b> <a href="{GITHUB}">{GITHUB}</a><br>
 <b>Live App:</b> <a href="{LIVE_APP}">Streamlit Cloud</a><br><br>
-<b>13 Tools:</b><br>
+<b>15 Tools:</b><br>
 🌊 Basin Registry · 📊 TDI Visualiser · ⚖️ UNWC Legal Layer<br>
 📤 Export · 📋 Dashboard · 🛰️ GEE Scripts (7 sensors)<br>
 📡 GRDC Stations · ⚡ Conflict Index · 🤝 Negotiation AI<br>
-🗺️ WebGIS Map · 📊 Dashboard Panel · 🏛️ ICJ/PCA Dossier · ℹ️ About<br><br>
+🗺️ WebGIS Map v2 · 🏛️ ICJ/PCA Dossier · 🗺️ Basin Risk Map (Leaflet)<br>📉 Uncertainty Analysis · ⚖️ Treaty Analysis (ATCI)<br><br>
 <b>5 Processing Algorithms:</b><br>
 ATDI · HIFD · Basin Legal Report · HBV-96 Calibration · Multi-Basin Comparison<br><br>
 <b>Data:</b> 26 basins · TFDD/ICOW · UNWC 1997 · GEE<br>
