@@ -94,7 +94,7 @@ class HSAEPlugin:
         from .hsae_processing_provider import HSAEProcessingProvider
         self.provider = HSAEProcessingProvider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-        self.toolbar = self.iface.addToolBar("HSAE v6.05")
+        self.toolbar = self.iface.addToolBar("HSAEv607Toolbar")
         self.toolbar.setObjectName("HSAEv603Toolbar")
 
         self._add("🌊 Load Basin Registry", self.load_basins,
