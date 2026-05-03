@@ -213,7 +213,7 @@ Covers all 7 world regions across all inhabited continents:
 | Status | Publication |
 |--------|-------------|
 | 🔄 **Under Review** | **Elsevier SoftwareX** — SOFTX-D-26-00442 — Confirmed under peer review April 26, 2026 |
-| 📝 **In Preparation** | **JOSS** — Journal of Open Source Software |
+| 📝 **Under Review** | **SoftwareX** — Elsevier · SOFTX-D-26-00442 |
 | ✅ **Published** | **Zenodo** — DOI: [10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160) |
 | ✅ **Published** | **QGIS Plugin Repository** — Plugin ID: 5040 · v6.0.6 |
 | ✅ **Published** | **PyPI** — [hydrosovereign](https://pypi.org/project/hydrosovereign/) |
