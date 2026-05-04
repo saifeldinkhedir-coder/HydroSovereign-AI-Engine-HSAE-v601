@@ -49,8 +49,8 @@ class HIFDAlgorithm(QgsProcessingAlgorithm):
         cap = self.parameterAsDouble(parameters, self.CAP, context)
         nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        hifd = min(80.0, max(5.0, 8 + min(cap / 3, 15) +
-                   (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        hifd = min(80.0, max(5.0, 8 + min(cap / 3, 15)
+                   + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
         feedback.pushInfo(f'HIFD = {hifd:.2f}%')
         return {self.OUT: hifd}
 
