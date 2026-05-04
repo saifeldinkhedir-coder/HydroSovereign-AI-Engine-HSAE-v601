@@ -15,8 +15,7 @@ from qgis.PyQt.QtWidgets import (
     QProgressBar,
     QTextEdit,
     QTabWidget,
-    QFileDialog,
-    QMessageBox)
+    QFileDialog)
 from qgis.PyQt.QtCore import Qt
 from pathlib import Path
 import json
