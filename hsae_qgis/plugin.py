@@ -158,9 +158,9 @@ class HSAEPlugin:
             "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
-            "i  About HSAE",
+            "ⓘ  About HSAE",
             self.about,
-            "About HSAE",
+            "ⓘ  About HSAE",
             False)
 
     def _add(self, text, cb, tip, toolbar=False):
@@ -822,7 +822,7 @@ tr:nth-child(even){{background:#161b22}}
                 "HSAE", f"Treaty panel error: {e}")
 
     def about(self):
-        QMessageBox.about(None, f"About HSAE v{VERSION}", f"""
+        QMessageBox.about(None, f"ⓘ  About HSAE", f"""
 <b>HydroSovereign AI Engine (HSAE) v{VERSION}</b><br><br>
 <b>Author:</b> {AUTHOR}<br>
 <b>ORCID:</b> {ORCID}<br>
