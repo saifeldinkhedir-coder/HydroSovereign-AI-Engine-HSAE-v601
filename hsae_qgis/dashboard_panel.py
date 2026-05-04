@@ -93,16 +93,16 @@ class HSAEDashboardPanel(QDockWidget):
                 'name', ''), int(
                 b.get(
                     'dispute_level', 0)))
-        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20)
-                   + (nc - 2) * 8 + (1 - rc) * 10))
-        hifd = min(80, max(5, 8 + min(cap / 3, 15)
-                   + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
-        nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38
-                    - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
+        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) +
+                   (nc - 2) * 8 + (1 - rc) * 10))
+        hifd = min(80, max(5, 8 + min(cap / 3, 15) +
+                   (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 -
+                    min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = round(max(0.2, min(0.9, 0.7 - atdi / 300 - hifd / 200)), 2)
-        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4)
-                   + 0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
+        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4) +
+                   0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
         wqi = round(max(30, min(90, 70 - atdi * 0.3 - hifd * 0.2)), 1)
         p_mm = round(rc * 3.5 + cap / 30, 2)
         tws = round(cap * 0.3, 1)
