@@ -158,7 +158,7 @@ class HSAEPlugin:
             "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
-            "ⓘ  About HSAE",
+            "i  About HSAE",
             self.about,
             "About HSAE",
             False)
