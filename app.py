@@ -123,6 +123,19 @@ except Exception as e:
     import streamlit as _st
     def render_upload_real_data(): _st.error(f"upload_real_data.py not found: {e}")
 
+# ── Sensor #10 — Microsoft Planetary Computer ─────────────────────────────────
+try:
+    from planetary_computer_sensor import (
+        fetch_all_pc_forcing,
+        fetch_pc_precipitation,
+        fetch_pc_optical,
+        render_pc_sensor_page,
+    )
+    _HAS_PC = True
+except Exception as _pc_err:
+    _HAS_PC = False
+    _PC_ERR = str(_pc_err)
+
 # ── Init DB — cached so it only runs once per server session ────────────────
 @st.cache_resource
 def _init_db_once():
@@ -742,6 +755,8 @@ with st.sidebar:
         "⚡ Conflict Index",
         "🔬 GERD Case Study",
         "🔄 Digital Twin · EnKF",
+        "─── v6.07 NEW ───",
+        "☁️ Planetary Computer",
     ]
     cur = st.session_state["active_page"]
     if cur not in PAGES: cur = PAGES[0]
@@ -795,6 +810,7 @@ with st.sidebar:
         "🏔️  HBV Calibration",
         "📡 Real Data · APIs",
         "🌐 v430 · Hybrid DSS",
+        "☁️ Planetary Computer",
     ], key="quick_jump")
     if _jump != "—" and _jump != st.session_state.get("page", ""):
         st.session_state["page"] = _jump
@@ -822,7 +838,7 @@ with st.sidebar:
 
     st.markdown("---")
     data_mode = st.radio("📡 Data Mode",
-        ["Simulation","Indirect CSV","Direct GEE","🆕 Real APIs (v6)"],
+        ["Simulation","Indirect CSV","Direct GEE","🆕 Real APIs (v6)","☁️ Planetary Computer"],
         index=0, key="sb_mode")
 
     prev_mode  = st.session_state.get("data_mode", "Simulation")
@@ -881,6 +897,52 @@ with st.sidebar:
         n_rd = len(st.session_state["real_df"])
         st.markdown(f"<span style='color:#22c55e;font-size:0.78rem;'>✅ Real data loaded: {n_rd:,} rows</span>",
                     unsafe_allow_html=True)
+
+    # ── Planetary Computer: fetch ERA5 + STAC data ────────────────────────────
+    if data_mode == "☁️ Planetary Computer":
+        try:
+            basin_cfg_pc = st.session_state.get("active_basin_cfg", {})
+            _d_s_pc = st.session_state.get("date_start", "2024-01-01")
+            _d_e_pc = st.session_state.get("date_end",   "2024-12-31")
+            _pc_cache_key = (f"pc_forcing_{basin_cfg_pc.get('id','unknown')}"
+                             f"_{_d_s_pc}_{_d_e_pc}")
+
+            if st.session_state.get(_pc_cache_key) is None and _HAS_PC:
+                with st.spinner("☁️ Planetary Computer: loading ERA5…"):
+                    _basin_id_pc = (basin_cfg_pc.get("id","blue_nile_gerd")
+                                    .lower().replace(" ","_").replace("-","_"))
+                    _pc_result = fetch_all_pc_forcing(
+                        _basin_id_pc, _d_s_pc, _d_e_pc)
+                    st.session_state[_pc_cache_key] = _pc_result
+
+                    # Push precipitation into session_state in same format as GEE
+                    _prec = _pc_result.get("precipitation", {})
+                    if _prec.get("P_mm"):
+                        import numpy as _np_pc, pandas as _pd_pc
+                        _P  = _np_pc.array(_prec["P_mm"],  dtype=float)
+                        _T  = _np_pc.array(_prec.get("T_C",   [25]*len(_P)), dtype=float)
+                        _ET = _np_pc.array(_prec.get("ET0_mm",[3]*len(_P)),  dtype=float)
+                        _SM = _np_pc.array(_prec.get("SM_m3m3",[0.2]*len(_P)),dtype=float)
+                        st.session_state["pc_P_mean"]   = round(float(_P.mean()),  3)
+                        st.session_state["pc_T_mean"]   = round(float(_T.mean()),  1)
+                        st.session_state["pc_ET0_mean"] = round(float(_ET.mean()), 2)
+                        st.session_state["data_mode"]   = "☁️ Planetary Computer"
+
+            if st.session_state.get(_pc_cache_key):
+                _p_pc = st.session_state.get("pc_P_mean", 0)
+                _t_pc = st.session_state.get("pc_T_mean", 0)
+                st.markdown(
+                    f"<div style='background:#0c1a2e;border-radius:6px;"
+                    f"padding:6px 10px;margin:4px 0;border:1px solid #0078D4'>"
+                    f"<span style='color:#60a5fa;font-size:0.75rem;'>☁️ Planetary Computer</span><br>"
+                    f"<span style='color:#93c5fd;font-size:0.72rem;'>"
+                    f"ERA5: P={_p_pc:.2f} mm/d · T={_t_pc:.1f}°C</span></div>",
+                    unsafe_allow_html=True
+                )
+            elif not _HAS_PC:
+                st.warning(f"PC module error: {_PC_ERR[:60]}")
+        except Exception as _pc_sidebar_err:
+            st.warning(f"PC Sensor: {str(_pc_sidebar_err)[:80]}")
 
     st.markdown("---")
     st.caption("HSAE v6.01 · Mr. Seifeldin M.G. Alkhedir · University of Khartoum")
@@ -1474,3 +1536,18 @@ elif page == "🔄 Digital Twin · EnKF":
         except Exception as e:
             st.error(f"Digital Twin error: {e}")
     else: st.info("▶️ Run v430 first.")
+
+# ── Sensor #10: Microsoft Planetary Computer ──────────────────────────────────
+elif page == "☁️ Planetary Computer":
+    st.markdown("## ☁️ Sensor #10 — Microsoft Planetary Computer")
+    st.caption(
+        "Azure Ecosystem · ERA5 · Sentinel-2 L2A · Landsat C2 · Copernicus DEM GLO-30  |  "
+        "Sensor #10 of 10 in HSAE v6.07"
+    )
+    _d_s_pc = st.session_state.get("date_start", "2024-01-01")
+    _d_e_pc = st.session_state.get("date_end",   "2024-12-31")
+    if _HAS_PC:
+        render_pc_sensor_page(basin, _d_s_pc, _d_e_pc)
+    else:
+        st.error("Planetary Computer module failed to import.")
+        st.code("pip install planetary-computer pystac-client rioxarray", language="bash")
