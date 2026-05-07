@@ -49,8 +49,8 @@ class ATDIAlgorithm(QgsProcessingAlgorithm):
         cap = self.parameterAsDouble(parameters, self.CAP, context)
         nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        atdi = min(95.0, max(5.0, 15 + disp * 12 +
-                   min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
+        atdi = min(95.0, max(5.0, 15 + disp * 12
+                   + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
         feedback.pushInfo(f'ATDI = {atdi:.2f}%')
         return {self.OUT: atdi}
 
