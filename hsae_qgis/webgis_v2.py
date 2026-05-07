@@ -612,11 +612,9 @@ function updateLegendContent(div, layer) {
     ci:'Conflict Index', atci:'Treaty Compliance (ATCI)'
   };
   const rows = entries[layer] || entries.atdi;
-  div.innerHTML = `<h4>${labels[layer]||'Risk Level'}</h4>` +
-    rows.map(([c,l]) =>
+  div.innerHTML = `<h4>${labels[layer]||'Risk Level'}</h4>` + rows.map(([c,l]) =>
       `<span class="dot" style="background:${c}"></span>${l}<br>`
-    ).join('') +
-    `<hr><small>Circle size &prop; risk level &middot; Click for analysis</small>`;
+    ).join('') + `<hr><small>Circle size &prop; risk level &middot; Click for analysis</small>`;
 }
 
 // ── ATTRIBUTION ───────────────────────────────────────────────────────────
