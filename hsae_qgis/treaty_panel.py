@@ -112,8 +112,7 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
 
         # Compute ATCI
         atci = round(min(95, max(20,
-            100 - (15 + disp * 12) * 0.6
-                - (8 + min(cap / 3, 15)) * 0.3)), 1)
+            100 - (15 + disp * 12) * 0.6 - (8 + min(cap / 3, 15)) * 0.3)), 1)
 
         # Overall metric
         color = ("#c0392b" if atci > 60 else
@@ -176,5 +175,4 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
             "Art. 12": 5, "Art. 17": -int(disp * 8),
             "Art. 20": 5, "Art. 21": 0, "Art. 33": -int(disp * 5),
         }
-        return max(5, min(95, base + offsets.get(art, 0)
-                          + random.randint(-3, 3)))
+        return max(5, min(95, base + offsets.get(art, 0) + random.randint(-3, 3)))
