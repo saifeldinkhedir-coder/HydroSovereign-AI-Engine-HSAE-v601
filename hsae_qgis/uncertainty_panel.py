@@ -101,10 +101,8 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
             c  = cap   + random.gauss(0, cap * 0.1)
             n  = nc    + random.gauss(0, 0.2)
             r  = rc    + random.gauss(0, 0.05)
-            atdi  = max(5, min(95, 15 + d * 12 + min(c / 2, 20)
-                               + (n - 2) * 8 + (1 - r) * 10))
-            ahifd = max(5, min(80, 8  + min(c / 3, 15)
-                               + (1 - r) * 12 + d * 5 + (n - 2) * 3))
+            atdi  = max(5, min(95, 15 + d * 12 + min(c / 2, 20) + (n - 2) * 8 + (1 - r) * 10))
+            ahifd = max(5, min(80, 8  + min(c / 3, 15) + (1 - r) * 12 + d * 5 + (n - 2) * 3))
             atdi_samples.append(atdi)
             ahifd_samples.append(ahifd)
 
