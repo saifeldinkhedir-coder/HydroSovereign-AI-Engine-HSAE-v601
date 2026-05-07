@@ -1,276 +1,249 @@
-from __future__ import annotations
-import json
 """
-HydroSovereign AI Engine v6.0.3 — Interactive Map Panel
-========================================================
-Embeds a Leaflet.js interactive map directly inside QGIS Desktop
-using QWebEngineView. Shows all 26 basins with full ATDI/HIFD/CI
-popups, risk colour-coding, and real-time updates.
-
+HSAE v6.0.8 — Interactive Basin Risk Map Panel
+================================================
+Pure Qt — no QWebEngineView required.
+Shows all 26 basins with ATDI/AHIFD/CI risk table.
+Opens full Leaflet map in browser when requested.
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
+from __future__ import annotations
+import json
+import os
+import tempfile
 from typing import Optional
 
 try:
-    from qgis.PyQt.QtWidgets import QDockWidget, QWidget, QVBoxLayout, QLabel
-    from qgis.PyQt.QtCore import Qt, QUrl
-    from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
-    HAS_WEBENGINE = True
+    from qgis.PyQt.QtWidgets import (
+        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
+        QLabel, QPushButton, QTableWidget, QTableWidgetItem,
+        QHeaderView, QAbstractItemView, QFrame, QScrollArea)
+    from qgis.PyQt.QtCore import Qt
+    from qgis.PyQt.QtGui import QColor, QBrush, QFont
+    HAS_QT = True
 except ImportError:
-    HAS_WEBENGINE = False
+    HAS_QT = False
 
 from qgis.core import QgsMessageLog, Qgis
 
-
-def _atdi_colour(atdi: float) -> str:
-    """Return hex colour for ATDI risk level."""
-    if atdi < 20:
-        return "#16a34a"   # green  — compliant
-    if atdi < 40:
-        return "#ca8a04"   # yellow — Art. 7
-    if atdi < 55:
-        return "#ea580c"   # orange — Art. 9
-    if atdi < 70:
-        return "#dc2626"   # red    — Art. 33
-    return "#7c3aed"                    # purple — Art. 35
+LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"
 
 
-def _unwc_zone(atdi: float) -> str:
-    if atdi < 20:
-        return "Compliant"
-    if atdi < 40:
-        return "Art. 7 — Notify"
-    if atdi < 55:
-        return "Art. 9 — Data Share"
-    if atdi < 70:
-        return "Art. 33 — Dispute"
-    return "Art. 35 — Emergency"
+def _risk_color(atdi: float) -> str:
+    if atdi >= 60:
+        return "#c0392b"
+    elif atdi >= 40:
+        return "#e67e22"
+    elif atdi >= 25:
+        return "#f1c40f"
+    return "#27ae60"
 
 
-def _build_html(basins: list, selected_id: Optional[str] = None) -> str:
-    """Build full Leaflet.js HTML for embedding in QWebEngineView."""
-
-    markers_js = []
-    for b in basins:
-        bid = b.get("id", "")
-        name = b.get("name", "Unknown")
-        lat = b.get("lat", 0)
-        lon = b.get("lon", 0)
-        atdi = round(float(b.get("atf_risk", b.get("tdi", 0.3) * 100)), 1)
-        hifd = round(atdi * 0.46, 1)
-        ci_raw = 0.40 * (atdi / 100) + 0.25 * (b.get("dispute_level", 3) / 5) + \
-            0.20 * (hifd / 100) + 0.15 * \
-            (b.get("n_countries", 3) / 6)
-        ci = round(ci_raw, 2)
-        p_neg = round(max(15, min(85, 95 - atdi * 0.8 - ci * 10)), 0)
-        dam = b.get("dam", "—")
-        river = b.get("river", "—")
-        colour = _atdi_colour(atdi)
-        zone = _unwc_zone(atdi)
-        n_c = b.get("n_countries", 3)
-        cap = b.get("cap_bcm", 0)
-        area = b.get("area_km2", 0)
-        c_up = b.get("country_up", "—")
-        arts = ", ".join(b.get("legal_arts", [zone.split("—")[0].strip()]))
-
-        popup_html = f"""
-<div style='font-family:Arial,sans-serif;min-width:260px;max-width:320px'>
-  <div style='background:linear-gradient(135deg,#061F4A,#0E6B6A);color:#fff;
-              padding:10px 14px;border-radius:6px 6px 0 0;margin:-12px -12px 10px'>
-    <div style='font-size:15px;font-weight:700'>🌊 {{name}}</div>
-    <div style='font-size:11px;opacity:0.85'>{{dam}} · {{river}}</div>
-  </div>
-  <table style='width:100%;border-collapse:collapse;font-size:12px'>
-    <tr style='background:#f4f6f9'>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>ATDI</td>
-      <td style='padding:5px 8px'><span style='background:{colour};color:#fff;
-         padding:2px 8px;border-radius:12px;font-weight:700'>{{atdi}}%</span></td>
-      <td style='padding:5px 8px;font-size:11px;color:#4A5568'>{{zone}}</td>
-    </tr>
-    <tr>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>HIFD</td>
-      <td style='padding:5px 8px'>{{hifd}}%</td>
-      <td style='padding:5px 8px;font-size:11px;color:#4A5568'>Flow deficit</td>
-    </tr>
-    <tr style='background:#f4f6f9'>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>CI</td>
-      <td style='padding:5px 8px'>{{ci}}</td>
-      <td style='padding:5px 8px;font-size:11px;color:#4A5568'>Conflict Index</td>
-    </tr>
-    <tr>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>P(Neg.)</td>
-      <td style='padding:5px 8px'>{{p_neg}}%</td>
-      <td style='padding:5px 8px;font-size:11px;color:#4A5568'>Negotiation success</td>
-    </tr>
-    <tr style='background:#f4f6f9'>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>Dam</td>
-      <td colspan='2' style='padding:5px 8px'>{{dam}}</td>
-    </tr>
-    <tr>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>Riparian</td>
-      <td style='padding:5px 8px'>{{n_c}} states</td>
-      <td style='padding:5px 8px;font-size:11px'>Cap: {{cap}} BCM</td>
-    </tr>
-    <tr style='background:#f4f6f9'>
-      <td style='padding:5px 8px;font-weight:600;color:#0B3D8E'>UNWC</td>
-      <td colspan='2' style='padding:5px 8px;font-size:11px'>{{arts}}</td>
-    </tr>
-  </table>
-  <div style='margin-top:8px;padding:6px 8px;background:#EBF4FF;border-radius:4px;
-              font-size:11px;color:#1A365D'>
-    🔑 ID: <b>{{bid}}</b> · Upstream: <b>{{c_up}}</b>
-  </div>
-</div>""".format(name=name, dam=dam, river=river, atdi=atdi, zone=zone,
-                 hifd=hifd, ci=ci, p_neg=p_neg, n_c=n_c, cap=cap,
-                 area=area, c_up=c_up, arts=arts, bid=bid, colour=colour)
-
-        radius = max(6, min(18, int(atdi / 5)))
-        opacity = "0.95" if bid == selected_id else "0.82"
-
-        markers_js.append(f"""
-  L.circleMarker([{lat}, {lon}], {{
-    radius: {radius},
-    fillColor: "{colour}",
-    color: "#FFFFFF",
-    weight: {3 if bid == selected_id else 1.5},
-    opacity: 1,
-    fillOpacity: {opacity}
-  }}).bindPopup({json.dumps(popup_html)}, {{maxWidth: 340}})
-    .bindTooltip("<b>{name}</b><br>ATDI {atdi}% · CI {ci}",
-      {{permanent: false, direction: "top"}})
-    .addTo(map);""")
-
-    markers_str = "\n".join(markers_js)
-
-    html = f"""<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<title>HSAE v6.0.3 — Basin Risk Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<style>
-  body,html{{margin:0;padding:0;background:#061F4A;font-family:Arial,sans-serif}}
-  #map{{width:100%;height:calc(100vh - 52px)}}
-  #header{{height:52px;background:linear-gradient(135deg,#061F4A 0%,#0E6B6A 100%);
-           display:flex;align-items:center;padding:0 16px;gap:12px}}
-  .htitle{{color:#fff;font-size:14px;font-weight:700}}
-  .hsub{{color:rgba(255,255,255,0.7);font-size:11px}}
-  .legend{{padding:10px 14px;background:rgba(255,255,255,0.95);
-           border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.2);
-           font-size:11px;line-height:1.8}}
-  .legend h4{{margin:0 0 6px;font-size:12px;color:#061F4A}}
-  .dot{{display:inline-block;width:12px;height:12px;
-        border-radius:50%;margin-right:6px;vertical-align:middle}}
-  .leaflet-popup-content-wrapper{{border-radius:8px;padding:0;overflow:hidden}}
-  .leaflet-popup-content{{margin:12px}}
-</style>
-</head>
-<body>
-<div id="header">
-  <span style="font-size:22px">🌊</span>
-  <div>
-    <div class="htitle">HydroSovereign AI Engine v6.0.3 — Basin Risk Map</div>
-    <div class="hsub">26 Globally Contested Basins · ATDI · HIFD · UNWC 1997 · Plugin ID: 5040</div>
-  </div>
-</div>
-<div id="map"></div>
-<script>
-var map = L.map('map', {{
-  center: [20, 20],
-  zoom: 2,
-  minZoom: 2,
-  maxZoom: 10
-}});
-
-L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}.png', {{
-  attribution: '&copy; <a href="https://carto.com/">CARTO</a> · HSAE v6.0.3',
-  subdomains: 'abcd',
-  maxZoom: 19
-}}).addTo(map);
-
-{markers_str}
-
-// Legend
-var legend = L.control({{position: 'bottomright'}});
-legend.onAdd = function(map) {{
-  var div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = '<h4>ATDI Risk Level (UNWC 1997)</h4>' + '<span class="dot" style="background:#16a34a"></span>&lt;20% Compliant<br>' + '<span class="dot" style="background:#ca8a04"></span>20–40% Art. 7 Notify<br>' + '<span class="dot" style="background:#ea580c"></span>40–55% Art. 9 Data Share<br>' + '<span class="dot" style="background:#dc2626"></span>55–70% Art. 33 Dispute<br>' + '<span class="dot" style="background:#7c3aed"></span>&ge;70% Art. 35 Emergency<br>' + '<hr style="margin:6px 0;border-color:#CBD5E0"><span style="font-size:10px;color:#4A5568">' + 'Circle size ∝ ATDI risk · Click for full analysis</span>';
-  return div;
-}};
-legend.addTo(map);
-
-// Attribution panel
-var info = L.control({{position: 'bottomleft'}});
-info.onAdd = function(map) {{
-  var div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = '<b>HSAE v6.0.3</b> · Plugin ID: 5040<br>' + 'DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank">10.5281/zenodo.19180160</a><br>' + 'ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank">0000-0003-0821-2991</a>';
-  return div;
-}};
-info.addTo(map);
-</script>
-</body>
-</html>"""
-    return html
+def _risk_label(atdi: float) -> str:
+    if atdi >= 60:
+        return "CRITICAL"
+    elif atdi >= 40:
+        return "HIGH"
+    elif atdi >= 25:
+        return "MEDIUM"
+    return "LOW"
 
 
-class HSAEMapPanel(QDockWidget):
-    """
-    Dockable interactive Leaflet.js map panel for HSAE v6.0.3.
-    Shows all 26 basins with ATDI/HIFD/CI popups inside QGIS Desktop.
-    """
+class HSAEMapPanel(QDockWidget if HAS_QT else object):
+    """Dock panel: Basin Risk Map (pure Qt table + browser fallback)."""
 
-    TITLE = "🗺️ HSAE Basin Risk Map — Interactive"
-
-    def __init__(self, iface, basins: list, parent=None):
-        super().__init__(self.TITLE, parent)
-        self.iface = iface
-        self.basins = basins
-        self.browser = None
-        self.setObjectName("HSAEMapPanelV603")
-        self.setAllowedAreas(
-            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea
-        )
-        self._build_widget()
-
-    def _build_widget(self):
-        container = QWidget()
-        layout = QVBoxLayout(container)
-        layout.setContentsMargins(0, 0, 0, 0)
-
-        if not HAS_WEBENGINE:
-            label = QLabel(
-                "⚠️ QWebEngineView not available.\n"
-                "Install PyQtWebEngine:\n"
-                "  pip install PyQtWebEngine"
-            )
-            label.setStyleSheet("color:#dc2626;padding:20px;font-size:12px")
-            label.setWordWrap(True)
-            layout.addWidget(label)
-        else:
-            self.browser = QWebEngineView()
-            self.browser.setMinimumHeight(400)
-            layout.addWidget(self.browser)
-            self._refresh()
-
-        self.setWidget(container)
-
-    def _refresh(self, selected_id: Optional[str] = None):
-        """Rebuild and reload the Leaflet map."""
-        if not self.browser:
+    def __init__(self, iface, basins: list):
+        if not HAS_QT:
             return
-        html = _build_html(self.basins, selected_id)
-        self.browser.setHtml(html, QUrl("about:blank"))
-        QgsMessageLog.logMessage(
-            f"HSAE Map Panel refreshed ({len(self.basins)} basins)",
-            "HSAE", Qgis.Info
-        )
+        super().__init__("🗺️ HSAE — Basin Risk Map", iface.mainWindow())
+        self.iface = iface
+        self._basins = basins
+        self.setMinimumWidth(560)
+        self.setMinimumHeight(500)
+        self.setFloating(True)
 
-    def highlight_basin(self, basin_id: str):
-        """Highlight a specific basin (called from other tools)."""
-        self._refresh(selected_id=basin_id)
+        root = QWidget()
+        self.setWidget(root)
+        main = QVBoxLayout(root)
+        main.setSpacing(8)
+        main.setContentsMargins(10, 10, 10, 10)
 
-    def update_basins(self, basins: list):
-        """Update basins data and refresh map."""
-        self.basins = basins
-        self._refresh()
+        # ── Title ─────────────────────────────────────────
+        title = QLabel(
+            "<b style='font-size:13px;color:#0E6B6A'>"
+            "🗺️ Global Basin Risk Map — 26 Basins</b>")
+        title.setTextFormat(Qt.RichText)
+        main.addWidget(title)
+
+        sub = QLabel(
+            "ATDI · AHIFD · Conflict Index · UNWC 1997 Compliance")
+        sub.setStyleSheet("color:#666;font-size:11px")
+        main.addWidget(sub)
+
+        # ── Buttons ───────────────────────────────────────
+        btn_row = QHBoxLayout()
+
+        btn_browser = QPushButton("🌐  Open Full Interactive Map (Browser)")
+        btn_browser.setStyleSheet(
+            "background:#0E6B6A;color:white;padding:6px 12px;"
+            "border-radius:5px;font-weight:bold;font-size:11px")
+        btn_browser.clicked.connect(self._open_in_browser)
+        btn_row.addWidget(btn_browser)
+
+        btn_app = QPushButton("☁️  Open Streamlit App")
+        btn_app.setStyleSheet(
+            "background:#2C3E50;color:white;padding:6px 12px;"
+            "border-radius:5px;font-size:11px")
+        btn_app.clicked.connect(lambda: __import__('webbrowser').open(LIVE_APP))
+        btn_row.addWidget(btn_app)
+
+        btn_refresh = QPushButton("↻  Refresh")
+        btn_refresh.setStyleSheet(
+            "background:#eee;color:#333;padding:6px 10px;"
+            "border-radius:5px;font-size:11px")
+        btn_refresh.clicked.connect(self._populate)
+        btn_row.addWidget(btn_refresh)
+        main.addLayout(btn_row)
+
+        # ── Risk legend ───────────────────────────────────
+        legend = QLabel(
+            "<span style='color:#c0392b'>■ CRITICAL (≥60%)</span>&nbsp;&nbsp;"
+            "<span style='color:#e67e22'>■ HIGH (≥40%)</span>&nbsp;&nbsp;"
+            "<span style='color:#f1c40f'>■ MEDIUM (≥25%)</span>&nbsp;&nbsp;"
+            "<span style='color:#27ae60'>■ LOW</span>")
+        legend.setTextFormat(Qt.RichText)
+        legend.setStyleSheet("font-size:10px;margin:2px 0")
+        main.addWidget(legend)
+
+        # ── Table ─────────────────────────────────────────
+        self._table = QTableWidget()
+        self._table.setColumnCount(6)
+        self._table.setHorizontalHeaderLabels(
+            ["Basin", "ATDI %", "AHIFD %", "CI", "Risk", "UNWC Art.7"])
+        self._table.horizontalHeader().setSectionResizeMode(
+            0, QHeaderView.Stretch)
+        for col in range(1, 6):
+            self._table.horizontalHeader().setSectionResizeMode(
+                col, QHeaderView.ResizeToContents)
+        self._table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self._table.setAlternatingRowColors(True)
+        self._table.setStyleSheet(
+            "QTableWidget{border:1px solid #ddd;font-size:11px}"
+            "QTableWidget::item{padding:3px}"
+            "QHeaderView::section{background:#0E6B6A;color:white;"
+            "font-weight:bold;padding:4px;border:none}")
+        self._table.verticalHeader().setVisible(False)
+        main.addWidget(self._table)
+
+        self._populate()
+
+    def _compute(self, basin: dict) -> dict:
+        """Compute key indices for a basin."""
+        disp = basin.get("dispute_level", 2)
+        cap = basin.get("dam_capacity_bcm", 50)
+        nc = basin.get("num_countries", 3)
+        rc = basin.get("riparian_cooperation", 0.45)
+        atdi = round(min(95, max(5,
+            15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
+        ahifd = round(min(80, max(5,
+            8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
+        ci = round(min(100, max(0,
+            disp * 15 + (1 - rc) * 30 + (nc - 2) * 5 + min(cap / 5, 20))), 0)
+        return {"atdi": atdi, "ahifd": ahifd, "ci": int(ci)}
+
+    def _populate(self) -> None:
+        """Fill the risk table with all 26 basins."""
+        self._table.setRowCount(0)
+        for basin in self._basins:
+            try:
+                d = self._compute(basin)
+                name = basin.get("name", "Unknown")
+                atdi = d["atdi"]
+                ahifd = d["ahifd"]
+                ci = d["ci"]
+                risk = _risk_label(atdi)
+                art7 = "⚠ Triggered" if atdi >= 40 else "✓ OK"
+                color = _risk_color(atdi)
+
+                row = self._table.rowCount()
+                self._table.insertRow(row)
+
+                items = [
+                    (name, None),
+                    (f"{atdi}%", color),
+                    (f"{ahifd}%", None),
+                    (str(ci), None),
+                    (risk, color),
+                    (art7, "#c0392b" if atdi >= 40 else "#27ae60"),
+                ]
+                for col, (text, fg) in enumerate(items):
+                    item = QTableWidgetItem(text)
+                    item.setTextAlignment(Qt.AlignCenter)
+                    if fg:
+                        item.setForeground(QBrush(QColor(fg)))
+                    if col == 4:
+                        font = QFont()
+                        font.setBold(True)
+                        item.setFont(font)
+                        item.setBackground(QBrush(QColor(color + "22")))
+                    self._table.setItem(row, col, item)
+            except Exception:
+                pass
+
+        self._table.sortItems(1, Qt.DescendingOrder)
+
+    def _build_leaflet_html(self) -> str:
+        """Build a Leaflet.js HTML map of all basins."""
+        markers = []
+        for b in self._basins:
+            try:
+                d = self._compute(b)
+                lat = b.get("lat", 0)
+                lon = b.get("lon", 0)
+                name = b.get("name", "Unknown").replace("'", "\'")
+                color = _risk_color(d["atdi"]).replace("#", "")
+                popup = (
+                    f"<b>{name}</b><br>"
+                    f"ATDI: {d['atdi']}% | AHIFD: {d['ahifd']}%<br>"
+                    f"CI: {d['ci']} | Risk: {_risk_label(d['atdi'])}"
+                )
+                markers.append(
+                    f"L.circleMarker([{lat},{lon}],{{radius:10,"
+                    f"color:'#{color}',fillColor:'#{color}',"
+                    f"fillOpacity:0.8}}).addTo(map)"
+                    f".bindPopup('{popup}');"
+                )
+            except Exception:
+                pass
+
+        markers_js = "
+".join(markers)
+        return f"""<!DOCTYPE html><html><head>
+<meta charset='utf-8'>
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9/dist/leaflet.css'/>
+<script src='https://unpkg.com/leaflet@1.9/dist/leaflet.js'></script>
+<style>html,body,#map{{margin:0;padding:0;height:100vh}}</style>
+</head><body>
+<div id='map'></div>
+<script>
+var map=L.map('map').setView([20,30],2);
+L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',
+  {{attribution:'&copy; OpenStreetMap'}}).addTo(map);
+{markers_js}
+</script></body></html>"""
+
+    def _open_in_browser(self) -> None:
+        """Save Leaflet map to temp file and open in browser."""
+        try:
+            html = self._build_leaflet_html()
+            tmp = tempfile.NamedTemporaryFile(
+                suffix=".html", delete=False, mode="w", encoding="utf-8")
+            tmp.write(html)
+            tmp.close()
+            import webbrowser
+            webbrowser.open(f"file://{tmp.name}")
+        except Exception as e:
+            QgsMessageLog.logMessage(
+                f"HSAE Map error: {e}", "HSAE", Qgis.Warning)
+
+    def update_basin(self, basin: dict) -> None:
+        self._populate()
