@@ -42,18 +42,15 @@ BASINS_26 = [
     {"id": "salween_myitsone", "name": "Salween – Myitsone", "region": "Asia", "lat": 25.32, "lon": 97.52,
         "bbox": [95.0, 23.0, 100.0, 28.0], "country_up": "China", "country_dn": "Myanmar", "tdi": 0.60},
     # ── Americas ──────────────────────────────────────────────────────────────
-    {"id": "amazon_belo_monte", "name": "Amazon – Belo Monte", "region": "Americas", "lat": -3.38, "lon":
-        - 51.77, "bbox": [-55.0, -6.0, -48.0, -1.0], "country_up": "Brazil", "country_dn": "Brazil", "tdi": 0.18},
+    {"id": "amazon_belo_monte", "name": "Amazon – Belo Monte", "region": "Americas", "lat": -3.38, "lon": - 51.77, "bbox": [-55.0, -6.0, -48.0, -1.0], "country_up": "Brazil", "country_dn": "Brazil", "tdi": 0.18},
     {"id": "parana_itaipu", "name": "Paraná – Itaipu", "region": "Americas", "lat": -25.41, "lon": -54.59,
         "bbox": [-57.0, -28.0, -52.0, -22.0], "country_up": "Brazil", "country_dn": "Paraguay", "tdi": 0.25},
     {"id": "orinoco_guri", "name": "Orinoco – Guri", "region": "Americas", "lat": 7.76, "lon": -63.00,
         "bbox": [-66.0, 5.0, -60.0, 10.0], "country_up": "Venezuela", "country_dn": "Venezuela", "tdi": 0.21},
     {"id": "colorado_hoover", "name": "Colorado – Hoover", "region": "Americas", "lat": 36.01, "lon": -114.74,
         "bbox": [-117.0, 34.0, -112.0, 38.0], "country_up": "USA", "country_dn": "USA/Mexico", "tdi": 0.72},
-    {"id": "columbia_gcoulee", "name": "Columbia – Grand Coulee", "region": "Americas", "lat": 47.96, "lon":
-        - 118.98, "bbox": [-121.0, 45.0, -116.0, 50.0], "country_up": "USA", "country_dn": "USA", "tdi": 0.30},
-    {"id": "rio_grande_amistad", "name": "Rio Grande – Amistad", "region": "Americas", "lat": 29.45, "lon":
-        - 101.07, "bbox": [-104.0, 27.0, -99.0, 31.0], "country_up": "USA", "country_dn": "Mexico", "tdi": 0.65},
+    {"id": "columbia_gcoulee", "name": "Columbia – Grand Coulee", "region": "Americas", "lat": 47.96, "lon": - 118.98, "bbox": [-121.0, 45.0, -116.0, 50.0], "country_up": "USA", "country_dn": "USA", "tdi": 0.30},
+    {"id": "rio_grande_amistad", "name": "Rio Grande – Amistad", "region": "Americas", "lat": 29.45, "lon": - 101.07, "bbox": [-104.0, 27.0, -99.0, 31.0], "country_up": "USA", "country_dn": "Mexico", "tdi": 0.65},
     # ── Europe ────────────────────────────────────────────────────────────────
     {"id": "danube_iron_gates", "name": "Danube – Iron Gates I", "region": "Europe", "lat": 44.67, "lon": 22.52,
         "bbox": [20.0, 42.0, 26.0, 47.0], "country_up": "Romania", "country_dn": "Serbia", "tdi": 0.20},
