@@ -193,43 +193,39 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
 
     def _build_leaflet_html(self) -> str:
         """Build a Leaflet.js HTML map of all basins."""
-        markers = []
+        marker_lines = []
         for b in self._basins:
             try:
                 d = self._compute(b)
                 lat = b.get("lat", 0)
                 lon = b.get("lon", 0)
-                name = b.get("name", "Unknown").replace("'", "\'")
-                color = _risk_color(d["atdi"]).replace("#", "")
-                popup = (
-                    f"<b>{name}</b><br>"
-                    f"ATDI: {d['atdi']}% | AHIFD: {d['ahifd']}%<br>"
-                    f"CI: {d['ci']} | Risk: {_risk_label(d['atdi'])}"
-                )
-                markers.append(
-                    f"L.circleMarker([{lat},{lon}],{{radius:10,"
-                    f"color:'#{color}',fillColor:'#{color}',"
-                    f"fillOpacity:0.8}}).addTo(map)"
-                    f".bindPopup('{popup}');"
+                name = b.get("name", "Unknown").replace("'", " ")
+                color = _risk_color(d["atdi"])
+                popup = name + " | ATDI:" + str(d["atdi"]) + "% | " + _risk_label(d["atdi"])
+                marker_lines.append(
+                    "L.circleMarker([" + str(lat) + "," + str(lon) + "],"
+                    + "{radius:10,color:'" + color + "',fillColor:'" + color
+                    + "',fillOpacity:0.8}).addTo(map)"
+                    + ".bindPopup('" + popup + "');"
                 )
             except Exception:
                 pass
 
-        markers_js = "
-".join(markers)
-        return f"""<!DOCTYPE html><html><head>
-<meta charset='utf-8'>
-<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9/dist/leaflet.css'/>
-<script src='https://unpkg.com/leaflet@1.9/dist/leaflet.js'></script>
-<style>html,body,#map{{margin:0;padding:0;height:100vh}}</style>
-</head><body>
-<div id='map'></div>
-<script>
-var map=L.map('map').setView([20,30],2);
-L.tileLayer('https://{{s}}.tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'&copy; OpenStreetMap'}}).addTo(map);
-{markers_js}
-</script></body></html>"""
+        markers_js = "\n".join(marker_lines)
+        html = (
+            "<!DOCTYPE html><html><head>"
+            "<meta charset='utf-8'>"
+            "<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9/dist/leaflet.css'/>"
+            "<script src='https://unpkg.com/leaflet@1.9/dist/leaflet.js'></script>"
+            "<style>html,body,#map{margin:0;padding:0;height:100vh}</style>"
+            "</head><body><div id='map'></div><script>"
+            "var map=L.map('map').setView([20,30],2);"
+            "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',"
+            "{attribution:'OpenStreetMap'}).addTo(map);"
+            + markers_js
+            + "</script></body></html>"
+        )
+        return html
 
     def _open_in_browser(self) -> None:
         """Save Leaflet map to temp file and open in browser."""
