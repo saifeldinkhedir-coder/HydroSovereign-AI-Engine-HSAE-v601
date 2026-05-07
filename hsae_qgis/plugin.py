@@ -34,6 +34,14 @@ App:     https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.strea
 from .map_panel import HSAEMapPanel
 from .treaty_panel import HSAETreatyPanel
 from .uncertainty_panel import HSAEUncertaintyPanel
+
+try:
+    from .webgis_v2 import build_webgis_v2
+    HAS_WEBGIS_V2 = True
+except Exception:
+    HAS_WEBGIS_V2 = False
+    def build_webgis_v2(*a, **kw): return ""
+
 from qgis.PyQt.QtWidgets import (QAction, QFileDialog, QDialog, QVBoxLayout,
                                  QTextEdit, QPushButton, QMessageBox,
                                  QHBoxLayout)
@@ -435,7 +443,7 @@ Map.setOptions('HYBRID');
             from qgis.core import (QgsVectorLayer, QgsProject, QgsField,
                                    QgsFeature, QgsGeometry, QgsPointXY,
                                    QgsSingleSymbolRenderer, QgsMarkerSymbol)
-            from qgis.PyQt.QtCore import Qt, QVariant
+            from qgis.PyQt.QtCore import QVariant
             stations = [
                 ("1040250", "Blue Nile/GERD", 10.53, 35.09, 1500, "Ethiopia/Sudan"),
                 ("1040220", "Roseires Dam", 11.85, 34.38, 1200, "Sudan"),
@@ -818,7 +826,7 @@ tr:nth-child(even){{background:#161b22}}
 
     def geoagent_tool(self):
         """Tool 16: GeoAgent Natural Language Query — opengeos/GeoAgent integration."""
-        from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit
+        from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton, QTextEdit
         dlg = QDialog(self.iface.mainWindow())
         dlg.setWindowTitle("🤖 HSAE GeoAgent — Natural Language Query")
         dlg.setMinimumWidth(560)
@@ -860,7 +868,7 @@ tr:nth-child(even){{background:#161b22}}
         dlg.exec_()
 
     def about(self):
-        QMessageBox.about(None, f"ⓘ  About HSAE", f"""
+        QMessageBox.about(None, "ⓘ  About HSAE", f"""
 <b>HydroSovereign AI Engine (HSAE) v{VERSION}</b><br><br>
 <b>Author:</b> {AUTHOR}<br>
 <b>ORCID:</b> {ORCID}<br>
