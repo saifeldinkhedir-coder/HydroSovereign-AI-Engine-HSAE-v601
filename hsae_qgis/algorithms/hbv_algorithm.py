@@ -95,8 +95,7 @@ class HBV96Algorithm(QgsProcessingAlgorithm):
         std_s = (sum((s - mean_s)**2 for s in Q_sim) / n)**0.5
         r = sum((o - mean_r) * (s - mean_s) for o, s in zip(Q_ref, Q_sim)) / \
             (n * std_r * std_s + 1e-9)
-        kge = 1 - ((r - 1)**2 + (std_s / (std_r + 1e-9) - 1) **
-                   2 + (mean_s / (mean_r + 1e-9) - 1)**2)**0.5
+        kge = 1 - ((r - 1)**2 + (std_s / (std_r + 1e-9) - 1)**2 + (mean_s / (mean_r + 1e-9) - 1)**2)**0.5
         nse = round(max(-1, min(1, nse)), 3)
         kge = round(max(-1, min(1, kge)), 3)
 
