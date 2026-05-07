@@ -488,8 +488,7 @@ Map.setOptions('HYBRID');
         rows = [hdr]
         for b in basins:
             d = self._compute(b)
-            risk = ("🔴 CRITICAL" if d['ci'] >= 0.6 else "🟠 HIGH" if d['ci']
-                    >= 0.4 else "🟡 MEDIUM" if d['ci'] >= 0.25 else "🟢 LOW")
+            risk = ("🔴 CRITICAL" if d['ci'] >= 0.6 else "🟠 HIGH" if d['ci'] >= 0.4 else "🟡 MEDIUM" if d['ci'] >= 0.25 else "🟢 LOW")
             rows.append(
                 f"{
                     b.get(
@@ -552,8 +551,7 @@ Map.setOptions('HYBRID');
             if not lat:
                 continue
             d = self._compute(b)
-            col = ("#f85149" if d['atdi'] >= 70 else "#f0883e" if d['atdi']
-                   >= 55 else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
+            col = ("#f85149" if d['atdi'] >= 70 else "#f0883e" if d['atdi'] >= 55 else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
             clist = (
                 ", ".join(
                     b.get(
@@ -729,8 +727,7 @@ function showPanel(p){{
         rows = ""
         for b in basins:
             d = self._compute(b)
-            col = ("#f85149" if d['atdi'] >= 70 else "#f0883e" if d['atdi']
-                   >= 55 else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
+            col = ("#f85149" if d['atdi'] >= 70 else "#f0883e" if d['atdi'] >= 55 else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
             cl = (
                 ", ".join(
                     b.get(
@@ -842,8 +839,7 @@ tr:nth-child(even){{background:#161b22}}
             "&#8226; <i>What is the ATDI for the Mekong basin?</i><br>"
             "&#8226; <i>Is the Euphrates in violation of Article 7?</i>"
         )
-        from qgis.PyQt.QtCore import Qt
-        info_lbl.setTextFormat(Qt.RichText)
+                info_lbl.setTextFormat(Qt.RichText)
         info_lbl.setWordWrap(True)
         info_lbl.setOpenExternalLinks(True)
         layout.addWidget(info_lbl)
