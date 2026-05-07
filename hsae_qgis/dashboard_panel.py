@@ -124,7 +124,7 @@ class HSAEDashboardPanel(QDockWidget):
                     cap=cap, area=area, rc=rc, disp=disp)
 
     def _lbl(self, text, style=""):
-        l = QLabel(text)
+        lyr = QLabel(text)
         layer_item.setStyleSheet(style)
         return l
 
