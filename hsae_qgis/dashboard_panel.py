@@ -51,7 +51,7 @@ DISP_LEVELS = {
 
 DARK = "#0d1117"
 DARK2 = "#161b22"
-BLUE = "#58a6ff"
+BLUE = "#58a6f"
 GREEN = "#3fb950"
 ORG = "#f0883e"
 RED = "#f85149"
@@ -93,16 +93,12 @@ class HSAEDashboardPanel(QDockWidget):
                 'name', ''), int(
                 b.get(
                     'dispute_level', 0)))
-        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20)
-                   + (nc - 2) * 8 + (1 - rc) * 10))
-        hifd = min(80, max(5, 8 + min(cap / 3, 15)
-                   + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
-        nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38
-                    - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
+        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
+        hifd = min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = round(max(0.2, min(0.9, 0.7 - atdi / 300 - hifd / 200)), 2)
-        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4)
-                   + 0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
+        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
         wqi = round(max(30, min(90, 70 - atdi * 0.3 - hifd * 0.2)), 1)
         p_mm = round(rc * 3.5 + cap / 30, 2)
         tws = round(cap * 0.3, 1)
@@ -131,7 +127,7 @@ class HSAEDashboardPanel(QDockWidget):
     def _frame(self, border_col=BRD):
         f = QFrame()
         f.setStyleSheet(f"background:{DARK};border:1px solid {border_col};"
-                        f"border-radius:4px;padding:3px")
+                        "border-radius:4px;padding:3px")
         return f
 
     def _build_ui(self):
@@ -165,7 +161,7 @@ class HSAEDashboardPanel(QDockWidget):
 
         # Tabs
         tabs = QTabWidget()
-        tabs.setStyleSheet(f"""
+        tabs.setStyleSheet("""
             QTabWidget::pane{{background:{DARK2};border:1px solid {BRD}}}
             QTabBar::tab{{background:{DARK};color:{GRAY};padding:4px 7px;font-size:10px}}
             QTabBar::tab:selected{{background:{DARK2};color:{BLUE}}}""")
@@ -218,7 +214,7 @@ class HSAEDashboardPanel(QDockWidget):
         g2.setSpacing(4)
         self.phys = {}
         pdefs = [("Area(k km²)", "🗺️"), ("Storage(BCM)", "🏗️"),
-                 ("Runoff", "💧"), ("Countries", "🌍"),
+                 ("Runof", "💧"), ("Countries", "🌍"),
                  ("P̄(mm/d)", "🌧️"), ("TWS(cm)", "🛰️")]
         for i, (key, ico) in enumerate(pdefs):
             r, c = divmod(i, 2)
@@ -261,8 +257,8 @@ class HSAEDashboardPanel(QDockWidget):
                         ("🚀 App", self._app)]:
             b = QPushButton(txt)
             b.setStyleSheet(
-                f"background:#238636;color:#fff;border:none;"
-                f"padding:5px;border-radius:3px;font-size:10px")
+                "background:#238636;color:#fff;border:none;"
+                "padding:5px;border-radius:3px;font-size:10px")
             b.clicked.connect(fn)
             bl.addWidget(b)
         ml.addLayout(bl)
@@ -300,7 +296,7 @@ class HSAEDashboardPanel(QDockWidget):
         self.bar_hifd.setValue(int(d['hifd']))
         self.phys["Area(k km²)"].setText(f"{d['area'] / 1000:.0f}k")
         self.phys["Storage(BCM)"].setText(f"{d['cap']:.0f}")
-        self.phys["Runoff"].setText(str(d['rc']))
+        self.phys["Runof"].setText(str(d['rc']))
         self.phys["Countries"].setText(str(d['nc']))
         self.phys["P̄(mm/d)"].setText(f"{d['p_mm']:.2f}")
         self.phys["TWS(cm)"].setText(f"{d['tws']:.1f}")
@@ -347,7 +343,7 @@ class HSAEDashboardPanel(QDockWidget):
                 f"Date:   {
                     datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}\n")
             f.write(
-                f"Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991\n\n")
+                "Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991\n\n")
             f.write(f"ATDI={d['atdi']:.1f}% | HIFD={d['hifd']:.1f}% | "
                     f"NSE={d['nse']} | KGE={d['kge']} | CI={d['ci']:.3f}\n")
             f.write(f"Risk: {d['risk_txt']} | P(Neg)={d['pneg']:.0%}\n")
