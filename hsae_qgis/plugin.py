@@ -1,5 +1,5 @@
 """
-plugin.py — HSAE v6.0.7 QGIS Plugin (Complete — May 2026)
+plugin.py — HSAE v6.0.8 QGIS Plugin (Complete — May 2026)
 ===========================================================
 15 Tools + 5 Processing Algorithms
 
@@ -41,7 +41,7 @@ from pathlib import Path
 import json
 
 PLUGIN_DIR = Path(__file__).parent
-VERSION = "6.0.7"
+VERSION = "6.0.8"
 AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
@@ -85,7 +85,7 @@ class HSAEPlugin:
         self.iface = iface
         self.provider = None
         self.actions = []
-        self.menu = "&HydroSovereign AI Engine v6.0.7"
+        self.menu = "&HydroSovereign AI Engine v6.0.8"
         self.toolbar = None
         self.panel = None
 
@@ -94,7 +94,7 @@ class HSAEPlugin:
         from .hsae_processing_provider import HSAEProcessingProvider
         self.provider = HSAEProcessingProvider()
         QgsApplication.processingRegistry().addProvider(self.provider)
-        self.toolbar = self.iface.addToolBar("HSAEv607Toolbar")
+        self.toolbar = self.iface.addToolBar("HSAEv608Toolbar")
         self.toolbar.setObjectName("HSAEv603Toolbar")
 
         self._add("🌊 Load Basin Registry", self.load_basins,
@@ -345,7 +345,7 @@ class HSAEPlugin:
 
     def gee_scripts(self):
         scripts = """// ============================================================
-// HSAE v6.0.7 — GEE Script Generator (7 Satellite Sensors)
+// HSAE v6.0.8 — GEE Script Generator (7 Satellite Sensors)
 // Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 // GEE Project: zinc-arc-484714-j8
 // ============================================================
@@ -430,7 +430,7 @@ Map.setCenter(35.09, 10.53, 7);
 Map.setOptions('HYBRID');
 """
         self._txt_dlg(
-            "HSAE v6.0.7 — GEE Script Generator (7 Sensors)",
+            "HSAE v6.0.8 — GEE Script Generator (7 Sensors)",
             scripts, w=780, h=560,
             save_name="HSAE_GEE_Scripts.js")
 
@@ -454,7 +454,7 @@ Map.setOptions('HYBRID');
             ]
             lyr = QgsVectorLayer(
                 "Point?crs=EPSG:4326",
-                "GRDC Stations (HSAE v6.0.7)",
+                "GRDC Stations (HSAE v6.0.8)",
                 "memory")
             pr = lyr.dataProvider()
             pr.addAttributes([QgsField("grdc_id", QVariant.String),
@@ -497,7 +497,7 @@ Map.setOptions('HYBRID');
                                 risk:<12} {
                                     d['dlvl']}")
         self._txt_dlg(
-            "HSAE v6.0.7 — Conflict Index (26 Basins · TFDD/ICOW)",
+            "HSAE v6.0.8 — Conflict Index (26 Basins · TFDD/ICOW)",
             "\n".join(rows), w=700, h=520,
             save_name="HSAE_Conflict_Index.csv")
 
@@ -517,7 +517,7 @@ Map.setOptions('HYBRID');
             rows.append(f"{b.get('name', '')[:38]:<38} {d['pneg']:>8.0%}"
                         f"  [{bar}] {strat:<16} {path}")
         self._txt_dlg(
-            "HSAE v6.0.7 — Negotiation AI (GBM Model · 478 Historical Cases)",
+            "HSAE v6.0.8 — Negotiation AI (GBM Model · 478 Historical Cases)",
             "\n".join(rows), w=720, h=520,
             save_name="HSAE_Negotiation_AI.csv")
 
@@ -578,7 +578,7 @@ Map.setOptions('HYBRID');
         geo = _j.dumps({"type": "FeatureCollection", "features": features})
         return f"""<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
-<title>HSAE v6.0.7 — WebGIS Global Basin Network</title>
+<title>HSAE v6.0.8 — WebGIS Global Basin Network</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -606,7 +606,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 </style></head><body>
 <div id="hdr">
   <div>
-    <h1>🌊 HSAE v6.0.7 — WebGIS Global Basin Network</h1>
+    <h1>🌊 HSAE v6.0.8 — WebGIS Global Basin Network</h1>
     <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
        DOI: 10.5281/zenodo.19180160 · Preprint: SSRN 2026</p>
   </div>
@@ -624,7 +624,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <script>
 var map=L.map('map',{{center:[20,30],zoom:2,preferCanvas:true}});
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'© CartoDB · HSAE v6.0.7 · Seifeldin M.G. Alkhedir'}}).addTo(map);
+  {{attribution:'© CartoDB · HSAE v6.0.8 · Seifeldin M.G. Alkhedir'}}).addTo(map);
 var data={geo};
 data.features.forEach(function(f){{
   var p=f.properties,c=f.geometry.coordinates;
@@ -821,6 +821,43 @@ tr:nth-child(even){{background:#161b22}}
             self.iface.messageBar().pushWarning(
                 "HSAE", f"Treaty panel error: {e}")
 
+    def geoagent_tool(self):
+        """Tool 16: GeoAgent Natural Language Query — opengeos/GeoAgent integration."""
+        from qgis.PyQt.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit
+        dlg = QDialog(self.iface.mainWindow())
+        dlg.setWindowTitle("🤖 HSAE GeoAgent — Natural Language Query")
+        dlg.setMinimumWidth(560)
+        layout = QVBoxLayout(dlg)
+        layout.addWidget(QLabel(
+            "<b>HydroSovereign AI Engine — GeoAgent Integration</b><br>"
+            "HSAE tools are now part of <a href='https://github.com/opengeos/GeoAgent'>"
+            "opengeos/GeoAgent</a> (PR #79, merged May 2026).<br><br>"
+            "Example queries:<br>"
+            "• <i>Analyze Blue Nile GERD compliance</i><br>"
+            "• <i>What is the ATDI for the Mekong basin?</i><br>"
+            "• <i>Is the Euphrates in violation of Article 7?</i>"
+        ))
+        lbl = QLabel("Install GeoAgent to use natural language queries:")
+        layout.addWidget(lbl)
+        code = QTextEdit()
+        code.setPlainText(
+            "pip install geoagent[hsae]\n\n"
+            "from geoagent.tools.hsae import hsae_tools\n"
+            "agent = hsae_tools()\n"
+            "result = agent.analyze_basin_compliance('Blue Nile')\n"
+            "print(result)"
+        )
+        code.setMaximumHeight(120)
+        layout.addWidget(code)
+        link_btn = QPushButton("Open GeoAgent on GitHub")
+        link_btn.clicked.connect(lambda: __import__('webbrowser').open(
+            'https://github.com/opengeos/GeoAgent'))
+        layout.addWidget(link_btn)
+        close_btn = QPushButton("Close")
+        close_btn.clicked.connect(dlg.accept)
+        layout.addWidget(close_btn)
+        dlg.exec_()
+
     def about(self):
         QMessageBox.about(None, f"ⓘ  About HSAE", f"""
 <b>HydroSovereign AI Engine (HSAE) v{VERSION}</b><br><br>
@@ -830,15 +867,15 @@ tr:nth-child(even){{background:#161b22}}
 <b>Preprint:</b> <a href="{SSRN_URL}">papers.ssrn.com</a><br>
 <b>GitHub:</b> <a href="{GITHUB}">{GITHUB}</a><br>
 <b>Live App:</b> <a href="{LIVE_APP}">Streamlit Cloud</a><br><br>
-<b>15 Tools:</b><br>
+<b>16 Tools:</b><br>
 🌊 Basin Registry · 📊 TDI Visualiser · ⚖️ UNWC Legal Layer<br>
 📤 Export · 📋 Dashboard · 🛰️ GEE Scripts (7 sensors)<br>
 📡 GRDC Stations · ⚡ Conflict Index · 🤝 Negotiation AI<br>
-🗺️ WebGIS Map v2 · 🏛️ ICJ/PCA Dossier · 🗺️ Basin Risk Map (Leaflet)<br>📉 Uncertainty Analysis · ⚖️ Treaty Analysis (ATCI)<br><br>
+🗺️ WebGIS Map v2 · 🏛️ ICJ/PCA Dossier · 🗺️ Basin Risk Map (Leaflet)<br>📉 Uncertainty Analysis · ⚖️ Treaty Analysis (ATCI) · 🤖 GeoAgent NL)<br><br>
 <b>5 Processing Algorithms:</b><br>
-ATDI · HIFD · Basin Legal Report · HBV-96 Calibration · Multi-Basin Comparison<br><br>
+ATDI · AHIFD · Basin Legal Report · HBV-96 Calibration · Multi-Basin Comparison<br><br>
 <b>Data:</b> 26 basins · TFDD/ICOW · UNWC 1997 · GEE<br>
 <b>Model:</b> HBV-96 + SCE-UA · GBM Negotiation AI (478 cases)<br>
 <b>Metrics:</b> NSE=0.63 · KGE=0.74 (pre-calibration)<br><br>
-<i>SoftwareX 2026 (under review) · Preprint: SSRN · University of Khartoum</i>
+<i>SoftwareX 2026 (under review) · Preprint: SSRN · University of Khartoum</i><br><i>GeoAgent integration: opengeos/GeoAgent PR #79 · merged May 2026</i>
 """)
