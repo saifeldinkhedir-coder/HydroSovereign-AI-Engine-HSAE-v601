@@ -828,15 +828,21 @@ tr:nth-child(even){{background:#161b22}}
         dlg.setWindowTitle("🤖 HSAE GeoAgent — Natural Language Query")
         dlg.setMinimumWidth(560)
         layout = QVBoxLayout(dlg)
-        layout.addWidget(QLabel(
+        info_lbl = QLabel(
             "<b>HydroSovereign AI Engine — GeoAgent Integration</b><br>"
-            "HSAE tools are now part of <a href='https://github.com/opengeos/GeoAgent'>"
-            "opengeos/GeoAgent</a> (PR #79, merged May 2026).<br><br>"
-            "Example queries:<br>"
-            "• <i>Analyze Blue Nile GERD compliance</i><br>"
-            "• <i>What is the ATDI for the Mekong basin?</i><br>"
-            "• <i>Is the Euphrates in violation of Article 7?</i>"
-        ))
+            "HSAE tools are now part of "
+            "<a href='https://github.com/opengeos/GeoAgent'>opengeos/GeoAgent</a>"
+            " (PR #79, merged May 2026).<br><br>"
+            "<b>Example queries:</b><br>"
+            "&#8226; <i>Analyze Blue Nile GERD compliance</i><br>"
+            "&#8226; <i>What is the ATDI for the Mekong basin?</i><br>"
+            "&#8226; <i>Is the Euphrates in violation of Article 7?</i>"
+        )
+        from qgis.PyQt.QtCore import Qt
+        info_lbl.setTextFormat(Qt.RichText)
+        info_lbl.setWordWrap(True)
+        info_lbl.setOpenExternalLinks(True)
+        layout.addWidget(info_lbl)
         lbl = QLabel("Install GeoAgent to use natural language queries:")
         layout.addWidget(lbl)
         code = QTextEdit()
