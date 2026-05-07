@@ -18,10 +18,10 @@ except ImportError:
     HAS_QT = False
 
 UNWC_ARTICLES = [
-    ("Art. 5",  "Equitable & reasonable utilisation"),
-    ("Art. 6",  "Factors for equitable utilisation"),
-    ("Art. 7",  "No significant harm obligation"),
-    ("Art. 9",  "Regular exchange of data & info"),
+    ("Art. 5", "Equitable & reasonable utilisation"),
+    ("Art. 6", "Factors for equitable utilisation"),
+    ("Art. 7", "No significant harm obligation"),
+    ("Art. 9", "Regular exchange of data & info"),
     ("Art. 11", "Prior notification of planned measures"),
     ("Art. 12", "Six-month reply period"),
     ("Art. 17", "Peaceful settlement / consultations"),
@@ -38,7 +38,7 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         if not HAS_QT:
             return
         super().__init__("⚖️ HSAE — Treaty Analysis (ATCI)", iface.mainWindow())
-        self.iface   = iface
+        self.iface = iface
         self._basins = basins
         self.setMinimumWidth(440)
         self.setMinimumHeight(520)
@@ -100,15 +100,16 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         # Clear
         for i in reversed(range(self._res_layout.count())):
             w = self._res_layout.itemAt(i).widget()
-            if w: w.deleteLater()
+            if w:
+                w.deleteLater()
 
-        idx   = self._combo.currentIndex()
+        idx = self._combo.currentIndex()
         basin = self._basins[idx] if idx < len(self._basins) else {}
-        name  = basin.get("name", "Unknown")
-        disp  = basin.get("dispute_level", 2)
-        cap   = basin.get("dam_capacity_bcm", 74)
-        nc    = basin.get("num_countries", 3)
-        rc    = basin.get("riparian_cooperation", 0.45)
+        name = basin.get("name", "Unknown")
+        disp = basin.get("dispute_level", 2)
+        cap = basin.get("dam_capacity_bcm", 74)
+        nc = basin.get("num_countries", 3)
+        rc = basin.get("riparian_cooperation", 0.45)
 
         # Compute ATCI
         atci = round(min(95, max(20,
@@ -151,7 +152,7 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
             art_color = "#c0392b" if score < 40 else "#e67e22" if score < 65 else "#27ae60"
             art_status = "⚠ Non-compliant" if score < 40 else "~ Partial" if score < 65 else "✓ Compliant"
 
-            lbl_art  = QLabel(f"<b>{art}</b>")
+            lbl_art = QLabel(f"<b>{art}</b>")
             lbl_art.setTextFormat(Qt.RichText)
             lbl_desc = QLabel(desc)
             lbl_desc.setStyleSheet("color:#555;font-size:10px")
