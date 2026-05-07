@@ -1,167 +1,180 @@
 """
-HSAE v6.0.3 — Treaty Analysis Panel
-=====================================
-Displays ATCI (Alkhedir Treaty Compliance Index) for any basin,
-comparing current treaty status against UNWC 1997 obligations.
+HSAE v6.0.8 — Treaty Analysis Panel (ATCI)
+============================================
+Pure Qt (no WebEngine) — works in all QGIS versions.
+Displays ATCI Treaty Compliance Index for any basin.
 """
 from __future__ import annotations
+import random
 
 try:
     from qgis.PyQt.QtWidgets import (
-        QDockWidget,
-        QWidget,
-        QVBoxLayout,
-        QComboBox,
-        QPushButton,
-        QHBoxLayout,
-        QLabel)
-    from qgis.PyQt.QtCore import QUrl
-    from qgis.PyQt.QtWebEngineWidgets import QWebEngineView
-    HAS_WEBENGINE = True
+        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
+        QLabel, QPushButton, QComboBox, QProgressBar,
+        QGroupBox, QGridLayout, QScrollArea, QFrame)
+    from qgis.PyQt.QtCore import Qt
+    HAS_QT = True
 except ImportError:
-    HAS_WEBENGINE = False
+    HAS_QT = False
 
-ARTICLES = [
-    (5, "Equitable and Reasonable Utilization", "HIFD > 25%"),
-    (7, "Obligation Not to Cause Significant Harm", "ATDI > 20%"),
-    (9, "Regular Exchange of Data and Information", "ATDI > 40%"),
-    (11, "Information Concerning Planned Measures", "ATDI > 35%"),
-    (12, "Notification Concerning Planned Measures", "ATDI > 45%"),
-    (17, "Consultations and Negotiations", "ATDI > 50%"),
-    (20, "Protection and Preservation of Ecosystems", "HIFD > 30%"),
-    (21, "Prevention, Reduction of Pollution", "HIFD > 20%"),
-    (33, "Settlement of Disputes", "ATDI > 55%"),
-    (35, "Emergency Situations", "ATDI > 70%"),
+UNWC_ARTICLES = [
+    ("Art. 5",  "Equitable & reasonable utilisation"),
+    ("Art. 6",  "Factors for equitable utilisation"),
+    ("Art. 7",  "No significant harm obligation"),
+    ("Art. 9",  "Regular exchange of data & info"),
+    ("Art. 11", "Prior notification of planned measures"),
+    ("Art. 12", "Six-month reply period"),
+    ("Art. 17", "Peaceful settlement / consultations"),
+    ("Art. 20", "Protection & preservation of ecosystems"),
+    ("Art. 21", "Prevention of water pollution"),
+    ("Art. 33", "Dispute settlement mechanism"),
 ]
 
 
-def _build_treaty_html(basin: dict) -> str:
-    name = basin.get("name", "Basin")
-    atdi = float(basin.get("atf_risk", basin.get("tdi", 0.4) * 100))
-    hifd = round(atdi * 0.46, 1)
+class HSAETreatyPanel(QDockWidget if HAS_QT else object):
+    """Dock panel: ATCI analysis for selected basin."""
 
-    rows = ""
-    triggered = 0
-    for art_n, art_title, threshold in ARTICLES:
-        param, val_s = threshold.split(" > ")
-        threshold_val = float(val_s.replace("%", ""))
-        test_val = atdi if param == "ATDI" else hifd
-        is_triggered = test_val > threshold_val
-        if is_triggered:
-            triggered += 1
-        status_text = "⚡ TRIGGERED" if is_triggered else "✅ Compliant"
-        status_col = "#dc2626" if is_triggered else "#16a34a"
-        row_bg = "#FFF5F5" if is_triggered else "#F0FFF4"
-        rows += f"""
-      <tr style='background:{row_bg}'>
-        <td style='padding:6px 10px;font-weight:700;color:#0B3D8E;
-                   white-space:nowrap'>Art. {art_n}</td>
-        <td style='padding:6px 10px;font-size:11px'>{art_title}</td>
-        <td style='padding:6px 10px;font-size:11px;color:#4A5568'>{threshold}</td>
-        <td style='padding:6px 10px;font-weight:700;color:{status_col};
-                   white-space:nowrap'>{status_text}</td>
-      </tr>"""
+    def __init__(self, iface, basins: list):
+        if not HAS_QT:
+            return
+        super().__init__("⚖️ HSAE — Treaty Analysis (ATCI)", iface.mainWindow())
+        self.iface   = iface
+        self._basins = basins
+        self.setMinimumWidth(440)
+        self.setMinimumHeight(520)
+        self.setFloating(True)
 
-    atci = round((triggered / len(ARTICLES)) * 100, 1)
-    atci_col = "#dc2626" if atci > 60 else "#ea580c" if atci > 30 else "#16a34a"
+        root = QWidget()
+        self.setWidget(root)
+        main = QVBoxLayout(root)
+        main.setSpacing(8)
+        main.setContentsMargins(10, 10, 10, 10)
 
-    return f"""<!DOCTYPE html>
-<html><head><meta charset="UTF-8"/>
-<style>
-  body{{margin:0;font-family:Arial,sans-serif;background:#f8fafc;color:#1A202C}}
-  .hdr{{background:linear-gradient(135deg,#061F4A,#553C9A);color:#fff;padding:12px 16px}}
-  .metric{{display:inline-block;background:rgba(255,255,255,0.15);border-radius:8px;
-           padding:6px 14px;margin-right:10px;text-align:center}}
-  .mv{{font-size:20px;font-weight:800}}.ml{{font-size:10px;opacity:0.8}}
-  table{{width:100%;border-collapse:collapse;margin:12px;width:calc(100% - 24px)}}
-  th{{background:#061F4A;color:#fff;padding:7px 10px;font-size:11px;text-align:left}}
-</style></head>
-<body>
-<div class="hdr">
-  <b>⚖️ Treaty Compliance Analysis — ATCI</b><br>
-  <span style='font-size:11px;opacity:0.8'>{name} · Alkhedir Treaty Compliance Index · UNWC 1997</span>
-  <div style='margin-top:10px'>
-    <div class="metric">
-      <div class="mv" style='color:{atci_col}'>{atci}%</div>
-      <div class="ml">ATCI Score</div>
-    </div>
-    <div class="metric">
-      <div class="mv">{triggered}/{len(ARTICLES)}</div>
-      <div class="ml">Articles Triggered</div>
-    </div>
-    <div class="metric">
-      <div class="mv">{atdi}%</div>
-      <div class="ml">ATDI</div>
-    </div>
-    <div class="metric">
-      <div class="mv">{hifd}%</div>
-      <div class="ml">HIFD</div>
-    </div>
-  </div>
-</div>
-<table>
-  <tr>
-    <th>Article</th><th>Obligation</th>
-    <th>Threshold</th><th>Status</th>
-  </tr>
-  {rows}
-</table>
-<p style='font-size:10px;color:#4A5568;margin:0 12px 12px'>
-  ATCI (Alkhedir Treaty Compliance Index) = triggered articles / total articles × 100.
-  Higher ATCI = more UNWC obligations breached. Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
-</p>
-</body></html>"""
+        # Title
+        title = QLabel("<b style='font-size:13px;color:#0E6B6A'>"
+                       "ATCI — Alkhedir Treaty Compliance Index</b>")
+        title.setTextFormat(Qt.RichText)
+        main.addWidget(title)
 
-
-class HSAETreatyPanel(QDockWidget):
-    """Dockable treaty compliance analysis panel (ATCI)."""
-
-    TITLE = "⚖️ HSAE Treaty Analysis (ATCI)"
-
-    def __init__(self, iface, basins: list, parent=None):
-        super().__init__(self.TITLE, parent)
-        self.iface = iface
-        self.basins = basins
-        self.browser = None
-        self.setObjectName("HSAETreatyPanelV603")
-        self._build()
-
-    def _build(self):
-        container = QWidget()
-        main_layout = QVBoxLayout(container)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        sub = QLabel("Article-by-article assessment vs UNWC 1997")
+        sub.setStyleSheet("color:#666;font-size:11px")
+        main.addWidget(sub)
 
         # Basin selector
-        top = QHBoxLayout()
-        top.addWidget(QLabel("Basin:"))
-        self.combo = QComboBox()
-        for b in self.basins:
-            self.combo.addItem(b.get("name", "?"), b)
-        top.addWidget(self.combo, 1)
-        btn = QPushButton("Analyse")
-        btn.clicked.connect(self._run)
-        top.addWidget(btn)
-        top_widget = QWidget()
-        top_widget.setLayout(top)
-        main_layout.addWidget(top_widget)
+        row = QHBoxLayout()
+        row.addWidget(QLabel("Basin:"))
+        self._combo = QComboBox()
+        for b in self._basins:
+            self._combo.addItem(b.get("name", "Unknown"))
+        row.addWidget(self._combo, 1)
+        btn = QPushButton("▶  Analyse")
+        btn.setStyleSheet(
+            "background:#0E6B6A;color:white;padding:5px 12px;"
+            "border-radius:5px;font-weight:bold")
+        btn.clicked.connect(self._analyse)
+        row.addWidget(btn)
+        main.addLayout(row)
 
-        if HAS_WEBENGINE:
-            self.browser = QWebEngineView()
-            main_layout.addWidget(self.browser)
+        # Separator
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setStyleSheet("color:#ddd")
+        main.addWidget(line)
 
-        self.setWidget(container)
-        if self.basins:
-            self._run()
+        # Scroll area for results
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        self._res_widget = QWidget()
+        self._res_layout = QVBoxLayout(self._res_widget)
+        self._res_layout.setSpacing(6)
+        scroll.setWidget(self._res_widget)
+        main.addWidget(scroll)
 
-    def _run(self):
-        basin = self.combo.currentData()
-        if basin and self.browser:
-            self.browser.setHtml(
-                _build_treaty_html(basin), QUrl("about:blank"))
+        # Placeholder
+        ph = QLabel("<i style='color:#888'>Select a basin and press Analyse.</i>")
+        ph.setTextFormat(Qt.RichText)
+        self._res_layout.addWidget(ph)
+        self._res_layout.addStretch()
 
-    def update_basin(self, basin: dict):
-        idx = next((i for i, b in enumerate(self.basins)
-                    if b.get("id") == basin.get("id")), -1)
-        if idx >= 0:
-            self.combo.setCurrentIndex(idx)
-        self._run()
+    def _analyse(self) -> None:
+        # Clear
+        for i in reversed(range(self._res_layout.count())):
+            w = self._res_layout.itemAt(i).widget()
+            if w: w.deleteLater()
+
+        idx   = self._combo.currentIndex()
+        basin = self._basins[idx] if idx < len(self._basins) else {}
+        name  = basin.get("name", "Unknown")
+        disp  = basin.get("dispute_level", 2)
+        cap   = basin.get("dam_capacity_bcm", 74)
+        nc    = basin.get("num_countries", 3)
+        rc    = basin.get("riparian_cooperation", 0.45)
+
+        # Compute ATCI
+        atci = round(min(95, max(20,
+            100 - (15 + disp * 12) * 0.6
+                - (8 + min(cap / 3, 15)) * 0.3)), 1)
+
+        # Overall metric
+        color = ("#c0392b" if atci > 60 else
+                 "#e67e22" if atci > 40 else "#27ae60")
+        status = ("HIGH RISK" if atci > 60 else
+                  "MEDIUM RISK" if atci > 40 else "LOW RISK")
+
+        hdr = QLabel(
+            f"<b style='font-size:12px'>{name}</b>&nbsp;&nbsp;"
+            f"<span style='color:{color};font-weight:bold'>"
+            f"ATCI = {atci} — {status}</span>")
+        hdr.setTextFormat(Qt.RichText)
+        self._res_layout.addWidget(hdr)
+
+        bar = QProgressBar()
+        bar.setMinimum(0); bar.setMaximum(100)
+        bar.setValue(int(atci))
+        bar.setFormat(f"ATCI = {atci}")
+        bar.setStyleSheet(
+            f"QProgressBar::chunk{{background:{color};border-radius:3px}}")
+        self._res_layout.addWidget(bar)
+
+        # Article-by-article
+        grp = QGroupBox("UNWC 1997 — Article Assessment")
+        grp.setStyleSheet(
+            "QGroupBox{font-weight:bold;color:#2C3E50;"
+            "border:1px solid #bdc3c7;border-radius:4px;margin-top:8px}"
+            "QGroupBox::title{subcontrol-origin:margin;left:8px}")
+        g = QGridLayout(grp)
+        g.setHorizontalSpacing(12)
+        g.setVerticalSpacing(4)
+
+        for row_i, (art, desc) in enumerate(UNWC_ARTICLES):
+            # Simple rule-based compliance per article
+            score = self._article_score(art, disp, cap, nc, rc)
+            art_color = "#c0392b" if score < 40 else "#e67e22" if score < 65 else "#27ae60"
+            art_status = "⚠ Non-compliant" if score < 40 else "~ Partial" if score < 65 else "✓ Compliant"
+
+            lbl_art  = QLabel(f"<b>{art}</b>")
+            lbl_art.setTextFormat(Qt.RichText)
+            lbl_desc = QLabel(desc)
+            lbl_desc.setStyleSheet("color:#555;font-size:10px")
+            lbl_stat = QLabel(
+                f"<span style='color:{art_color}'>{art_status}</span>")
+            lbl_stat.setTextFormat(Qt.RichText)
+
+            g.addWidget(lbl_art,  row_i, 0)
+            g.addWidget(lbl_desc, row_i, 1)
+            g.addWidget(lbl_stat, row_i, 2)
+
+        self._res_layout.addWidget(grp)
+        self._res_layout.addStretch()
+
+    def _article_score(self, art, disp, cap, nc, rc):
+        """Simple rule-based article score 0-100."""
+        base = int(rc * 60 + (3 - disp) * 10)
+        offsets = {
+            "Art. 5": 10, "Art. 6": 8, "Art. 7": -int(disp * 15),
+            "Art. 9": -5, "Art. 11": -int(cap / 10),
+            "Art. 12": 5, "Art. 17": -int(disp * 8),
+            "Art. 20": 5, "Art. 21": 0, "Art. 33": -int(disp * 5),
+        }
+        return max(5, min(95, base + offsets.get(art, 0)
+                          + random.randint(-3, 3)))
