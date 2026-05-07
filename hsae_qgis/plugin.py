@@ -871,7 +871,7 @@ tr:nth-child(even){{background:#161b22}}
 🌊 Basin Registry · 📊 TDI Visualiser · ⚖️ UNWC Legal Layer<br>
 📤 Export · 📋 Dashboard · 🛰️ GEE Scripts (7 sensors)<br>
 📡 GRDC Stations · ⚡ Conflict Index · 🤝 Negotiation AI<br>
-🗺️ WebGIS Map v2 · 🏛️ ICJ/PCA Dossier · 🗺️ Basin Risk Map (Leaflet)<br>📉 Uncertainty Analysis · ⚖️ Treaty Analysis (ATCI) · 🤖 GeoAgent NL)<br><br>
+🗺️ WebGIS Map v2 · 🏛️ ICJ/PCA Dossier · 🗺️ Basin Risk Map (Leaflet)<br>📉 Uncertainty Analysis · ⚖️ Treaty Analysis (ATCI) · 🤖 GeoAgent NL<br><br>
 <b>5 Processing Algorithms:</b><br>
 ATDI · AHIFD · Basin Legal Report · HBV-96 Calibration · Multi-Basin Comparison<br><br>
 <b>Data:</b> 26 basins · TFDD/ICOW · UNWC 1997 · GEE<br>
