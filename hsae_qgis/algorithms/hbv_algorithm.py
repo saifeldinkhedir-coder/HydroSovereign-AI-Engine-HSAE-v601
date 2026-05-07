@@ -68,8 +68,8 @@ class HBV96Algorithm(QgsProcessingAlgorithm):
 
         for i in range(n):
             doy = i + 1
-            P = max(0, precip * (0.5 + 1.5 * max(0, math.sin(math.pi *
-                    (doy - 120) / 180))**1.4) + random.gauss(0, 0.3))
+            P = max(0, precip * (0.5 + 1.5 * max(0, math.sin(math.pi
+                    * (doy - 120) / 180))**1.4) + random.gauss(0, 0.3))
             ET = max(0, 0.4 * temp * min(1, SM / (FC * LP + 1e-9)))
             SM = max(0, min(FC, SM + P - ET - K1 * (SM / (FC + 1e-9))**2 * FC))
             rch = max(0, P - ET - (FC - SM))
