@@ -839,7 +839,6 @@ tr:nth-child(even){{background:#161b22}}
             "&#8226; <i>What is the ATDI for the Mekong basin?</i><br>"
             "&#8226; <i>Is the Euphrates in violation of Article 7?</i>"
         )
-                info_lbl.setTextFormat(Qt.RichText)
         info_lbl.setWordWrap(True)
         info_lbl.setOpenExternalLinks(True)
         layout.addWidget(info_lbl)
