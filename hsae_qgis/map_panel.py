@@ -195,14 +195,7 @@ L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}{{r}}
 var legend = L.control({{position: 'bottomright'}});
 legend.onAdd = function(map) {{
   var div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = '<h4>ATDI Risk Level (UNWC 1997)</h4>' +
-    '<span class="dot" style="background:#16a34a"></span>&lt;20% Compliant<br>' +
-    '<span class="dot" style="background:#ca8a04"></span>20–40% Art. 7 Notify<br>' +
-    '<span class="dot" style="background:#ea580c"></span>40–55% Art. 9 Data Share<br>' +
-    '<span class="dot" style="background:#dc2626"></span>55–70% Art. 33 Dispute<br>' +
-    '<span class="dot" style="background:#7c3aed"></span>&ge;70% Art. 35 Emergency<br>' +
-    '<hr style="margin:6px 0;border-color:#CBD5E0"><span style="font-size:10px;color:#4A5568">' +
-    'Circle size ∝ ATDI risk · Click for full analysis</span>';
+  div.innerHTML = '<h4>ATDI Risk Level (UNWC 1997)</h4>' + '<span class="dot" style="background:#16a34a"></span>&lt;20% Compliant<br>' + '<span class="dot" style="background:#ca8a04"></span>20–40% Art. 7 Notify<br>' + '<span class="dot" style="background:#ea580c"></span>40–55% Art. 9 Data Share<br>' + '<span class="dot" style="background:#dc2626"></span>55–70% Art. 33 Dispute<br>' + '<span class="dot" style="background:#7c3aed"></span>&ge;70% Art. 35 Emergency<br>' + '<hr style="margin:6px 0;border-color:#CBD5E0"><span style="font-size:10px;color:#4A5568">' + 'Circle size ∝ ATDI risk · Click for full analysis</span>';
   return div;
 }};
 legend.addTo(map);
@@ -211,9 +204,7 @@ legend.addTo(map);
 var info = L.control({{position: 'bottomleft'}});
 info.onAdd = function(map) {{
   var div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = '<b>HSAE v6.0.3</b> · Plugin ID: 5040<br>' +
-    'DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank">10.5281/zenodo.19180160</a><br>' +
-    'ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank">0000-0003-0821-2991</a>';
+  div.innerHTML = '<b>HSAE v6.0.3</b> · Plugin ID: 5040<br>' + 'DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank">10.5281/zenodo.19180160</a><br>' + 'ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank">0000-0003-0821-2991</a>';
   return div;
 }};
 info.addTo(map);
@@ -238,8 +229,7 @@ class HSAEMapPanel(QDockWidget):
         self.browser = None
         self.setObjectName("HSAEMapPanelV603")
         self.setAllowedAreas(
-            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea |
-            Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea
+            Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea | Qt.TopDockWidgetArea | Qt.BottomDockWidgetArea
         )
         self._build_widget()
 
