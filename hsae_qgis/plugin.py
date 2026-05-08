@@ -339,7 +339,7 @@ class HSAEPlugin:
     def show_dashboard(self):
         try:
             from .dialog_main import HSAEMainDialog
-            HSAEMainDialog(self.iface.mainWindow()).exec_()
+            HSAEMainDialog(self.iface, self._basins()).exec_()
         except Exception as e:
             QMessageBox.critical(None, "HSAE Error", str(e))
 
