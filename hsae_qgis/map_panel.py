@@ -56,7 +56,7 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
             return
         super().__init__("🗺️ HSAE — Basin Risk Map", iface.mainWindow())
         self.iface = iface
-        self._basins = basins
+        self._basins_data = basins
         self.setMinimumWidth(560)
         self.setMinimumHeight(500)
         self.setFloating(True)
@@ -100,7 +100,7 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
         btn_refresh.setStyleSheet(
             "background:#eee;color:#333;padding:6px 10px;"
             "border-radius:5px;font-size:11px")
-        btn_refresh.clicked.connect(self._populate)
+        btn_refresh.clicked.connect(self._refresh)
         btn_row.addWidget(btn_refresh)
         main.addLayout(btn_row)
 
@@ -150,10 +150,15 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
             disp * 15 + (1 - rc) * 30 + (nc - 2) * 5 + min(cap / 5, 20))), 0)
         return {"atdi": atdi, "ahifd": ahifd, "ci": int(ci)}
 
+    def _refresh(self) -> None:
+        """Refresh table — recompute all basins."""
+        self._table.setRowCount(0)
+        self._populate()
+
     def _populate(self) -> None:
         """Fill the risk table with all 26 basins."""
         self._table.setRowCount(0)
-        for basin in self._basins:
+        for basin in self._basins_data:
             try:
                 d = self._compute(basin)
                 name = basin.get("name", "Unknown")
@@ -194,14 +199,17 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
     def _build_leaflet_html(self) -> str:
         """Build a Leaflet.js HTML map of all basins."""
         marker_lines = []
-        for b in self._basins:
+        for b in self._basins_data:
             try:
                 d = self._compute(b)
                 lat = b.get("lat", 0)
                 lon = b.get("lon", 0)
                 name = b.get("name", "Unknown").replace("'", " ")
                 color = _risk_color(d["atdi"])
-                popup = name + " | ATDI:" + str(d["atdi"]) + "% | " + _risk_label(d["atdi"])
+                popup = (name + " | ATDI:" + str(d["atdi"]) + "%" 
+                    + " | AHIFD:" + str(d["ahifd"]) + "%"
+                    + " | CI:" + str(d["ci"])
+                    + " | " + _risk_label(d["atdi"]))
                 marker_lines.append(
                     "L.circleMarker([" + str(lat) + "," + str(lon) + "],"
                     + "{radius:10,color:'" + color + "',fillColor:'" + color
