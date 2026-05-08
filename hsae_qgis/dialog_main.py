@@ -1,5 +1,8 @@
 """
-dialog_main.py — HSAE Main Dashboard Dialog
+dialog_main.py — HSAE v6.0.8 Dashboard Dialog
+===============================================
+Shows all 26 basins with 6 computed indices:
+ATDI · AHIFD · CI · ATCI · NSE · KGE · Risk
 """
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel,
@@ -11,20 +14,64 @@ from qgis.PyQt.QtGui import QFont, QColor
 import webbrowser
 
 
+def _compute_indices(b):
+    """Compute all 6 HSAE indices for a basin dict."""
+    disp  = float(b.get("dispute_level", b.get("disp", 2)))
+    cap   = float(b.get("cap_bcm", b.get("cap", 10)))
+    nc    = float(b.get("n_countries", b.get("num_countries", 3)))
+    rc    = float(b.get("runoff_c", 0.35))
+
+    atdi  = round(min(95, max(5,
+        15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
+    ahifd = round(min(80, max(5,
+        8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
+    ci    = round(min(1.0, max(0.0,
+        0.4 * atdi / 100 + 0.25 * (disp / 4)
+        + 0.2 * ahifd / 100 + 0.1 * (nc - 2) * 0.15)), 3)
+    atci  = round(min(95, max(20, 100 - atdi * 0.6 - ahifd * 0.3)), 1)
+    nse   = round(max(0.1, min(0.9,
+        0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
+    kge   = round(max(0.1, min(0.95, nse + 0.11)), 2)
+
+    if atdi >= 60:
+        risk = "CRITICAL"
+    elif atdi >= 40:
+        risk = "HIGH"
+    elif atdi >= 25:
+        risk = "MEDIUM"
+    else:
+        risk = "LOW"
+
+    region = b.get("continent", b.get("region", "—"))
+    for emoji in ["🌍 ", "🌎 ", "🌏 ", "🌍", "🌎", "🌏"]:
+        region = region.replace(emoji, "")
+
+    countries = b.get("country", [])
+    upstream  = b.get("country_up", countries[0] if countries else "—")
+    downstream = b.get("country_dn", "") or (
+        " / ".join(countries[1:]) if len(countries) > 1 else "—")
+
+    return {
+        "atdi": atdi, "ahifd": ahifd, "ci": ci,
+        "atci": atci, "nse": nse, "kge": kge,
+        "risk": risk, "region": region,
+        "upstream": upstream, "downstream": downstream,
+    }
+
+
 class HSAEMainDialog(QDialog):
 
     def __init__(self, iface, basins):
         super().__init__(iface.mainWindow())
-        self.iface = iface
-        self.basins = basins
+        self.iface   = iface
+        self.basins  = basins
         self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.8")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(1000, 620)
         self._build_ui()
 
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        # ── Header ───────────────────────────────────────────────────────────
         header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.8")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
@@ -34,161 +81,43 @@ class HSAEMainDialog(QDialog):
         layout.addWidget(header)
 
         sub = QLabel(
-            "26 Basins · 7 Regions · TDI · UN 1997 · GEE · AI  |  Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991")  # noqa: E501
+            "26 Basins · 6 Indices · ATDI · AHIFD · CI · ATCI · NSE · KGE  |  "
+            "Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991")
         sub.setAlignment(Qt.AlignCenter)
+        sub.setStyleSheet("color:#555;font-size:11px")
         layout.addWidget(sub)
 
-        # ── Tabs ─────────────────────────────────────────────────────────────
         tabs = QTabWidget()
-
-        # Tab 1 — Basin Registry
-        tabs.addTab(self._build_basin_tab(), "🌍 26 Basins")
-
-        # Tab 2 — TDI Summary
-        tabs.addTab(self._build_tdi_tab(), "📊 TDI Summary")
-
-        # Tab 3 — About
-        tabs.addTab(self._build_about_tab(), "ℹ️ About")
-
+        tabs.addTab(self._build_basins_tab(), "📊 26 Basins — All Indices")
+        tabs.addTab(self._build_summary_tab(), "📈 Risk Summary")
+        tabs.addTab(self._build_about_tab(), "ℹ About")
         layout.addWidget(tabs)
 
-        # ── Buttons ──────────────────────────────────────────────────────────
-        btn_layout = QHBoxLayout()
+        btns = QHBoxLayout()
+        for label, url in [
+            ("🚀 Open Live App",
+             "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"),
+            ("📦 GitHub Repo",
+             "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"),
+            ("🌐 Website",
+             "https://saifeldinkhedir-coder.github.io/hydrosovereign.org/"),
+        ]:
+            btn = QPushButton(label)
+            btn.setStyleSheet(
+                "background:#0E6B6A;color:white;padding:5px 14px;"
+                "border-radius:5px;font-weight:bold")
+            btn.clicked.connect(lambda checked, u=url: webbrowser.open(u))
+            btns.addWidget(btn)
+        close = QPushButton("✖ Close")
+        close.clicked.connect(self.accept)
+        close.setStyleSheet(
+            "background:#c0392b;color:white;padding:5px 14px;border-radius:5px")
+        btns.addWidget(close)
+        layout.addLayout(btns)
 
-        btn_app = QPushButton("🚀 Open Live App")
-        btn_app.clicked.connect(lambda: webbrowser.open(
-            "https://hsae-v600.streamlit.app"))
-        btn_layout.addWidget(btn_app)
-
-        btn_github = QPushButton("📦 GitHub Repo")
-        btn_github.clicked.connect(lambda: webbrowser.open(
-            "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"))
-        btn_layout.addWidget(btn_github)
-
-        btn_close = QPushButton("✖ Close")
-        btn_close.clicked.connect(self.close)
-        btn_layout.addWidget(btn_close)
-
-        layout.addLayout(btn_layout)
         self.setLayout(layout)
 
-    def _build_basin_tab(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-
-        table = QTableWidget(len(self.basins), 6)
-        table.setHorizontalHeaderLabels(
-            ["Name", "Region", "Upstream", "Downstream", "TDI %", "Risk"])
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-
-        RISK_COLORS = {
-            "CRITICAL": QColor("#F1948A"),
-            "HIGH": QColor("#FADBD8"),
-            "MEDIUM": QColor("#FDEBD0"),
-            "LOW": QColor("#FEF9E7"),
-        }
-
-        for i, b in enumerate(self.basins):
-            # Compute real ATDI from basin parameters
-            disp = float(b.get('dispute_level', b.get('disp', 2)))
-            cap  = float(b.get('cap_bcm', b.get('cap', 10)))
-            nc   = float(b.get('n_countries', b.get('num_countries', 3)))
-            rc   = float(b.get('runoff_c', 0.35))
-            tdi_pct = round(min(95, max(5,
-                15 + disp * 12 + min(cap / 2, 20)
-                + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-
-            if tdi_pct >= 60:
-                risk = 'CRITICAL'
-            elif tdi_pct >= 40:
-                risk = 'HIGH'
-            elif tdi_pct >= 25:
-                risk = 'MEDIUM'
-            else:
-                risk = 'LOW'
-
-            # Region / upstream / downstream
-            region = b.get('continent', b.get('region', '—'))
-            region = region.replace('🌍 ', '').replace('🌎 ', '').replace('🌏 ', '')
-            upstream = b.get('country_up', '')
-            ctry = b.get('country', [])
-            downstream = b.get('country_dn', '') or (
-                ' / '.join(ctry[1:]) if len(ctry) > 1 else '—')
-
-            row_data = [
-                b['name'],
-                region,
-                upstream,
-                downstream,
-                f'{tdi_pct}%',
-                risk]
-            for j, val in enumerate(row_data):
-                item = QTableWidgetItem(str(val))
-                item.setBackground(RISK_COLORS.get(risk, QColor("white")))
-                table.setItem(i, j, item)
-
-        layout.addWidget(table)
-        widget.setLayout(layout)
-        return widget
-
-    def _build_tdi_tab(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-
-        text = QTextEdit()
-        text.setReadOnly(True)
-
-        high    = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) >= 60]
-        medium  = [b for b in self.basins if 40 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 60]
-        low     = [b for b in self.basins if 25 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 40]
-        minimal = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 25]
-
-        html = f"""
-        <h2>📊 TDI Summary — 26 Basins</h2>
-        <p><b>Formula:</b> TDI = (I_adj − Q_out) / (I_adj + 0.001) | ATDI = mean(TDI) × 100</p>
-        <p><b>α = 0.30</b> · I_adj = max(0, I_in − 0.30 × (ET_PM + ET_MODIS))</p>
-        <hr>
-        <h3 style="color:#C0392B;">🔴 HIGH Risk — Art.9 Violation (≥ 55%) — {len(high)} basins</h3>
-        <p>{' · '.join(b['name'] for b in high)}</p>
-        <h3 style="color:#E67E22;">🟠 MEDIUM Risk — Art.7 Violation (40–55%) — {len(medium)} basins</h3>
-        <p>{' · '.join(b['name'] for b in medium)}</p>
-        <h3 style="color:#F1C40F;">🟡 LOW Risk — Art.5 Violation (25–40%) — {len(low)} basins</h3>
-        <p>{' · '.join(b['name'] for b in low)}</p>
-        <h3 style="color:#27AE60;">🟢 MINIMAL Risk (< 25%) — {len(minimal)} basins</h3>
-        <p>{' · '.join(b['name'] for b in minimal)}</p>
-        <hr>
-        <p><b>Legal Thresholds (UN 1997):</b><br>
-        ≥ 25% → Art. 5 Equitable Use | ≥ 40% → Art. 7 No Significant Harm | ≥ 55% → Art. 9 Data Exchange</p>
-        """
-        text.setHtml(html)
-        layout.addWidget(text)
-        widget.setLayout(layout)
-        return widget
-
-    def _build_about_tab(self):
-        widget = QWidget()
-        layout = QVBoxLayout()
-        text = QTextEdit()
-        text.setReadOnly(True)
-        text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.8</h2>
-        <p><b>Author:</b> Seifeldin M.G. Alkhedir — سيف الدين محمد قسم الله الخضر</p>
-        <p><b>ORCID:</b> 0000-0003-0821-2991</p>
-        <p><b>Email:</b> saifeldinkhedir@gmail.com</p>
-        <p><b>Institution:</b> University of Khartoum · Institute of Environmental Studies</p>
-        <hr>
-        <p><b>Description:</b> The first open-source platform integrating multi-source satellite
-        remote sensing, conceptual rainfall-runoff modelling, machine learning, and international
-        water law automation for 26 transboundary river basins across 7 geographic regions.</p>
-        <hr>
-        <p><b>Live App:</b> https://hsae-v600.streamlit.app</p>
-        <p><b>GitHub:</b> https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-</p>
-        <p><b>License:</b> MIT</p>
-        """)
-        layout.addWidget(text)
-        widget.setLayout(layout)
-        return widget    def _build_basins_tab(self):
-        """Build 26 basins table with ALL indices: ATDI, AHIFD, CI, ATCI, NSE, KGE, Risk."""
+    def _build_basins_tab(self):
         widget = QWidget()
         layout = QVBoxLayout()
 
@@ -198,13 +127,15 @@ class HSAEMainDialog(QDialog):
             ["Basin", "Region", "ATDI%", "AHIFD%", "CI", "ATCI", "NSE", "KGE", "Risk"])
         table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         for c in range(1, 9):
-            table.horizontalHeader().setSectionResizeMode(c, QHeaderView.ResizeToContents)
+            table.horizontalHeader().setSectionResizeMode(
+                c, QHeaderView.ResizeToContents)
         table.setEditTriggers(QTableWidget.NoEditTriggers)
         table.setAlternatingRowColors(True)
         table.setSortingEnabled(True)
         table.setStyleSheet(
             "QTableWidget{font-size:11px}"
-            "QHeaderView::section{background:#0E6B6A;color:white;font-weight:bold;padding:4px}")
+            "QHeaderView::section{background:#0E6B6A;color:white;"
+            "font-weight:bold;padding:4px;border:none}")
         table.verticalHeader().setVisible(False)
         table.setRowCount(len(self.basins))
 
@@ -212,96 +143,75 @@ class HSAEMainDialog(QDialog):
             "CRITICAL": QColor("#F1948A"),
             "HIGH":     QColor("#FADBD8"),
             "MEDIUM":   QColor("#FDEBD0"),
-            "LOW":      QColor("#EAFAF1"),
+            "LOW":      QColor("#D5F5E3"),
         }
 
         for i, b in enumerate(self.basins):
-            # ── Compute all indices ────────────────────────
-            disp = float(b.get("dispute_level", b.get("disp", 2)))
-            cap  = float(b.get("cap_bcm", b.get("cap", 10)))
-            nc   = float(b.get("n_countries", b.get("num_countries", 3)))
-            rc   = float(b.get("runoff_c", 0.35))
-
-            atdi  = round(min(95, max(5,
-                15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-            ahifd = round(min(80, max(5,
-                8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
-            ci    = round(min(100, max(0,
-                0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * ahifd / 100
-                + 0.1 * (nc - 2) * 0.15)), 3)
-            atci  = round(min(95, max(20,
-                100 - atdi * 0.6 - ahifd * 0.3)), 1)
-            nse   = round(max(0.1, min(0.9, 0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
-            kge   = round(max(0.1, min(0.95, nse + 0.11)), 2)
-
-            if atdi >= 60:
-                risk = "CRITICAL"
-            elif atdi >= 40:
-                risk = "HIGH"
-            elif atdi >= 25:
-                risk = "MEDIUM"
-            else:
-                risk = "LOW"
-
-            region = b.get("continent", b.get("region", "—"))
-            region = region.replace("🌍 ", "").replace("🌎 ", "").replace("🌏 ", "")
-
+            d = _compute_indices(b)
             row_data = [
                 b.get("name", ""),
-                region,
-                f"{atdi}%",
-                f"{ahifd}%",
-                f"{ci:.3f}",
-                f"{atci}",
-                f"{nse}",
-                f"{kge}",
-                risk,
+                d["region"],
+                str(d["atdi"]) + "%",
+                str(d["ahifd"]) + "%",
+                str(d["ci"]),
+                str(d["atci"]),
+                str(d["nse"]),
+                str(d["kge"]),
+                d["risk"],
             ]
-            bg = RISK_COLORS.get(risk, QColor("white"))
+            bg = RISK_COLORS.get(d["risk"], QColor("white"))
+            bold = QFont()
+            bold.setBold(True)
             for j, val in enumerate(row_data):
                 item = QTableWidgetItem(str(val))
-                item.setTextAlignment(0x84)  # AlignCenter
-                if j >= 2:  # colour numeric columns
+                item.setTextAlignment(0x84)
+                if j >= 2:
                     item.setBackground(bg)
-                if j == 8:  # Risk column bold
-                    font = QFont()
-                    font.setBold(True)
-                    item.setFont(font)
+                if j == 8:
+                    item.setFont(bold)
                 table.setItem(i, j, item)
 
         layout.addWidget(table)
         widget.setLayout(layout)
         return widget
 
-    def _build_tdi_tab(self):
+    def _build_summary_tab(self):
         widget = QWidget()
         layout = QVBoxLayout()
 
-        text = QTextEdit()
-        text.setReadOnly(True)
+        indices = [_compute_indices(b) for b in self.basins]
+        critical = [b for b, d in zip(self.basins, indices) if d["risk"] == "CRITICAL"]
+        high     = [b for b, d in zip(self.basins, indices) if d["risk"] == "HIGH"]
+        medium   = [b for b, d in zip(self.basins, indices) if d["risk"] == "MEDIUM"]
+        low      = [b for b, d in zip(self.basins, indices) if d["risk"] == "LOW"]
 
-        high    = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) >= 60]
-        medium  = [b for b in self.basins if 40 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 60]
-        low     = [b for b in self.basins if 25 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 40]
-        minimal = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 25]
+        avg_atdi  = round(sum(d["atdi"]  for d in indices) / len(indices), 1)
+        avg_ahifd = round(sum(d["ahifd"] for d in indices) / len(indices), 1)
+        avg_nse   = round(sum(d["nse"]   for d in indices) / len(indices), 2)
+        avg_kge   = round(sum(d["kge"]   for d in indices) / len(indices), 2)
 
         html = f"""
-        <h2>📊 TDI Summary — 26 Basins</h2>
-        <p><b>Formula:</b> TDI = (I_adj − Q_out) / (I_adj + 0.001) | ATDI = mean(TDI) × 100</p>
-        <p><b>α = 0.30</b> · I_adj = max(0, I_in − 0.30 × (ET_PM + ET_MODIS))</p>
+        <h2 style='color:#0E6B6A'>📈 Risk Summary — {len(self.basins)} Basins</h2>
+        <p><b>Platform averages:</b>
+           ATDI={avg_atdi}% &nbsp;|&nbsp; AHIFD={avg_ahifd}%
+           &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
+        <p><b>Formula:</b> ATDI = 15 + disp×12 + min(cap/2,20) + (nc−2)×8 + (1−rc)×10</p>
+        <p><b>Thresholds (UNWC 1997):</b>
+           ≥60% CRITICAL (Art.9) &nbsp;|&nbsp;
+           ≥40% HIGH (Art.7) &nbsp;|&nbsp;
+           ≥25% MEDIUM (Art.5)</p>
         <hr>
-        <h3 style="color:#C0392B;">🔴 HIGH Risk — Art.9 Violation (≥ 55%) — {len(high)} basins</h3>
-        <p>{' · '.join(b['name'] for b in high)}</p>
-        <h3 style="color:#E67E22;">🟠 MEDIUM Risk — Art.7 Violation (40–55%) — {len(medium)} basins</h3>
-        <p>{' · '.join(b['name'] for b in medium)}</p>
-        <h3 style="color:#F1C40F;">🟡 LOW Risk — Art.5 Violation (25–40%) — {len(low)} basins</h3>
-        <p>{' · '.join(b['name'] for b in low)}</p>
-        <h3 style="color:#27AE60;">🟢 MINIMAL Risk (< 25%) — {len(minimal)} basins</h3>
-        <p>{' · '.join(b['name'] for b in minimal)}</p>
-        <hr>
-        <p><b>Legal Thresholds (UN 1997):</b><br>
-        ≥ 25% → Art. 5 Equitable Use | ≥ 40% → Art. 7 No Significant Harm | ≥ 55% → Art. 9 Data Exchange</p>
+        <p><span style='color:#c0392b'>🔴 CRITICAL — {len(critical)} basins:</span><br>
+        {" · ".join(b.get("name","") for b in critical) or "—"}</p>
+        <p><span style='color:#e67e22'>🟠 HIGH — {len(high)} basins:</span><br>
+        {" · ".join(b.get("name","") for b in high) or "—"}</p>
+        <p><span style='color:#f39c12'>🟡 MEDIUM — {len(medium)} basins:</span><br>
+        {" · ".join(b.get("name","") for b in medium) or "—"}</p>
+        <p><span style='color:#27ae60'>🟢 LOW — {len(low)} basins:</span><br>
+        {" · ".join(b.get("name","") for b in low) or "—"}</p>
         """
+        text = QTextEdit()
+        text.setReadOnly(True)
         text.setHtml(html)
         layout.addWidget(text)
         widget.setLayout(layout)
@@ -314,18 +224,17 @@ class HSAEMainDialog(QDialog):
         text.setReadOnly(True)
         text.setHtml("""
         <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.8</h2>
-        <p><b>Author:</b> Seifeldin M.G. Alkhedir — سيف الدين محمد قسم الله الخضر</p>
-        <p><b>ORCID:</b> 0000-0003-0821-2991</p>
-        <p><b>Email:</b> saifeldinkhedir@gmail.com</p>
-        <p><b>Institution:</b> University of Khartoum · Institute of Environmental Studies</p>
-        <hr>
-        <p><b>Description:</b> The first open-source platform integrating multi-source satellite
-        remote sensing, conceptual rainfall-runoff modelling, machine learning, and international
-        water law automation for 26 transboundary river basins across 7 geographic regions.</p>
-        <hr>
-        <p><b>Live App:</b> https://hsae-v600.streamlit.app</p>
-        <p><b>GitHub:</b> https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-</p>
-        <p><b>License:</b> MIT</p>
+        <p>Free, open-source platform automating satellite-based transboundary
+        water law compliance for 26 globally contested river basins. GPL-3.0.</p>
+        <p><b>6 Original Indices:</b> ATDI · AHIFD · AFSF · AHLB · ASI · ATCI</p>
+        <p><b>16 Tools + 5 Processing Algorithms</b></p>
+        <p><b>GeoAgent integration:</b> opengeos/GeoAgent PR #79 · merged May 2026</p>
+        <p><b>Author:</b> Seifeldin M.G. Alkhedir<br>
+        <b>ORCID:</b> 0000-0003-0821-2991<br>
+        <b>Affiliation:</b> University of Khartoum<br>
+        <b>Email:</b> saifeldinkhedir@gmail.com</p>
+        <p><b>Publication:</b> Elsevier SoftwareX · SOFTX-D-26-00442 (under review)<br>
+        <b>DOI:</b> 10.5281/zenodo.19180160</p>
         """)
         layout.addWidget(text)
         widget.setLayout(layout)
