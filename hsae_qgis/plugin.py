@@ -307,7 +307,7 @@ class HSAEPlugin:
             from .tdi_visualiser import apply_tdi_style
             lyr = self.iface.activeLayer()
             if lyr:
-                apply_tdi_style(lyr)
+                apply_tdi_style(self.iface)
                 self.iface.messageBar().pushSuccess("HSAE", "✅ TDI style applied")
             else:
                 QMessageBox.warning(None, "HSAE", "Select a basin layer first")
@@ -318,7 +318,7 @@ class HSAEPlugin:
         try:
             from .legal_layer import load_legal_layer
             from qgis.core import QgsProject
-            lyr = load_legal_layer(self._basins())
+            lyr = load_legal_layer(self.iface, self._basins())
             QgsProject.instance().addMapLayer(lyr)
             self.iface.messageBar().pushSuccess("HSAE", "✅ UNWC legal layer loaded")
         except Exception as e:
@@ -338,8 +338,8 @@ class HSAEPlugin:
 
     def show_dashboard(self):
         try:
-            from .dialog_main import HSAEDialog
-            HSAEDialog(self.iface.mainWindow()).exec_()
+            from .dialog_main import HSAEMainDialog
+            HSAEMainDialog(self.iface.mainWindow()).exec_()
         except Exception as e:
             QMessageBox.critical(None, "HSAE Error", str(e))
 
