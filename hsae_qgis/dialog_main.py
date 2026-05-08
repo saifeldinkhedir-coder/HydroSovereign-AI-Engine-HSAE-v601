@@ -82,33 +82,45 @@ class HSAEMainDialog(QDialog):
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         RISK_COLORS = {
+            "CRITICAL": QColor("#F1948A"),
             "HIGH": QColor("#FADBD8"),
             "MEDIUM": QColor("#FDEBD0"),
             "LOW": QColor("#FEF9E7"),
-            "MINIMAL": QColor("#EAFAF1"),
         }
 
         for i, b in enumerate(self.basins):
-            tdi_pct = round(b.get("tdi", 0) * 100, 1)
-            if tdi_pct >= 55:
-                risk = "HIGH"
+            # Compute real ATDI from basin parameters
+            disp = float(b.get('dispute_level', b.get('disp', 2)))
+            cap  = float(b.get('cap_bcm', b.get('cap', 10)))
+            nc   = float(b.get('n_countries', b.get('num_countries', 3)))
+            rc   = float(b.get('runoff_c', 0.35))
+            tdi_pct = round(min(95, max(5,
+                15 + disp * 12 + min(cap / 2, 20)
+                + (nc - 2) * 8 + (1 - rc) * 10)), 1)
+
+            if tdi_pct >= 60:
+                risk = 'CRITICAL'
             elif tdi_pct >= 40:
-                risk = "MEDIUM"
+                risk = 'HIGH'
             elif tdi_pct >= 25:
-                risk = "LOW"
+                risk = 'MEDIUM'
             else:
-                risk = "MINIMAL"
+                risk = 'LOW'
+
+            # Region / upstream / downstream
+            region = b.get('continent', b.get('region', '—'))
+            region = region.replace('🌍 ', '').replace('🌎 ', '').replace('🌏 ', '')
+            upstream = b.get('country_up', '')
+            ctry = b.get('country', [])
+            downstream = b.get('country_dn', '') or (
+                ' / '.join(ctry[1:]) if len(ctry) > 1 else '—')
 
             row_data = [
-                b["name"],
-                b["region"],
-                b.get(
-                    "country_up",
-                    ""),
-                b.get(
-                    "country_dn",
-                    ""),
-                f"{tdi_pct}%",
+                b['name'],
+                region,
+                upstream,
+                downstream,
+                f'{tdi_pct}%',
                 risk]
             for j, val in enumerate(row_data):
                 item = QTableWidgetItem(str(val))
