@@ -167,6 +167,16 @@ class HSAEPlugin:
             "ATCI — Alkhedir Treaty Compliance Index for all articles",
             toolbar=False)
         self._add(
+            "─── v6.08 NEW ───",
+            lambda: None,
+            "New in v6.0.8",
+            False)
+        self._add(
+            "🤖 GeoAgent · Natural Language",
+            self.geoagent_tool,
+            "Run any HSAE analysis using natural language via opengeos/GeoAgent",
+            toolbar=False)
+        self._add(
             "ⓘ  About HSAE",
             self.about,
             "ⓘ  About HSAE",
