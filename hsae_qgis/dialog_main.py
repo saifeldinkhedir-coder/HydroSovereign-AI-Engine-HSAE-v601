@@ -17,7 +17,7 @@ class HSAEMainDialog(QDialog):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.basins = basins
-        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.0")
+        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.8")
         self.setMinimumSize(900, 600)
         self._build_ui()
 
@@ -25,7 +25,7 @@ class HSAEMainDialog(QDialog):
         layout = QVBoxLayout()
 
         # ── Header ───────────────────────────────────────────────────────────
-        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.0")
+        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.8")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
         font.setPointSize(14)
@@ -126,10 +126,10 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
 
-        high = [b for b in self.basins if b.get("tdi", 0) * 100 >= 55]
-        medium = [b for b in self.basins if 40 <= b.get("tdi", 0) * 100 < 55]
-        low = [b for b in self.basins if 25 <= b.get("tdi", 0) * 100 < 40]
-        minimal = [b for b in self.basins if b.get("tdi", 0) * 100 < 25]
+        high    = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) >= 60]
+        medium  = [b for b in self.basins if 40 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 60]
+        low     = [b for b in self.basins if 25 <= min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 40]
+        minimal = [b for b in self.basins if min(95, max(5, 15 + float(b.get('dispute_level', 2)) * 12 + min(float(b.get('cap_bcm', b.get('cap', 10))) / 2, 20) + (float(b.get('n_countries', 3)) - 2) * 8 + (1 - float(b.get('runoff_c', 0.35))) * 10)) < 25]
 
         html = f"""
         <h2>📊 TDI Summary — 26 Basins</h2>
@@ -159,7 +159,7 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
         text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.0</h2>
+        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.8</h2>
         <p><b>Author:</b> Seifeldin M.G. Alkhedir — سيف الدين محمد قسم الله الخضر</p>
         <p><b>ORCID:</b> 0000-0003-0821-2991</p>
         <p><b>Email:</b> saifeldinkhedir@gmail.com</p>
