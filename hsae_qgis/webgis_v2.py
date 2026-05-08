@@ -1,5 +1,5 @@
 """
-HSAE v6.0.4 -- WebGIS Map v2
+HSAE v6.0.8 -- WebGIS Map v2
 Professional interactive map with Search, Layer Toggle,
 Basemap Switcher, Risk Filter, Chart Popups, and Export PNG.
 """
@@ -18,7 +18,7 @@ def build_webgis_v2(basins: list, compute_fn) -> str:
             continue
         d = compute_fn(b)
         atdi = round(d.get('atdi', 0), 1)
-        hifd = round(d.get('hifd', 0), 1)
+        hifd = round(d.get('ahifd', 0), 1)
         ci = round(d.get('ci', 0), 3)
         pneg = round(d.get('pneg', 0), 1)
         nse = d.get('nse', 0)
@@ -67,7 +67,7 @@ def build_webgis_v2(basins: list, compute_fn) -> str:
                 "countries": clist,
                 "nc": nc,
                 "atdi": atdi,
-                "hifd": hifd,
+                "ahifd": hifd,
                 "ci": ci,
                 "pneg": pneg,
                 "nse": nse,
@@ -107,13 +107,13 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HSAE v6.0.4 -- WebGIS Basin Risk Map v2</title>
+<title>HSAE v6.0.8 -- WebGIS Basin Risk Map v2</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}  # noqa: E501
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
 
   /* ── HEADER ── */
   #hdr{height:56px;background:linear-gradient(135deg,#061F4A 0%,#0E6B6A 100%);
@@ -209,8 +209,8 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <div id="hdr">
   <span class="hlogo">🌊</span>
   <div>
-    <div class="htitle">HydroSovereign AI Engine v6.0.4 -- WebGIS Basin Risk Map v2</div>
-    <div class="hsub">26 Globally Contested Basins &middot; ATDI &middot; HIFD &middot; ATCI &middot; UNWC 1997 &middot; Plugin ID: 5040</div>  # noqa: E501
+    <div class="htitle">HydroSovereign AI Engine v6.0.8 -- WebGIS Basin Risk Map v2</div>
+    <div class="hsub">26 Globally Contested Basins &middot; ATDI &middot; AHIFD &middot; ATCI &middot; UNWC 1997 &middot; Plugin ID: 5040</div>
   </div>
   <div id="hdr-right">
     <button class="btn" onclick="exportPNG()" title="Export map as PNG">&#128247; Export PNG</button>
@@ -224,7 +224,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
     <span class="tb-label">Layer:</span>
     <select id="layer-sel" onchange="switchLayer()">
       <option value="atdi">ATDI Risk</option>
-      <option value="hifd">HIFD Flow Deficit</option>
+      <option value="ahifd">AHIFD Flow Deficit</option>
       <option value="ci">Conflict Index</option>
       <option value="atci">Treaty Compliance (ATCI)</option>
     </select>
@@ -281,13 +281,13 @@ const features = GJ.features;
 // ── BASEMAPS ──────────────────────────────────────────────────────────────
 const BASEMAPS = {
   dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.4',subdomains:'abcd',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.8',subdomains:'abcd',maxZoom:19}),
   light: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.4',subdomains:'abcd',maxZoom:19}),
-  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',  # noqa: E501
-    {attribution:'&copy; ESRI &middot; HSAE v6.0.4',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.8',subdomains:'abcd',maxZoom:19}),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {attribution:'&copy; ESRI &middot; HSAE v6.0.8',maxZoom:19}),
   osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.4',maxZoom:19}),
+    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.8',maxZoom:19}),
 };
 
 // ── MAP INIT ──────────────────────────────────────────────────────────────
@@ -298,7 +298,7 @@ BASEMAPS.dark.addTo(map);
 // ── COLOUR HELPERS ────────────────────────────────────────────────────────
 function colourFor(layer, p) {
   if (layer === 'atdi') return p.colour;
-  if (layer === 'hifd') {
+  if (layer === 'ahifd') {
     if (p.hifd < 15) return '#16a34a';
     if (p.hifd < 25) return '#ca8a04';
     if (p.hifd < 35) return '#ea580c';
@@ -321,7 +321,7 @@ function colourFor(layer, p) {
 }
 
 function radiusFor(layer, p) {
-  const val = layer==='atdi'?p.atdi : layer==='hifd'?p.hifd :
+  const val = layer==='atdi'?p.atdi : layer==='ahifd'?p.hifd :
               layer==='ci'?p.ci*100 : p.atci;
   return Math.max(6, Math.min(20, val / 5 + 4));
 }
@@ -356,7 +356,7 @@ function makePopup(p) {
       <div class="p-v" style="color:${p.colour}">${p.atdi}%</div>
     </div>
     <div class="p-kv">
-      <div class="p-k">HIFD</div>
+      <div class="p-k">AHIFD</div>
       <div class="p-v">${p.hifd}%</div>
     </div>
     <div class="p-kv">
@@ -382,7 +382,7 @@ function makePopup(p) {
       width="280" height="110"></canvas>
   </div>
   <div class="p-footer">
-    HSAE v6.0.4 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
+    HSAE v6.0.8 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
   </div>
 </div>`;
 }
@@ -399,7 +399,7 @@ function drawChart(p) {
   chartInstances[id] = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['ATDI %', 'HIFD %', 'CI x100', 'ATCI %', 'P(Neg) %'],
+      labels: ['ATDI %', 'AHIFD %', 'CI x100', 'ATCI %', 'P(Neg) %'],
       datasets: [{
         data: [p.atdi, p.hifd, p.ci * 100, p.atci, p.pneg],
         backgroundColor: [p.colour, '#0E6B6A', '#f59e0b', '#a78bfa', '#3b82f6'],
@@ -608,7 +608,7 @@ function updateLegendContent(div, layer) {
     ],
   };
   const labels = {
-    atdi:'ATDI Risk Level', hifd:'HIFD Flow Deficit',
+    atdi:'ATDI Risk Level', hifd:'AHIFD Flow Deficit',
     ci:'Conflict Index', atci:'Treaty Compliance (ATCI)'
   };
   const rows = entries[layer] || entries.atdi;
@@ -621,7 +621,7 @@ function updateLegendContent(div, layer) {
 const attrCtrl = L.control({position: 'bottomleft'});
 attrCtrl.onAdd = function() {
   const div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = `<b>HSAE v6.0.4</b> &middot; Plugin ID: 5040<br>
+  div.innerHTML = `<b>HSAE v6.0.8</b> &middot; Plugin ID: 5040<br>
     DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank"
       style="color:#60a5fa">10.5281/zenodo.19180160</a><br>
     ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank"
