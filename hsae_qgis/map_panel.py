@@ -138,12 +138,9 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
         cap = basin.get("dam_capacity_bcm", 50)
         nc = basin.get("num_countries", 3)
         rc = basin.get("riparian_cooperation", 0.45)
-        atdi = round(min(95, max(5,
-            15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-        ahifd = round(min(80, max(5,
-            8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
-        ci = round(min(100, max(0,
-            disp * 15 + (1 - rc) * 30 + (nc - 2) * 5 + min(cap / 5, 20))), 0)
+        atdi = round(min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
+        ahifd = round(min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
+        ci = round(min(100, max(0, disp * 15 + (1 - rc) * 30 + (nc - 2) * 5 + min(cap / 5, 20))), 0)
         return {"atdi": atdi, "ahifd": ahifd, "ci": int(ci)}
 
     def _refresh(self) -> None:
@@ -202,15 +199,9 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
                 lon = b.get("lon", 0)
                 name = b.get("name", "Unknown").replace("'", " ")
                 color = _risk_color(d["atdi"])
-                popup = (name + " | ATDI:" + str(d["atdi"]) + "%" 
-                    + " | AHIFD:" + str(d["ahifd"]) + "%"
-                    + " | CI:" + str(d["ci"])
-                    + " | " + _risk_label(d["atdi"]))
+                popup = (name + " | ATDI:" + str(d["atdi"]) + "%" + " | AHIFD:" + str(d["ahifd"]) + "%" + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
                 marker_lines.append(
-                    "L.circleMarker([" + str(lat) + "," + str(lon) + "],"
-                    + "{radius:10,color:'" + color + "',fillColor:'" + color
-                    + "',fillOpacity:0.8}).addTo(map)"
-                    + ".bindPopup('" + popup + "');"
+                    "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + "{radius:10,color:'" + color + "',fillColor:'" + color + "',fillOpacity:0.8}).addTo(map)" + ".bindPopup('" + popup + "');"
                 )
             except Exception:
                 pass
@@ -225,9 +216,7 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
             "</head><body><div id='map'></div><script>"
             "var map=L.map('map').setView([20,30],2);"
             "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',"
-            "{attribution:'OpenStreetMap'}).addTo(map);"
-            + markers_js
-            + "</script></body></html>"
+            "{attribution:'OpenStreetMap'}).addTo(map);" + markers_js + "</script></body></html>"
         )
         return html
 
