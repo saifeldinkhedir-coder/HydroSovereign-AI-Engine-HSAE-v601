@@ -14,7 +14,6 @@ try:
         QLabel, QPushButton, QProgressBar, QScrollArea,
         QGroupBox, QGridLayout)
     from qgis.PyQt.QtCore import Qt
-    from qgis.PyQt.QtGui import QFont
     HAS_QT = True
 except ImportError:
     HAS_QT = False
@@ -110,10 +109,10 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
             s_sorted = sorted(s)
             n = len(s_sorted)
             return {
-                "mean":  round(sum(s) / n, 1),
-                "p5":    round(s_sorted[int(n * 0.05)], 1),
-                "p95":   round(s_sorted[int(n * 0.95)], 1),
-                "std":   round((sum((x - sum(s)/n)**2 for x in s) / n) ** 0.5, 1),
+                "mean": round(sum(s) / n, 1),
+                "p5": round(s_sorted[int(n * 0.05)], 1),
+                "p95": round(s_sorted[int(n * 0.95)], 1),
+                "std": round((sum((x - sum(s) / n) ** 2 for x in s) / n) ** 0.5, 1),
             }
 
         a_st = stats(atdi_samples)
@@ -136,17 +135,18 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
                 f"QGroupBox::title{{subcontrol-origin:margin;left:8px}}")
             g_layout = QGridLayout(grp)
 
-            g_layout.addWidget(QLabel("Mean:"),  0, 0)
+            g_layout.addWidget(QLabel("Mean:"), 0, 0)
             g_layout.addWidget(QLabel(f"<b>{st['mean']}%</b>"), 0, 1)
             g_layout.addWidget(QLabel("Std Dev:"), 1, 0)
             g_layout.addWidget(QLabel(f"{st['std']}%"), 1, 1)
-            g_layout.addWidget(QLabel("90% CI:"),  2, 0)
+            g_layout.addWidget(QLabel("90% CI:"), 2, 0)
             g_layout.addWidget(
                 QLabel(f"<b>[{st['p5']}% — {st['p95']}%]</b>"), 2, 1)
 
             # Progress bar as visual CI
             bar = QProgressBar()
-            bar.setMinimum(0); bar.setMaximum(100)
+            bar.setMinimum(0)
+            bar.setMaximum(100)
             bar.setValue(int(st["mean"]))
             bar.setTextVisible(True)
             bar.setFormat(f"{st['mean']}%  (90% CI: {st['p5']}–{st['p95']}%)")
@@ -164,17 +164,18 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
             "QGroupBox::title{subcontrol-origin:margin;left:8px}")
         s_layout = QGridLayout(sobol_grp)
         factors = [
-            ("Dispute Level",  0.38),
-            ("Dam Capacity",   0.27),
-            ("Cooperation",    0.21),
-            ("Num Countries",  0.14),
+            ("Dispute Level", 0.38),
+            ("Dam Capacity", 0.27),
+            ("Cooperation", 0.21),
+            ("Num Countries", 0.14),
         ]
         for row, (name, val) in enumerate(factors):
             s_layout.addWidget(QLabel(name), row, 0)
             bar2 = QProgressBar()
-            bar2.setMinimum(0); bar2.setMaximum(100)
+            bar2.setMinimum(0)
+            bar2.setMaximum(100)
             bar2.setValue(int(val * 100))
-            bar2.setFormat(f"{int(val*100)}%")
+            bar2.setFormat(f"{int(val * 100)}%")
             bar2.setStyleSheet(
                 "QProgressBar::chunk{background:#2C3E50;border-radius:3px}")
             s_layout.addWidget(bar2, row, 1)
