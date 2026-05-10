@@ -10,11 +10,11 @@ import random
 
 try:
     from qgis.PyQt.QtWidgets import (
-        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
+        QDockWidget, QWidget, QVBoxLayout,
         QLabel, QPushButton, QProgressBar, QScrollArea,
-        QGroupBox, QGridLayout, QTextEdit)
+        QGroupBox, QGridLayout)
     from qgis.PyQt.QtCore import Qt
-    from qgis.PyQt.QtGui import QFont, QColor
+    from qgis.PyQt.QtGui import QFont
     HAS_QT = True
 except ImportError:
     HAS_QT = False
@@ -88,21 +88,21 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
                 w.deleteLater()
 
         basin = self._basin
-        disp  = basin.get("dispute_level", 2)
-        cap   = basin.get("dam_capacity_bcm", 74)
-        nc    = basin.get("num_countries", 3)
-        rc    = basin.get("riparian_cooperation", 0.45)
+        disp = basin.get("dispute_level", 2)
+        cap = basin.get("dam_capacity_bcm", 74)
+        nc = basin.get("num_countries", 3)
+        rc = basin.get("riparian_cooperation", 0.45)
 
         # Monte Carlo N=500
         N = 500
         atdi_samples, ahifd_samples = [], []
         for _ in range(N):
-            d  = disp  + random.gauss(0, 0.3)
-            c  = cap   + random.gauss(0, cap * 0.1)
-            n  = nc    + random.gauss(0, 0.2)
-            r  = rc    + random.gauss(0, 0.05)
-            atdi  = max(5, min(95, 15 + d * 12 + min(c / 2, 20) + (n - 2) * 8 + (1 - r) * 10))
-            ahifd = max(5, min(80, 8  + min(c / 3, 15) + (1 - r) * 12 + d * 5 + (n - 2) * 3))
+            d = disp + random.gauss(0, 0.3)
+            c = cap + random.gauss(0, cap * 0.1)
+            n = nc + random.gauss(0, 0.2)
+            r = rc + random.gauss(0, 0.05)
+            atdi = max(5, min(95, 15 + d * 12 + min(c / 2, 20) + (n - 2) * 8 + (1 - r) * 10))
+            ahifd = max(5, min(80, 8 + min(c / 3, 15) + (1 - r) * 12 + d * 5 + (n - 2) * 3))
             atdi_samples.append(atdi)
             ahifd_samples.append(ahifd)
 
