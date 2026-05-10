@@ -90,7 +90,7 @@ class HSAEMainDialog(QDialog):
         btns = QHBoxLayout()
         for label, url in [
             ("🚀 Open Live App",
-             "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"),
+             "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app"),
             ("📦 GitHub Repo",
              "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"),
             ("🌐 Website",
