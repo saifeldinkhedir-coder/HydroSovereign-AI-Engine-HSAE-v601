@@ -40,6 +40,7 @@ try:
     HAS_WEBGIS_V2 = True
 except Exception:
     HAS_WEBGIS_V2 = False
+
     def build_webgis_v2(*a, **kw):
         return ""
 
