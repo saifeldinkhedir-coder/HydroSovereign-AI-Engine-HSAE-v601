@@ -139,6 +139,31 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     except Exception:
         pass
 
+    # Auto-add OpenStreetMap basemap if not already present
+    try:
+        from qgis.core import QgsRasterLayer
+        existing = [
+            l.name() for l in QgsProject.instance().mapLayers().values()
+        ]
+        if "OpenStreetMap" not in existing:
+            osm_url = (
+                "type=xyz"
+                "&url=https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+                "&zmax=19&zmin=0"
+            )
+            osm = QgsRasterLayer(osm_url, "OpenStreetMap", "wms")
+            if osm.isValid():
+                QgsProject.instance().addMapLayer(osm)
+                root = QgsProject.instance().layerTreeRoot()
+                osm_node = root.findLayer(osm.id())
+                if osm_node:
+                    clone = osm_node.clone()
+                    parent = osm_node.parent()
+                    parent.removeChildNode(osm_node)
+                    parent.addChildNode(clone)
+    except Exception:
+        pass
+
     return lyr
 
 
