@@ -63,8 +63,8 @@ def apply_tdi_style(iface):
 
     n_crit = sum(1 for v in atdi_vals if v >= 60)
     n_high = sum(1 for v in atdi_vals if 40 <= v < 60)
-    n_med  = sum(1 for v in atdi_vals if 25 <= v < 40)
-    n_low  = sum(1 for v in atdi_vals if v < 25)
+    n_med = sum(1 for v in atdi_vals if 25 <= v < 40)
+    n_low = sum(1 for v in atdi_vals if v < 25)
 
     iface.messageBar().pushSuccess(
         "HSAE TDI v6.0.8",
