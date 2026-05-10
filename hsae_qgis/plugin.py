@@ -822,7 +822,7 @@ tr:nth-child(even){{background:#161b22}}
             if not hasattr(
                     self,
                     '_treaty_panel') or self._treaty_panel is None:
-                self._treaty_panel = HSAETreatyPanel(self.iface, basins)
+                self._treaty_panel = HSAETreatyPanel(self.iface, self._basins())
                 self.iface.mainWindow().addDockWidget(
                     2,  # Qt.RightDockWidgetArea
                     self._treaty_panel)
