@@ -352,9 +352,9 @@ class HSAEDashboardPanel(QDockWidget):
     def _webgis(self):
         import webbrowser
         webbrowser.open(
-            "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app")
+            "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app")
 
     def _app(self):
         import webbrowser
         webbrowser.open(
-            "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app")
+            "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app")
