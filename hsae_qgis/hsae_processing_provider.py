@@ -25,13 +25,13 @@ class HSAEProcessingProvider(QgsProcessingProvider):
         return 'hsae'
 
     def name(self):
-        return 'HydroSovereign AI Engine v6.01'
+        return 'HydroSovereign AI Engine v6.0.8'
 
     def longName(self):
-        return 'HSAE v6.01 — Transboundary Water Analysis'
+        return 'HSAE v6.0.8 — Transboundary Water Analysis'
 
     def versionInfo(self):
-        return '6.0.1'
+        return '6.0.8'
 
     def icon(self):
         from qgis.PyQt.QtGui import QIcon
