@@ -22,7 +22,7 @@ except ImportError:
 
 from qgis.core import QgsMessageLog, Qgis
 
-LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app"
+LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app"
 
 
 def _risk_color(atdi: float) -> str:
