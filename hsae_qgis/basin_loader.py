@@ -123,6 +123,22 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
 
     lyr.updateExtents()
     _style_layer(lyr)
+    # Style: colored circles by risk level
+    try:
+        from qgis.core import (QgsMarkerSymbol, QgsSingleSymbolRenderer,
+                               QgsSymbol, QgsProperty)
+        symbol = QgsMarkerSymbol.createSimple({
+            "name": "circle",
+            "color": "#0E6B6A",
+            "color_border": "#ffffff",
+            "size": "5",
+            "outline_width": "0.8"
+        })
+        lyr.setRenderer(QgsSingleSymbolRenderer(symbol))
+        lyr.triggerRepaint()
+    except Exception:
+        pass
+
     return lyr
 
 
