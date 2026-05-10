@@ -135,9 +135,9 @@ class HSAEMainDialog(QDialog):
 
         RISK_COLORS = {
             "CRITICAL": QColor("#F1948A"),
-            "HIGH":     QColor("#FADBD8"),
-            "MEDIUM":   QColor("#FDEBD0"),
-            "LOW":      QColor("#D5F5E3"),
+            "HIGH": QColor("#FADBD8"),
+            "MEDIUM": QColor("#FDEBD0"),
+            "LOW": QColor("#D5F5E3"),
         }
 
         for i, b in enumerate(self.basins):
@@ -179,10 +179,10 @@ class HSAEMainDialog(QDialog):
         medium = [b for b, d in zip(self.basins, indices) if d["risk"] == "MEDIUM"]
         low = [b for b, d in zip(self.basins, indices) if d["risk"] == "LOW"]
 
-        avg_atdi = round(sum(d["atdi"]  for d in indices) / len(indices), 1)
+        avg_atdi = round(sum(d["atdi"] for d in indices) / len(indices), 1)
         avg_ahifd = round(sum(d["ahifd"] for d in indices) / len(indices), 1)
-        avg_nse = round(sum(d["nse"]   for d in indices) / len(indices), 2)
-        avg_kge = round(sum(d["kge"]   for d in indices) / len(indices), 2)
+        avg_nse = round(sum(d["nse"] for d in indices) / len(indices), 2)
+        avg_kge = round(sum(d["kge"] for d in indices) / len(indices), 2)
 
         html = f"""
         <h2 style='color:#0E6B6A'>📈 Risk Summary — {len(self.basins)} Basins</h2>
@@ -196,13 +196,13 @@ class HSAEMainDialog(QDialog):
            ≥25% MEDIUM (Art.5)</p>
         <hr>
         <p><span style='color:#c0392b'>🔴 CRITICAL — {len(critical)} basins:</span><br>
-        {" · ".join(b.get("name","") for b in critical) or "—"}</p>
+        {" · ".join(b.get("name", "") for b in critical) or "—"}</p>
         <p><span style='color:#e67e22'>🟠 HIGH — {len(high)} basins:</span><br>
-        {" · ".join(b.get("name","") for b in high) or "—"}</p>
+        {" · ".join(b.get("name", "") for b in high) or "—"}</p>
         <p><span style='color:#f39c12'>🟡 MEDIUM — {len(medium)} basins:</span><br>
-        {" · ".join(b.get("name","") for b in medium) or "—"}</p>
+        {" · ".join(b.get("name", "") for b in medium) or "—"}</p>
         <p><span style='color:#27ae60'>🟢 LOW — {len(low)} basins:</span><br>
-        {" · ".join(b.get("name","") for b in low) or "—"}</p>
+        {" · ".join(b.get("name", "") for b in low) or "—"}</p>
         """
         text = QTextEdit()
         text.setReadOnly(True)
