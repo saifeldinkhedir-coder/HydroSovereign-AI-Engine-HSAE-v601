@@ -10,7 +10,8 @@ from __future__ import annotations
 import tempfile
 
 try:
-    from qgis.PyQt.QtWidgets import (QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
+    from qgis.PyQt.QtWidgets import (
+        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
         QLabel, QPushButton, QTableWidget, QTableWidgetItem,
         QHeaderView, QAbstractItemView)
     from qgis.PyQt.QtCore import Qt
