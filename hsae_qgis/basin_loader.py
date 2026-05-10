@@ -1,5 +1,5 @@
 """
-basin_loader.py — HSAE v6.01
+basin_loader.py — HSAE v6.0.8
 Load 26 Transboundary Basins as QGIS Vector Layer
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -46,7 +46,7 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     Returns the layer (caller adds to project).
     """
     lyr = QgsVectorLayer("Point?crs=EPSG:4326",
-                         "HSAE v6.01 — 26 Transboundary Basins", "memory")
+                         "HSAE v6.0.8 — 26 Transboundary Basins", "memory")
     pr = lyr.dataProvider()
     pr.addAttributes([
         QgsField("id", QVariant.String),
