@@ -1,5 +1,5 @@
 """
-hsae_processing_provider.py — HSAE v6.01
+hsae_processing_provider.py — HSAE v6.0.8
 Complete Processing Provider — 5 Algorithms
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
