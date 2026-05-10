@@ -9,25 +9,14 @@ import random
 
 try:
     from qgis.PyQt.QtWidgets import (
-        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
-        QLabel, QPushButton, QComboBox, QProgressBar,
-        QGroupBox, QGridLayout, QScrollArea, QFrame)
+        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox, QProgressBar, QGroupBox, QGridLayout, QScrollArea, QFrame)
     from qgis.PyQt.QtCore import Qt
     HAS_QT = True
 except ImportError:
     HAS_QT = False
 
 UNWC_ARTICLES = [
-    ("Art. 5", "Equitable & reasonable utilisation"),
-    ("Art. 6", "Factors for equitable utilisation"),
-    ("Art. 7", "No significant harm obligation"),
-    ("Art. 9", "Regular exchange of data & info"),
-    ("Art. 11", "Prior notification of planned measures"),
-    ("Art. 12", "Six-month reply period"),
-    ("Art. 17", "Peaceful settlement / consultations"),
-    ("Art. 20", "Protection & preservation of ecosystems"),
-    ("Art. 21", "Prevention of water pollution"),
-    ("Art. 33", "Dispute settlement mechanism"),
+    ("Art. 5", "Equitable & reasonable utilisation"), ("Art. 6", "Factors for equitable utilisation"), ("Art. 7", "No significant harm obligation"), ("Art. 9", "Regular exchange of data & info"), ("Art. 11", "Prior notification of planned measures"), ("Art. 12", "Six-month reply period"), ("Art. 17", "Peaceful settlement / consultations"), ("Art. 20", "Protection & preservation of ecosystems"), ("Art. 21", "Prevention of water pollution"), ("Art. 33", "Dispute settlement mechanism"),
 ]
 
 
@@ -112,8 +101,7 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         rc = basin.get("riparian_cooperation", 0.45)
 
         # Compute ATCI
-        atci = round(min(95, max(20,
-            100 - (15 + disp * 12) * 0.6 - (8 + min(cap / 3, 15)) * 0.3)), 1)
+        atci = round(min(95, max(20, 100 - (15 + disp * 12) * 0.6 - (8 + min(cap / 3, 15)) * 0.3)), 1)
 
         # Overall metric
         color = ("#c0392b" if atci > 60 else
@@ -129,7 +117,8 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         self._res_layout.addWidget(hdr)
 
         bar = QProgressBar()
-        bar.setMinimum(0); bar.setMaximum(100)
+        bar.setMinimum(0)
+        bar.setMaximum(100)
         bar.setValue(int(atci))
         bar.setFormat(f"ATCI = {atci}")
         bar.setStyleSheet(
@@ -160,7 +149,7 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
                 f"<span style='color:{art_color}'>{art_status}</span>")
             lbl_stat.setTextFormat(Qt.RichText)
 
-            g.addWidget(lbl_art,  row_i, 0)
+            g.addWidget(lbl_art, row_i, 0)
             g.addWidget(lbl_desc, row_i, 1)
             g.addWidget(lbl_stat, row_i, 2)
 
@@ -171,9 +160,5 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         """Simple rule-based article score 0-100."""
         base = int(rc * 60 + (3 - disp) * 10)
         offsets = {
-            "Art. 5": 10, "Art. 6": 8, "Art. 7": -int(disp * 15),
-            "Art. 9": -5, "Art. 11": -int(cap / 10),
-            "Art. 12": 5, "Art. 17": -int(disp * 8),
-            "Art. 20": 5, "Art. 21": 0, "Art. 33": -int(disp * 5),
-        }
+            "Art. 5": 10, "Art. 6": 8, "Art. 7": -int(disp * 15), "Art. 9": -5, "Art. 11": -int(cap / 10), "Art. 12": 5, "Art. 17": -int(disp * 8), "Art. 20": 5, "Art. 21": 0, "Art. 33": -int(disp * 5), }
         return max(5, min(95, base + offsets.get(art, 0) + random.randint(-3, 3)))
