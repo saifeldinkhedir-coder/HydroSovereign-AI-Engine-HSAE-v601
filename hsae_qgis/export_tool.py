@@ -1,5 +1,5 @@
 """
-export_tool.py — HSAE v6.01
+export_tool.py — HSAE v6.0.8
 Export Basin Data to Shapefile / GeoJSON / CSV
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
