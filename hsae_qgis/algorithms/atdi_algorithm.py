@@ -1,5 +1,5 @@
 """
-atdi_algorithm.py — HSAE v6.01 QGIS Processing Algorithm
+atdi_algorithm.py — HSAE v6.0.8 QGIS Processing Algorithm
 ATDI: Alkhedir Transparency Deficit Index
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
