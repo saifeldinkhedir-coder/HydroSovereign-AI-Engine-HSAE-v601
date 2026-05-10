@@ -16,22 +16,16 @@ import webbrowser
 
 def _compute_indices(b):
     """Compute all 6 HSAE indices for a basin dict."""
-    disp  = float(b.get("dispute_level", b.get("disp", 2)))
-    cap   = float(b.get("cap_bcm", b.get("cap", 10)))
-    nc    = float(b.get("n_countries", b.get("num_countries", 3)))
-    rc    = float(b.get("runoff_c", 0.35))
-
-    atdi  = round(min(95, max(5,
-        15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-    ahifd = round(min(80, max(5,
-        8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
-    ci    = round(min(1.0, max(0.0,
-        0.4 * atdi / 100 + 0.25 * (disp / 4)
-        + 0.2 * ahifd / 100 + 0.1 * (nc - 2) * 0.15)), 3)
-    atci  = round(min(95, max(20, 100 - atdi * 0.6 - ahifd * 0.3)), 1)
-    nse   = round(max(0.1, min(0.9,
-        0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
-    kge   = round(max(0.1, min(0.95, nse + 0.11)), 2)
+    disp = float(b.get("dispute_level", b.get("disp", 2)))
+    cap = float(b.get("cap_bcm", b.get("cap", 10)))
+    nc = float(b.get("n_countries", b.get("num_countries", 3)))
+    rc = float(b.get("runoff_c", 0.35))
+    atdi = round(min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
+    ahifd = round(min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
+    ci = round(min(1.0, max(0.0, 0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * ahifd / 100 + 0.1 * (nc - 2) * 0.15)), 3)
+    atci = round(min(95, max(20, 100 - atdi * 0.6 - ahifd * 0.3)), 1)
+    nse = round(max(0.1, min(0.9, 0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
+    kge = round(max(0.1, min(0.95, nse + 0.11)), 2)
 
     if atdi >= 60:
         risk = "CRITICAL"
@@ -47,7 +41,7 @@ def _compute_indices(b):
         region = region.replace(emoji, "")
 
     countries = b.get("country", [])
-    upstream  = b.get("country_up", countries[0] if countries else "—")
+    upstream = b.get("country_up", countries[0] if countries else "—")
     downstream = b.get("country_dn", "") or (
         " / ".join(countries[1:]) if len(countries) > 1 else "—")
 
@@ -63,8 +57,8 @@ class HSAEMainDialog(QDialog):
 
     def __init__(self, iface, basins):
         super().__init__(iface.mainWindow())
-        self.iface   = iface
-        self.basins  = basins
+        self.iface = iface
+        self.basins = basins
         self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.8")
         self.setMinimumSize(1000, 620)
         self._build_ui()
@@ -181,14 +175,14 @@ class HSAEMainDialog(QDialog):
 
         indices = [_compute_indices(b) for b in self.basins]
         critical = [b for b, d in zip(self.basins, indices) if d["risk"] == "CRITICAL"]
-        high     = [b for b, d in zip(self.basins, indices) if d["risk"] == "HIGH"]
-        medium   = [b for b, d in zip(self.basins, indices) if d["risk"] == "MEDIUM"]
-        low      = [b for b, d in zip(self.basins, indices) if d["risk"] == "LOW"]
+        high = [b for b, d in zip(self.basins, indices) if d["risk"] == "HIGH"]
+        medium = [b for b, d in zip(self.basins, indices) if d["risk"] == "MEDIUM"]
+        low = [b for b, d in zip(self.basins, indices) if d["risk"] == "LOW"]
 
-        avg_atdi  = round(sum(d["atdi"]  for d in indices) / len(indices), 1)
+        avg_atdi = round(sum(d["atdi"]  for d in indices) / len(indices), 1)
         avg_ahifd = round(sum(d["ahifd"] for d in indices) / len(indices), 1)
-        avg_nse   = round(sum(d["nse"]   for d in indices) / len(indices), 2)
-        avg_kge   = round(sum(d["kge"]   for d in indices) / len(indices), 2)
+        avg_nse = round(sum(d["nse"]   for d in indices) / len(indices), 2)
+        avg_kge = round(sum(d["kge"]   for d in indices) / len(indices), 2)
 
         html = f"""
         <h2 style='color:#0E6B6A'>📈 Risk Summary — {len(self.basins)} Basins</h2>
