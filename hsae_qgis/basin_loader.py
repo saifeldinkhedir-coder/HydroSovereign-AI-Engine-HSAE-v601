@@ -125,8 +125,7 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     _style_layer(lyr)
     # Style: colored circles by risk level
     try:
-        from qgis.core import (QgsMarkerSymbol, QgsSingleSymbolRenderer,
-                               QgsSymbol, QgsProperty)
+        from qgis.core import QgsMarkerSymbol, QgsSingleSymbolRenderer
         symbol = QgsMarkerSymbol.createSimple({
             "name": "circle",
             "color": "#0E6B6A",
@@ -141,10 +140,8 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
 
     # Auto-add OpenStreetMap basemap if not already present
     try:
-        from qgis.core import QgsRasterLayer
-        existing = [
-            l.name() for l in QgsProject.instance().mapLayers().values()
-        ]
+        from qgis.core import QgsRasterLayer, QgsProject as _QP
+        existing = [lyr.name() for lyr in _QP.instance().mapLayers().values()]
         if "OpenStreetMap" not in existing:
             osm_url = (
                 "type=xyz"
@@ -153,8 +150,8 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
             )
             osm = QgsRasterLayer(osm_url, "OpenStreetMap", "wms")
             if osm.isValid():
-                QgsProject.instance().addMapLayer(osm)
-                root = QgsProject.instance().layerTreeRoot()
+                _QP.instance().addMapLayer(osm)
+                root = _QP.instance().layerTreeRoot()
                 osm_node = root.findLayer(osm.id())
                 if osm_node:
                     clone = osm_node.clone()
