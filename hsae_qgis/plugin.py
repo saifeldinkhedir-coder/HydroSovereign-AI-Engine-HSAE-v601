@@ -818,7 +818,6 @@ tr:nth-child(even){{background:#161b22}}
     def open_treaty_analysis(self):
         """Open ATCI Treaty Compliance Analysis panel."""
         try:
-            basins = self._basins()
             if not hasattr(
                     self,
                     '_treaty_panel') or self._treaty_panel is None:
