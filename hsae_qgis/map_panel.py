@@ -7,16 +7,12 @@ Opens full Leaflet map in browser when requested.
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from __future__ import annotations
-import json
-import os
 import tempfile
-from typing import Optional
 
 try:
-    from qgis.PyQt.QtWidgets import (
-        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
+    from qgis.PyQt.QtWidgets import (QDockWidget, QWidget, QVBoxLayout, QHBoxLayout,
         QLabel, QPushButton, QTableWidget, QTableWidgetItem,
-        QHeaderView, QAbstractItemView, QFrame, QScrollArea)
+        QHeaderView, QAbstractItemView)
     from qgis.PyQt.QtCore import Qt
     from qgis.PyQt.QtGui import QColor, QBrush, QFont
     HAS_QT = True
