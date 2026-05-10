@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.01 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.8 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -62,10 +62,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.01 Real-Time Dashboard Panel."""
+    """HSAE v6.0.8 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.01 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.8 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -140,7 +140,7 @@ class HSAEDashboardPanel(QDockWidget):
         # Header
         ml.addWidget(
             self._lbl(
-                "🌊 HydroSovereign AI Engine v6.01",
+                "🌊 HydroSovereign AI Engine v6.0.8",
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(
@@ -337,7 +337,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.01 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.8 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {
