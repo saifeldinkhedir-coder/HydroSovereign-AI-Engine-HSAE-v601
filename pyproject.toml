@@ -4,14 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.0.8"
+version = "6.5.4"
 description = "HydroSovereign AI Engine (HSAE) — Satellite-driven transboundary water law compliance"
 readme = "README.md"
 license = {text = "GPL-3.0"}
 authors = [{name = "Seifeldin M.G. Alkhedir", email = "saifeldinkhedir@gmail.com"}]
 keywords = [
     "hydrology", "water-law", "UNWC", "transboundary",
-    "QGIS", "satellite", "ATDI", "AHIFD", "eWaterCycle", "HBV96"
+    "QGIS", "satellite", "ATDI", "AHIFD", "eWaterCycle",
+    "HBV96", "GEE", "water-sovereignty", "GeoAgent"
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -36,13 +37,22 @@ dependencies = [
 
 [project.optional-dependencies]
 gee  = ["earthengine-api>=0.1.380"]
-full = ["hydrosovereign[gee]", "streamlit>=1.30", "plotly>=5.18", "folium>=0.15"]
+full = [
+    "hydrosovereign[gee]",
+    "streamlit>=1.30",
+    "plotly>=5.18",
+    "folium>=0.15",
+]
+
+[project.scripts]
+hydrosovereign = "hydrosovereign.cli:main"
 
 [project.urls]
 Homepage     = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
 Repository   = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
 "Bug Tracker"= "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues"
 DOI          = "https://doi.org/10.5281/zenodo.19180160"
+PyPI         = "https://pypi.org/project/hydrosovereign/"
 
 [tool.setuptools.packages.find]
 include = ["hydrosovereign*"]
