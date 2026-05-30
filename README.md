@@ -7,6 +7,7 @@
 > Install: **QGIS → Plugins → Manage and Install Plugins → Search "HydroSovereign"**
 
 [![QGIS Plugin](https://img.shields.io/badge/QGIS_Plugin-ID_5040-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/hsae_qgis/)
+[![Downloads](https://img.shields.io/badge/Downloads-440%2B-brightgreen?style=flat-square)](https://plugins.qgis.org/plugins/hsae_qgis/) [![Countries](https://img.shields.io/badge/Countries-20-blue?style=flat-square)](https://plugins.qgis.org/plugins/hsae_qgis/) [![Security](https://img.shields.io/badge/Security_Scan-100%25-success?style=flat-square)](https://plugins.qgis.org/plugins/hsae_qgis/)
 [![PyPI](https://img.shields.io/badge/PyPI-hydrosovereign_v6.5.3-3775A9?style=for-the-badge&logo=pypi&logoColor=white)](https://pypi.org/project/hydrosovereign/)
 [![Live App](https://img.shields.io/badge/Live_App-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19180160-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.19180160)
