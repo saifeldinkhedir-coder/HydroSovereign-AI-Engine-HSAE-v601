@@ -1,17 +1,19 @@
 [build-system]
 requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 [project]
-name            = "hydrosovereign"
-version         = "6.0.8"
-description     = "HydroSovereign AI Engine (HSAE) — Satellite-driven transboundary water law compliance"
-readme          = "README.md"
-license         = {text = "GPL-3.0"}
-authors         = [{name = "Seifeldin M.G. Alkhedir", email = "saifeldinkhedir@gmail.com"}]
-keywords        = ["hydrology", "water-law", "UNWC", "transboundary", "QGIS", "satellite",
-                   "ATDI", "AHIFD", "eWaterCycle", "GEE", "HBV96"]
-classifiers     = [
+name = "hydrosovereign"
+version = "6.0.8"
+description = "HydroSovereign AI Engine (HSAE) — Satellite-driven transboundary water law compliance"
+readme = "README.md"
+license = {text = "GPL-3.0"}
+authors = [{name = "Seifeldin M.G. Alkhedir", email = "saifeldinkhedir@gmail.com"}]
+keywords = [
+    "hydrology", "water-law", "UNWC", "transboundary",
+    "QGIS", "satellite", "ATDI", "AHIFD", "eWaterCycle", "HBV96"
+]
+classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -24,7 +26,7 @@ classifiers     = [
     "Topic :: Scientific/Engineering :: GIS",
 ]
 requires-python = ">=3.9"
-dependencies    = [
+dependencies = [
     "numpy>=1.24",
     "pandas>=2.0",
     "scipy>=1.10",
@@ -37,14 +39,13 @@ gee  = ["earthengine-api>=0.1.380"]
 full = ["hydrosovereign[gee]", "streamlit>=1.30", "plotly>=5.18", "folium>=0.15"]
 
 [project.urls]
-Homepage        = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
-Documentation   = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx"
-Repository      = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
-"Bug Tracker"   = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues"
-DOI             = "https://doi.org/10.5281/zenodo.19180160"
+Homepage     = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
+Repository   = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
+"Bug Tracker"= "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues"
+DOI          = "https://doi.org/10.5281/zenodo.19180160"
 
 [tool.setuptools.packages.find]
 include = ["hydrosovereign*"]
 
 [tool.setuptools.package-data]
-"hydrosovereign" = ["*.json", "*.yaml", "*.yml"]
+"hydrosovereign" = ["*.json", "*.yaml", "*.yml", "*.csv"]
