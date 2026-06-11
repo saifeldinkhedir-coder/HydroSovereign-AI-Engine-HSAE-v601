@@ -1,10 +1,16 @@
 """
-HSAE v6.0.8 -- WebGIS Map v2 (v6.0.8)
+HSAE v6.0.9 -- WebGIS Map v2 (v6.0.9)
 Professional interactive map with Search, Layer Toggle,
 Basemap Switcher, Risk Filter, Chart Popups, and Export PNG.
 """
 from __future__ import annotations
 import json as _json
+
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
 
 
 def build_webgis_v2(basins: list, compute_fn) -> str:
@@ -18,7 +24,7 @@ def build_webgis_v2(basins: list, compute_fn) -> str:
             continue
         d = compute_fn(b)
         atdi = round(d.get('atdi', 0), 1)
-        hifd = round(d.get('ahifd', 0), 1)
+        hifd = round(d.get('ahifd', d.get('hifd', 0)), 1)  # AHIFD
         ci = round(d.get('ci', 0), 3)
         pneg = round(d.get('pneg', 0), 1)
         nse = d.get('nse', 0)
@@ -68,6 +74,7 @@ def build_webgis_v2(basins: list, compute_fn) -> str:
                 "nc": nc,
                 "atdi": atdi,
                 "ahifd": hifd,
+                "hifd": hifd,  # backward compat
                 "ci": ci,
                 "pneg": pneg,
                 "nse": nse,
@@ -84,8 +91,13 @@ def build_webgis_v2(basins: list, compute_fn) -> str:
     return _HTML_TEMPLATE.replace('__GEOJSON__', geojson_str)
 
 
-def _compute_atci(atdi: float, hifd: float) -> int:
-    """Compute ATCI score (0-100)."""
+def _compute_atci(atdi: float, hifd: float) -> float:
+    """Compute ATCI using calibrated HSAE formula."""
+    return round(min(95.0, max(20.0, 100.0 - atdi * 0.5 - hifd * 0.4)), 1)
+
+
+def _compute_atci_OLD(atdi: float, hifd: float) -> int:
+    """Legacy (disabled)."""
     thresholds = [
         ('Art.5', hifd > 25),
         ('Art.7', atdi > 20),
@@ -107,7 +119,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HSAE v6.0.8 -- WebGIS Basin Risk Map v2</title>
+<title>HSAE v6.0.9 -- WebGIS Basin Risk Map v2</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -209,7 +221,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <div id="hdr">
   <span class="hlogo">🌊</span>
   <div>
-    <div class="htitle">HydroSovereign AI Engine v6.0.8 -- WebGIS Basin Risk Map v2</div>
+    <div class="htitle">HydroSovereign AI Engine v6.0.9 -- WebGIS Basin Risk Map v2</div>
     <div class="hsub">26 Globally Contested Basins &middot; ATDI &middot; AHIFD &middot; ATCI &middot; UNWC 1997 &middot; Plugin ID: 5040</div>
   </div>
   <div id="hdr-right">
@@ -281,13 +293,13 @@ const features = GJ.features;
 // ── BASEMAPS ──────────────────────────────────────────────────────────────
 const BASEMAPS = {
   dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.8',subdomains:'abcd',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.9',subdomains:'abcd',maxZoom:19}),
   light: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.8',subdomains:'abcd',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.9',subdomains:'abcd',maxZoom:19}),
   satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {attribution:'&copy; ESRI &middot; HSAE v6.0.8',maxZoom:19}),
+    {attribution:'&copy; ESRI &middot; HSAE v6.0.9',maxZoom:19}),
   osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.8',maxZoom:19}),
+    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.9',maxZoom:19}),
 };
 
 // ── MAP INIT ──────────────────────────────────────────────────────────────
@@ -299,9 +311,9 @@ BASEMAPS.dark.addTo(map);
 function colourFor(layer, p) {
   if (layer === 'atdi') return p.colour;
   if (layer === 'ahifd') {
-    if (p.hifd < 15) return '#16a34a';
-    if (p.hifd < 25) return '#ca8a04';
-    if (p.hifd < 35) return '#ea580c';
+    if (p.ahifd < 15) return '#16a34a';
+    if (p.ahifd < 25) return '#ca8a04';
+    if (p.ahifd < 35) return '#ea580c';
     return '#dc2626';
   }
   if (layer === 'ci') {
@@ -321,7 +333,7 @@ function colourFor(layer, p) {
 }
 
 function radiusFor(layer, p) {
-  const val = layer==='atdi'?p.atdi : layer==='ahifd'?p.hifd :
+  const val = layer==='atdi'?p.atdi : layer==='ahifd'?p.ahifd :
               layer==='ci'?p.ci*100 : p.atci;
   return Math.max(6, Math.min(20, val / 5 + 4));
 }
@@ -382,7 +394,7 @@ function makePopup(p) {
       width="280" height="110"></canvas>
   </div>
   <div class="p-footer">
-    HSAE v6.0.8 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
+    HSAE v6.0.9 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
   </div>
 </div>`;
 }
@@ -621,7 +633,7 @@ function updateLegendContent(div, layer) {
 const attrCtrl = L.control({position: 'bottomleft'});
 attrCtrl.onAdd = function() {
   const div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = `<b>HSAE v6.0.8</b> &middot; Plugin ID: 5040<br>
+  div.innerHTML = `<b>HSAE v6.0.9</b> &middot; Plugin ID: 5040<br>
     DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank"
       style="color:#60a5fa">10.5281/zenodo.19180160</a><br>
     ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank"

@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.0.8 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.9 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -19,6 +19,12 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from pathlib import Path
 import json
+
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -62,10 +68,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.0.8 Real-Time Dashboard Panel."""
+    """HSAE v6.0.9 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.0.8 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.9 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -80,8 +86,10 @@ class HSAEDashboardPanel(QDockWidget):
 
     def _compute(self, b):
         rc = float(b.get('runoff_c', 0.3))
-        cap = float(b.get('cap', 10))
-        nc = len(
+        cap = float(b.get('cap', b.get('cap_bcm', b.get('dam_capacity_bcm', 10))))
+        _nc_raw = b.get('country', b.get('countries', None))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(b.get('n_countries', b.get('num_countries', 3)))
+        __skip = len(
             b.get(
                 'country',
                 ['?'])) if isinstance(
@@ -93,12 +101,17 @@ class HSAEDashboardPanel(QDockWidget):
                 'name', ''), int(
                 b.get(
                     'dispute_level', 0)))
-        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
-        hifd = min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        atdi = _r['atdi']
+        hifd = _r['ahifd']  # displayed as AHIFD
+        afsf = _r['afsf']
+        ahlb = _r['ahlb']
+        asi  = _r['asi']
+        atci = _r['atci']
         nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
-        pneg = round(max(0.2, min(0.9, 0.7 - atdi / 300 - hifd / 200)), 2)
-        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
+        pneg = _r['pneg']
+        ci   = _r['ci']
         wqi = round(max(30, min(90, 70 - atdi * 0.3 - hifd * 0.2)), 1)
         p_mm = round(rc * 3.5 + cap / 30, 2)
         tws = round(cap * 0.3, 1)
@@ -114,7 +127,8 @@ class HSAEDashboardPanel(QDockWidget):
         risk_col = RED if atdi >= 70 else ORG if atdi >= 55 else "#e3b341" if atdi >= 40 else GREEN
         risk_txt = ("🔴 CRITICAL" if atdi >= 70 else "🟠 HIGH" if atdi >= 55
                     else "🟡 MODERATE" if atdi >= 40 else "🟢 LOW")
-        return dict(atdi=atdi, hifd=hifd, nse=nse, kge=kge, pneg=pneg, ci=ci,
+        return dict(atdi=atdi, ahifd=hifd, hifd=hifd, afsf=afsf, ahlb=ahlb,
+                    asi=asi, atci=atci, nse=nse, kge=kge, pneg=pneg, ci=ci,
                     wqi=wqi, p_mm=p_mm, tws=tws, dlvl=dlvl, arts=arts,
                     risk_col=risk_col, risk_txt=risk_txt, nc=nc,
                     cap=cap, area=area, rc=rc, disp=disp)
@@ -140,7 +154,7 @@ class HSAEDashboardPanel(QDockWidget):
         # Header
         ml.addWidget(
             self._lbl(
-                "🌊 HydroSovereign AI Engine v6.0.8",
+                "🌊 HydroSovereign AI Engine v6.0.9",
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(
@@ -172,7 +186,7 @@ class HSAEDashboardPanel(QDockWidget):
         g.setSpacing(4)
         self.vals = {}
         defs = [
-            ("ATDI%", ORG), ("HIFD%", "#e3b341"),
+            ("ATDI%", ORG), ("AHIFD%", "#e3b341"),
             ("NSE", GREEN), ("KGE", BLUE),
             ("CI", RED), ("WQI", "#a78bfa"),
             ("P(Neg)", "#34d399"), ("Disp", GRAY),
@@ -196,7 +210,7 @@ class HSAEDashboardPanel(QDockWidget):
         pb_l.setContentsMargins(0, 4, 0, 0)
         self.bar_atdi = self._bar(ORG)
         self.bar_hifd = self._bar("#e3b341")
-        for lab, bar in [("ATDI", self.bar_atdi), ("HIFD", self.bar_hifd)]:
+        for lab, bar in [("ATDI", self.bar_atdi), ("AHIFD", self.bar_hifd)]:
             rl = QHBoxLayout()
             rl.addWidget(
                 self._lbl(
@@ -285,7 +299,7 @@ class HSAEDashboardPanel(QDockWidget):
         b = self.current
         d = self._compute(b)
         self.vals["ATDI%"].setText(f"{d['atdi']:.1f}%")
-        self.vals["HIFD%"].setText(f"{d['hifd']:.1f}%")
+        self.vals["AHIFD%"].setText(f"{d['hifd']:.1f}%")
         self.vals["NSE"].setText(str(d['nse']))
         self.vals["KGE"].setText(str(d['kge']))
         self.vals["CI"].setText(f"{d['ci']:.3f}")
@@ -337,7 +351,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.0.8 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.9 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {
@@ -352,9 +366,9 @@ class HSAEDashboardPanel(QDockWidget):
     def _webgis(self):
         import webbrowser
         webbrowser.open(
-            "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app")
+            "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app")
 
     def _app(self):
         import webbrowser
         webbrowser.open(
-            "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app")
+            "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app")

@@ -1,5 +1,5 @@
 """
-dialog_main.py — HSAE v6.0.8 Dashboard Dialog
+dialog_main.py — HSAE v6.0.9 Dashboard Dialog
 ===============================================
 Shows all 26 basins with 6 computed indices:
 ATDI · AHIFD · CI · ATCI · NSE · KGE · Risk
@@ -13,6 +13,12 @@ from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QFont, QColor
 import webbrowser
 
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
+
 
 def _compute_indices(b):
     """Compute all 6 HSAE indices for a basin dict."""
@@ -20,10 +26,15 @@ def _compute_indices(b):
     cap = float(b.get("cap_bcm", b.get("cap", 10)))
     nc = float(b.get("n_countries", b.get("num_countries", 3)))
     rc = float(b.get("runoff_c", 0.35))
-    atdi = round(min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-    ahifd = round(min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
-    ci = round(min(1.0, max(0.0, 0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * ahifd / 100 + 0.1 * (nc - 2) * 0.15)), 3)
-    atci = round(min(95, max(20, 100 - atdi * 0.6 - ahifd * 0.3)), 1)
+    _r    = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+    atdi  = _r['atdi']
+    ahifd = _r['ahifd']
+    afsf  = _r['afsf']
+    ahlb  = _r['ahlb']
+    asi   = _r['asi']
+    atci  = _r['atci']
+    ci    = _r['ci']
+    pneg  = _r['pneg']
     nse = round(max(0.1, min(0.9, 0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
     kge = round(max(0.1, min(0.95, nse + 0.11)), 2)
 
@@ -59,14 +70,14 @@ class HSAEMainDialog(QDialog):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.basins = basins
-        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.8")
+        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.9")
         self.setMinimumSize(1000, 620)
         self._build_ui()
 
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.8")
+        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.9")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
         font.setPointSize(14)
@@ -217,7 +228,7 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
         text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.8</h2>
+        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.9</h2>
         <p>Free, open-source platform automating satellite-based transboundary
         water law compliance for 26 globally contested river basins. GPL-3.0.</p>
         <p><b>6 Original Indices:</b> ATDI · AHIFD · AFSF · AHLB · ASI · ATCI</p>

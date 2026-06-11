@@ -1,11 +1,16 @@
 """
-atdi_algorithm.py — HSAE v6.0.8 QGIS Processing Algorithm
+atdi_algorithm.py — HSAE v6.0.9 QGIS Processing Algorithm
 ATDI: Alkhedir Transparency Deficit Index
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingOutputNumber)
 
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_all, compute_atci,
+    compute_conflict_index, compute_pneg,
+    compute_nse_approx, compute_kge_approx
+)
 
 class ATDIAlgorithm(QgsProcessingAlgorithm):
 
@@ -49,7 +54,9 @@ class ATDIAlgorithm(QgsProcessingAlgorithm):
         cap = self.parameterAsDouble(parameters, self.CAP, context)
         nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        atdi = min(95.0, max(5.0, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
+        atdi = compute_atdi(
+            runoff_c=rc, cap_bcm=cap,
+            n_countries=int(nc), dispute_level=int(disp))
         feedback.pushInfo(f'ATDI = {atdi:.2f}%')
         return {self.OUT: atdi}
 

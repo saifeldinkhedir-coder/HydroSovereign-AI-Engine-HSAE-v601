@@ -1,5 +1,5 @@
 """
-basin_loader.py — HSAE v6.0.8
+basin_loader.py — HSAE v6.0.9
 Load 26 Transboundary Basins as QGIS Vector Layer
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -8,6 +8,12 @@ from qgis.core import (QgsVectorLayer, QgsFeature, QgsGeometry,
                        QgsRendererCategory,
                        QgsMarkerSymbol)
 from qgis.PyQt.QtCore import QVariant
+
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -46,7 +52,7 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     Returns the layer (caller adds to project).
     """
     lyr = QgsVectorLayer("Point?crs=EPSG:4326",
-                         "HSAE v6.0.8 — 26 Transboundary Basins", "memory")
+                         "HSAE v6.0.9 — 26 Transboundary Basins", "memory")
     pr = lyr.dataProvider()
     pr.addAttributes([
         QgsField("id", QVariant.String),
@@ -62,7 +68,11 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
         QgsField("area_km2", QVariant.Double),
         QgsField("runoff_c", QVariant.Double),
         QgsField("atdi_pct", QVariant.Double),
-        QgsField("hifd_pct", QVariant.Double),
+        QgsField("ahifd_pct", QVariant.Double),
+        QgsField("afsf",      QVariant.Double),
+        QgsField("ahlb",      QVariant.Double),
+        QgsField("asi",       QVariant.Double),
+        QgsField("atci",      QVariant.Double),
         QgsField("nse", QVariant.Double),
         QgsField("kge", QVariant.Double),
         QgsField("ci", QVariant.Double),
@@ -80,21 +90,26 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
             continue
 
         name = b.get('name', '')
-        rc = float(b.get('runoff_c', 0.3))
-        cap = float(b.get('cap', b.get('cap_bcm', 10)))
-        nc = (len(b.get('country', ['?'])) if isinstance(
-            b.get('country'), list) else int(b.get('n_countries', 2)))
+        rc = float(b.get('runoff_c', b.get('riparian_cooperation', 0.35)))
+        cap = float(b.get('cap', b.get('cap_bcm', b.get('dam_capacity_bcm', 10))))
+        _nc_raw = b.get('country', b.get('countries', None))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(b.get('n_countries', b.get('num_countries', 3)))
         area = float(b.get('eff_cat_km2', b.get('area_km2', 100000)))
         disp = DISP_LEVELS.get(name, int(b.get('dispute_level', 0)))
 
         # Compute indices
-        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
-        hifd = min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        atdi = _r['atdi']
+        hifd = _r['ahifd']
+        afsf = _r['afsf']
+        ahlb = _r['ahlb']
+        asi  = _r['asi']
+        atci_val = _r['atci']
         nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = round(
-            max(0.2, min(0.9, 0.7 - atdi / 300 - hifd / 200 - (nc - 2) * 0.04)), 2)
-        ci = round(0.4 * atdi / 100 + 0.25 * (disp / 4) + 0.2 * hifd / 100 + 0.1 * (nc - 2) * 0.15, 3)
+            compute_pneg(atdi=atdi, ahifd=hifd, n_countries=int(nc)), 2)
+        ci   = _r['ci']
         dlvl = ['LOW', 'LOW', 'MEDIUM', 'HIGH',
                 'CRITICAL', 'CRITICAL'][min(disp, 5)]
         arts = ['Art.5 ERU', 'Art.9 Data']
@@ -115,7 +130,8 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
             b.get('continent', b.get('region', '')), clist, nc,
             b.get('treaty', ''), b.get('legal_arts', ''),
             cap, area, rc,
-            round(atdi, 1), round(hifd, 1), nse, kge, ci,
+            round(atdi,1), round(hifd,1), round(afsf,3), round(ahlb,3),
+            round(asi,3), round(atci_val,1), nse, kge, ci,
             pneg, dlvl, ', '.join(arts),
             b.get('context', '')[:200],
         ])

@@ -1,6 +1,6 @@
 """
-hsae_processing_provider.py — HSAE v6.0.8
-Complete Processing Provider — 5 Algorithms
+hsae_processing_provider.py — HSAE v6.0.9
+Complete Processing Provider — 6 Algorithms
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import QgsProcessingProvider
@@ -15,24 +15,23 @@ class HSAEProcessingProvider(QgsProcessingProvider):
         from .algorithms.basin_report_algorithm import BasinReportAlgorithm
         from .algorithms.hbv_algorithm import HBV96Algorithm
         from .algorithms.comparison_algorithm import MultiBasinComparisonAlgorithm
+        from .algorithms.custom_basin_algorithm import CustomBasinAlgorithm
+
         self.addAlgorithm(ATDIAlgorithm())
         self.addAlgorithm(HIFDAlgorithm())
         self.addAlgorithm(BasinReportAlgorithm())
         self.addAlgorithm(HBV96Algorithm())
         self.addAlgorithm(MultiBasinComparisonAlgorithm())
+        self.addAlgorithm(CustomBasinAlgorithm())
 
     def id(self):
-        return 'hsae'
+        return "hsae"
 
     def name(self):
-        return 'HydroSovereign AI Engine v6.0.8'
-
-    def longName(self):
-        return 'HSAE v6.0.8 — Transboundary Water Analysis'
-
-    def versionInfo(self):
-        return '6.0.8'
+        return "HydroSovereign AI Engine"
 
     def icon(self):
-        from qgis.PyQt.QtGui import QIcon
-        return QIcon(str(Path(__file__).parent / 'icon.png'))
+        return QgsProcessingProvider.icon(self)
+
+    def longName(self):
+        return "HydroSovereign AI Engine — AWSI Indices v6.0.9"

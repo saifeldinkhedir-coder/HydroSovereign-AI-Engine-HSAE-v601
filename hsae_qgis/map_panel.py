@@ -1,5 +1,5 @@
 """
-HSAE v6.0.8 — Interactive Basin Risk Map Panel
+HSAE v6.0.9 — Interactive Basin Risk Map Panel
 ================================================
 Pure Qt — no QWebEngineView required.
 Shows all 26 basins with ATDI/AHIFD/CI risk table.
@@ -22,7 +22,13 @@ except ImportError:
 
 from qgis.core import QgsMessageLog, Qgis
 
-LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.8-6euz2zxcmerkzxgordmvxf.streamlit.app"
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
+
+LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app"
 
 
 def _risk_color(atdi: float) -> str:
@@ -115,7 +121,7 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
         self._table = QTableWidget()
         self._table.setColumnCount(6)
         self._table.setHorizontalHeaderLabels(
-            ["Basin", "ATDI %", "AHIFD %", "CI", "Risk", "UNWC Art.7"])
+            ["Basin", "ATDI %", "AHIFD %", "ATCI", "CI", "Risk", "UNWC Art.7"])
         self._table.horizontalHeader().setSectionResizeMode(
             0, QHeaderView.Stretch)
         for col in range(1, 6):
@@ -136,13 +142,21 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
     def _compute(self, basin: dict) -> dict:
         """Compute key indices for a basin."""
         disp = basin.get("dispute_level", 2)
-        cap = basin.get("dam_capacity_bcm", 50)
-        nc = basin.get("num_countries", 3)
-        rc = basin.get("riparian_cooperation", 0.45)
-        atdi = round(min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10)), 1)
-        ahifd = round(min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3)), 1)
-        ci = round(min(100, max(0, disp * 15 + (1 - rc) * 30 + (nc - 2) * 5 + min(cap / 5, 20))), 0)
-        return {"atdi": atdi, "ahifd": ahifd, "ci": int(ci)}
+        cap = float(basin.get("cap", basin.get("cap_bcm", basin.get("dam_capacity_bcm", 50))))
+        _nc_raw = basin.get("country", basin.get("countries", None))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(basin.get("n_countries", basin.get("num_countries", 3)))
+        rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
+        _r    = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        return {
+            "atdi":  _r['atdi'],
+            "ahifd": _r['ahifd'],
+            "afsf":  _r['afsf'],
+            "ahlb":  _r['ahlb'],
+            "asi":   _r['asi'],
+            "atci":  _r['atci'],
+            "ci":    _r['ci'],
+            "pneg":  _r['pneg'],
+        }
 
     def _refresh(self) -> None:
         """Refresh table — recompute all basins."""
@@ -200,7 +214,7 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
                 lon = b.get("lon", 0)
                 name = b.get("name", "Unknown").replace("'", " ")
                 color = _risk_color(d["atdi"])
-                popup = (name + " | ATDI:" + str(d["atdi"]) + "%" + " | AHIFD:" + str(d["ahifd"]) + "%" + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
+                popup = (name + " | ATDI:" + str(d["atdi"]) + "% | AAHIFD:" + str(d["ahifd"]) + "% | ATCI:" + str(d["atci"]) + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
                 marker_lines.append(
                     "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + "{radius:10,color:'" + color + "',fillColor:'" + color + "',fillOpacity:0.8}).addTo(map)" + ".bindPopup('" + popup + "');"
                 )

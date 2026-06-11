@@ -1,11 +1,16 @@
 """
-comparison_algorithm.py — HSAE v6.0.8 QGIS Processing Algorithm
+comparison_algorithm.py — HSAE v6.0.9 QGIS Processing Algorithm
 Multi-Basin Comparison Tool (CSV + HTML report)
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterString,
                        QgsProcessingParameterFileDestination)
 
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_all, compute_atci,
+    compute_conflict_index, compute_pneg,
+    compute_nse_approx, compute_kge_approx
+)
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -35,7 +40,6 @@ DISP_LEVELS = {
     "Murray-Darling – Hume Dam": 1,
     "Amazon – Belo Monte Dam": 1,
 }
-
 
 class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
 
@@ -98,8 +102,12 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
                 list) else 2
             area = float(b.get('eff_cat_km2', 100000))
             disp = DISP_LEVELS.get(name, int(b.get('dispute_level', 0)))
-            atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
-            hifd = min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+            atdi = compute_atdi(
+                runoff_c=rc, cap_bcm=cap,
+                n_countries=int(nc), dispute_level=int(disp))
+            hifd = compute_ahifd(
+                runoff_c=rc, cap_bcm=cap,
+                n_countries=int(nc), dispute_level=int(disp))
             nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
             kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
             pneg = round(
@@ -145,7 +153,7 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
                         r['name']},{
                         r['nc']},{
                         r['atdi']:.1f},{
-                        r['hifd']:.1f}," f"{
+                        r['ahifd']:.1f}," f"{
                         r['nse']},{
                             r['kge']},{
                                 r['ci']:.3f},{
@@ -158,7 +166,7 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
           <td><b>{r['name']}</b></td><td style='text-align:center'>{r['nc']}</td>
           <td style='color:{"#f85149" if r["atdi"] >= 55 else "#f0883e" if r["atdi"] >= 40 else "#3fb950"};
               font-weight:bold'>{r['atdi']:.1f}%</td>
-          <td>{r['hifd']:.1f}%</td><td>{r['nse']}</td><td>{r['kge']}</td>
+          <td>{r['ahifd']:.1f}%</td><td>{r['nse']}</td><td>{r['kge']}</td>
           <td>{r['ci']:.3f}</td>
           <td>{'🔴' if r["dlvl"] == "CRITICAL" else "🟠" if r["dlvl"] == "HIGH"
                else "🟡" if r["dlvl"] == "MEDIUM" else "🟢"} {r['dlvl']}</td>
@@ -168,7 +176,7 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
         from datetime import datetime
         with open(outhtml, 'w', encoding='utf-8') as f:
             f.write(f"""<!DOCTYPE html><html><head>
-<title>HSAE v6.0.8 — Multi-Basin Comparison</title>
+<title>HSAE v6.0.9 — Multi-Basin Comparison</title>
 <style>
 body{{font-family:Arial,sans-serif;background:#0d1117;color:#e6edf3;padding:20px}}
 h1{{color:#58a6ff;font-size:16px}}
@@ -178,7 +186,7 @@ th{{background:#161b22;color:#58a6ff;padding:7px 5px;border:1px solid #30363d;te
 td{{padding:6px 5px;border:1px solid #21262d;vertical-align:top}}
 tr:nth-child(even){{background:#161b22}}
 </style></head><body>
-<h1>🌊 HSAE v6.0.8 — Multi-Basin Comparison Report</h1>
+<h1>🌊 HSAE v6.0.9 — Multi-Basin Comparison Report</h1>
 <h2>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
     DOI: 10.5281/zenodo.19180160 ·
     Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</h2>
@@ -188,7 +196,7 @@ tr:nth-child(even){{background:#161b22}}
 <th>P(Neg)</th><th>UN Articles</th>
 </tr></thead><tbody>{rows}</tbody></table>
 <p style='color:#8b949e;font-size:10px;margin-top:12px'>
-HSAE v6.0.8 · {len(results)} basins · UNWC 1997 · TFDD/ICOW</p>
+HSAE v6.0.9 · {len(results)} basins · UNWC 1997 · TFDD/ICOW</p>
 </body></html>""")
 
         feedback.setProgress(100)

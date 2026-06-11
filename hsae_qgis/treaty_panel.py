@@ -1,11 +1,17 @@
 """
-HSAE v6.0.8 — Treaty Analysis Panel (ATCI)
+HSAE v6.0.9 — Treaty Analysis Panel (ATCI)
 ============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays ATCI Treaty Compliance Index for any basin.
 """
 from __future__ import annotations
 import random
+
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_afsf,
+    compute_ahlb, compute_asi, compute_atci,
+    compute_conflict_index, compute_pneg, compute_all
+)
 
 try:
     from qgis.PyQt.QtWidgets import (
@@ -96,12 +102,21 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         basin = self._basins[idx] if idx < len(self._basins) else {}
         name = basin.get("name", "Unknown")
         disp = basin.get("dispute_level", 2)
-        cap = basin.get("dam_capacity_bcm", 74)
-        nc = basin.get("num_countries", 3)
-        rc = basin.get("riparian_cooperation", 0.45)
+        cap = float(basin.get("cap", basin.get("cap_bcm", basin.get("dam_capacity_bcm", 74))))
+        _nc_raw = basin.get("country", basin.get("countries", None))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(basin.get("n_countries", basin.get("num_countries", 3)))
+        rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
 
         # Compute ATCI
-        atci = round(min(95, max(20, 100 - (15 + disp * 12) * 0.6 - (8 + min(cap / 3, 15)) * 0.3)), 1)
+        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        atdi  = _r['atdi']
+        ahifd = _r['ahifd']
+        afsf  = _r['afsf']
+        ahlb  = _r['ahlb']
+        asi   = _r['asi']
+        atci  = _r['atci']
+        ci    = _r['ci']
+        pneg  = _r['pneg']
 
         # Overall metric
         color = ("#c0392b" if atci > 60 else

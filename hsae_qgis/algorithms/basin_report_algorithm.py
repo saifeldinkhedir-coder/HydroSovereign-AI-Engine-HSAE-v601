@@ -1,5 +1,5 @@
 """
-basin_report_algorithm.py — HSAE v6.0.8 QGIS Processing Algorithm
+basin_report_algorithm.py — HSAE v6.0.9 QGIS Processing Algorithm
 Complete Basin Legal Report Generator
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -7,6 +7,11 @@ from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingParameterString,
                        QgsProcessingParameterFileDestination)
 
+from hsae_qgis.core.indices import (
+    compute_atdi, compute_ahifd, compute_all, compute_atci,
+    compute_conflict_index, compute_pneg,
+    compute_nse_approx, compute_kge_approx
+)
 
 class BasinReportAlgorithm(QgsProcessingAlgorithm):
 
@@ -62,8 +67,12 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
         treaty = self.parameterAsString(parameters, self.TREATY, context)
         output = self.parameterAsFileOutput(parameters, self.OUTPUT, context)
 
-        atdi = min(95, max(5, 15 + disp * 12 + min(cap / 2, 20) + (nc - 2) * 8 + (1 - rc) * 10))
-        hifd = min(80, max(5, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        atdi = compute_atdi(
+            runoff_c=rc, cap_bcm=cap,
+            n_countries=int(nc), dispute_level=int(disp))
+        hifd = compute_ahifd(
+            runoff_c=rc, cap_bcm=cap,
+            n_countries=int(nc), dispute_level=int(disp))
         nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = round(max(0.2, min(0.9, 0.7 - atdi / 300 - hifd / 200)), 2)
@@ -85,7 +94,7 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
 
         from datetime import datetime
         report = f"""
-HSAE v6.0.8 — BASIN LEGAL REPORT
+HSAE v6.0.9 — BASIN LEGAL REPORT
 {'=' * 60}
 Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
 Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991

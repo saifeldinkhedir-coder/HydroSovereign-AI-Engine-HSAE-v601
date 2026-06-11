@@ -98,7 +98,7 @@ Implemented as a **49-module Python application** (31,273 lines · 33 pages · z
 **Manual includes:**
 - ⚡ Quick Start (5-minute tutorial)
 - 🛠️ All 13 Tools — step-by-step with screenshots
-- ⚙️ 5 Processing Algorithms — complete reference
+- ⚙️ 6 Processing Algorithms — complete reference
 - 🗺️ 26 Basin registry with ATDI/HIFD values
 - 📊 Scientific indices (ATDI, HIFD, CI, HBV-96, NSE, KGE)
 - 🖥️ QGIS Desktop operating guide (Ch. 11)

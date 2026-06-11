@@ -2,47 +2,52 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.8: Transboundary water sovereignty. 26 basins, 16 tools, 5 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
-version=6.0.8
+description=HSAE v6.0.9: Transboundary water sovereignty. 26 basins, 17 tools, 6 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), Add Custom Basin, GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
+version=6.0.9
 author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.0.8 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
+about=HydroSovereign AI Engine (HSAE) v6.0.9 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
     Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
-    Key results for Blue Nile (GERD): ATDI = 43.5 percent (Art.7 UNWC), AHIFD = 20.0 percent, NSE = 0.63, KGE = 0.74, CI = 44 MEDIUM, P(Negotiation) = 58 percent, ATCI = 70 percent.
-    16 tools plus 5 Processing Algorithms. Plugin ID: 5040. Approved by QGIS PSC (0 Critical, 0 Warnings).
+    NEW in v6.0.9: Add Custom Basin tool — analyse any worldwide basin by lat/lon, dam capacity, and dispute level using all 6 AWSI indices.
+    NEW in v6.0.9: Unified AWSI formula engine (core/indices.py) — ATDI calibrated to 43.6%% across all systems.
+    Key results for Blue Nile (GERD): ATDI = 43.5%% (Art.7 UNWC triggered), AHIFD = 20.0%%, NSE = 0.63, KGE = 0.74, CI = 0.44 MODERATE, P(Negotiation) = 58%%, ATCI = 70/100.
+    17 tools plus 6 Processing Algorithms. Plugin ID: 5040. Approved by QGIS PSC (0 Critical, 0 Warnings). 456+ downloads, 20 countries.
     Peer-reviewed publication: Elsevier SoftwareX SOFTX-D-26-00442 (under review). Preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
     Archive DOI: https://doi.org/10.5281/zenodo.19180160
     Manual v6 (15 chapters): https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/raw/main/hsae_qgis/HSAE_v601_QGIS_Plugin_Manual_v6.docx
 tracker=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601/issues
 repository=https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601
 hasProcessingProvider=yes
-tags=hydrology,water,transboundary,ATDI,HIFD,AFSF,ATCI,ASI,AHLB,UNWC,GEE,satellite,HBV,legal,Nile,Mekong,Euphrates,ICJ,PCA,negotiation,conflict,WebGIS,sovereignty,AI,machine-learning,digital-twin,open-source,leaflet,uncertainty,treaty
+tags=hydrology,water,transboundary,ATDI,AHIFD,AFSF,ATCI,ASI,AHLB,UNWC,GEE,satellite,HBV,legal,Nile,Mekong,Euphrates,ICJ,PCA,negotiation,conflict,WebGIS,sovereignty,AI,machine-learning,custom-basin,open-source,uncertainty,treaty
 homepage=https://plugins.qgis.org/plugins/hsae_qgis/
 category=Vector
 icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    v6.0.9 (June 2026) -- Add Custom Basin + Unified Formula Engine:
+    NEW Tool 17: Add Custom Basin — analyse any worldwide transboundary basin by lat/lon,
+    dam capacity (BCM), riparian country count, and dispute intensity level.
+    Auto-estimates runoff coefficient from lat/lon using Koppen-Geiger climate zones.
+    Outputs all 6 AWSI indices + CI + Risk + triggered UNWC articles.
+    Option to add result as QGIS vector point layer or session basin registry.
+    NEW: core/indices.py — single source of truth for all AWSI formulas across 11 modules.
+    FIX: ATDI calibrated to 43.6%% (was incorrectly 95%%) — now consistent across all systems.
+    NEW: 6th Processing Algorithm: Custom Basin AWSI Analyser (QGIS Processing Toolbox).
+    Updated to 17 tools + 6 Processing Algorithms.
+
     v6.0.8 (May 2026) -- GeoAgent integration + AHIFD name fix:
     Added Tool 16: GeoAgent Natural Language Query (opengeos/GeoAgent PR #79, merged by Prof. Qiusheng Wu).
     HSAE tools (9 @geo_tool functions) now part of opengeos/GeoAgent ecosystem.
     Fixed index name: HIFD -> AHIFD (Alkhedir Human-Induced Flow Deficit) throughout.
-    Updated to 16 tools total. AHIFD corrected in all annotations.
+
     v6.0.7 (May 2026) -- Publication links and name correction:
     Updated preprint link to SSRN: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
-    Corrected author name spelling to Alkhedir throughout all files.
-    SoftwareX SOFTX-D-26-00442 confirmed under peer review (1 review completed).
-    
+    SoftwareX SOFTX-D-26-00442 confirmed under peer review.
+
     v6.0.6 (May 2026) -- Name correction plus metadata update:
     Corrected author name spelling to Alkhedir throughout all files.
-    Updated publication reference to SoftwareX SOFTX-D-26-00442 (under peer review).
-    Added SSRN preprint: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396
-    Added Zenodo archive DOI: https://doi.org/10.5281/zenodo.19180160
-    Corrected tool count: 16 tools plus 5 Processing Algorithms (About dialog is not a tool).
-
-    v6.0.5 (April 2026) -- Description fix:
-    Removed ambiguous abbreviations from visible text.
-    Restructured about section for readability.
+    Added SSRN preprint and Zenodo archive DOI: https://doi.org/10.5281/zenodo.19180160
 
     v6.0.4 (April 2026) -- WebGIS Map v2:
     Added WebGIS Map v2 with Search, Layer Toggle, Basemap Switcher, Risk Filter, Chart.js popups.
@@ -50,6 +55,5 @@ changelog=
     v6.0.3 (April 2026) -- Tools 14 15 16 plus Manual v6:
     Added Leaflet map inside QGIS Desktop, Bayesian Uncertainty Panel, Treaty Compliance Panel.
 
-    v6.0.1 (April 21, 2026) -- Official QGIS publication:
+    v6.0.1 (April 2026) -- Official QGIS publication:
     Plugin ID 5040 approved. Security scan: 0 Critical, 0 Warnings.
-

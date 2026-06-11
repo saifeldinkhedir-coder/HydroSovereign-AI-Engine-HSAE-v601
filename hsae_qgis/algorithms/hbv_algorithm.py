@@ -1,5 +1,5 @@
 """
-hbv_algorithm.py — HSAE v6.0.8 QGIS Processing Algorithm
+hbv_algorithm.py — HSAE v6.0.9 QGIS Processing Algorithm
 HBV-96 Hydrological Model with SCE-UA Calibration
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
