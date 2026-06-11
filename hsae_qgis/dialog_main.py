@@ -35,17 +35,13 @@ def _compute_indices(b):
     atci  = _r['atci']
     ci    = _r['ci']
     pneg  = _r['pneg']
-    nse = round(max(0.1, min(0.9, 0.7 - atdi / 300 - ahifd / 200 - (nc - 2) * 0.04)), 2)
-    kge = round(max(0.1, min(0.95, nse + 0.11)), 2)
+    nse = _r['nse']
+    kge = _r['kge']
 
-    if atdi >= 60:
-        risk = "CRITICAL"
-    elif atdi >= 40:
-        risk = "HIGH"
-    elif atdi >= 25:
-        risk = "MEDIUM"
-    else:
-        risk = "LOW"
+    # Risk from central engine (CRITICAL≥70 · HIGH≥55 · MODERATE≥40 · LOW)
+    risk = _r['risk']
+    if risk == "MODERATE":
+        risk = "MEDIUM"  # dialog uses MEDIUM label
 
     region = b.get("continent", b.get("region", "—"))
     for emoji in ["🌍 ", "🌎 ", "🌏 ", "🌍", "🌎", "🌏"]:
@@ -200,11 +196,12 @@ class HSAEMainDialog(QDialog):
         <p><b>Platform averages:</b>
            ATDI={avg_atdi}% &nbsp;|&nbsp; AHIFD={avg_ahifd}%
            &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
-        <p><b>Formula:</b> ATDI = 15 + disp×12 + min(cap/2,20) + (nc−2)×8 + (1−rc)×10</p>
+        <p><b>Formula (calibrated v6.0.9):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
         <p><b>Thresholds (UNWC 1997):</b>
-           ≥60% CRITICAL (Art.9) &nbsp;|&nbsp;
-           ≥40% HIGH (Art.7) &nbsp;|&nbsp;
-           ≥25% MEDIUM (Art.5)</p>
+           ≥70% CRITICAL (Art.33) &nbsp;|&nbsp;
+           ≥55% HIGH (Art.33) &nbsp;|&nbsp;
+           ≥40% MEDIUM (Art.7 triggered) &nbsp;|&nbsp;
+           &lt;40% LOW</p>
         <hr>
         <p><span style='color:#c0392b'>🔴 CRITICAL — {len(critical)} basins:</span><br>
         {" · ".join(b.get("name", "") for b in critical) or "—"}</p>

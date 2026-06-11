@@ -34,6 +34,7 @@ App:     https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.str
 from .map_panel import HSAEMapPanel
 from .treaty_panel import HSAETreatyPanel
 from .uncertainty_panel import HSAEUncertaintyPanel
+from .custom_basin_tool import CustomBasinDialog
 
 try:
     from .webgis_v2 import build_webgis_v2
@@ -103,6 +104,7 @@ class HSAEPlugin:
         self.actions = []
         self.menu = "&HydroSovereign AI Engine v6.0.9"
         self.toolbar = None
+        self.session_basins = []  # custom basins added this session
         self.panel = None
 
     def initGui(self):
@@ -188,6 +190,35 @@ class HSAEPlugin:
             self.about,
             "ⓘ  About HSAE",
             False)
+
+        self._add(
+            "🌍 Add Custom Basin",
+            self.add_custom_basin,
+            "Analyse any user-defined transboundary basin worldwide",
+            True)
+
+    def add_custom_basin(self):
+        """Open the Add Custom Basin dialog (Tool 17, v6.0.9)."""
+        try:
+            dlg = CustomBasinDialog(
+                self.iface, self.session_basins, self.iface.mainWindow())
+            dlg.basin_added.connect(self._on_custom_basin_added)
+            dlg.exec_()
+        except Exception as e:
+            from qgis.PyQt.QtWidgets import QMessageBox
+            QMessageBox.critical(
+                None, "HSAE Error",
+                f"Could not open Add Custom Basin:\n{e}")
+
+    def _on_custom_basin_added(self, basin_dict):
+        """Slot: notify when a custom basin is added to the registry."""
+        try:
+            self.iface.statusBarIface().showMessage(
+                f"✅ Custom basin '{basin_dict['name']}' added — "
+                f"ATDI={basin_dict['_atdi']}% Risk={basin_dict['_risk']}",
+                5000)
+        except Exception:
+            pass
 
     def _add(self, text, cb, tip, toolbar=False):
         a = QAction(text, self.iface.mainWindow())
