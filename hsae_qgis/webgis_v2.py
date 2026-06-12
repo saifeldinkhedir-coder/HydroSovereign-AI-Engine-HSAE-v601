@@ -1,5 +1,5 @@
 """
-HSAE v6.0.11 -- WebGIS Map v2 (v6.0.9)
+HSAE v6.0.11 -- WebGIS Map v2
 Professional interactive map with Search, Layer Toggle,
 Basemap Switcher, Risk Filter, Chart Popups, and Export PNG.
 """

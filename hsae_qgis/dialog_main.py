@@ -60,7 +60,7 @@ class HSAEMainDialog(QDialog):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.basins = basins
-        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.9")
+        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.11")
         self.setMinimumSize(1000, 620)
         self._build_ui()
 

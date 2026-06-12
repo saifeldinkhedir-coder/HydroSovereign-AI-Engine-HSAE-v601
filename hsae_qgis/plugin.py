@@ -60,7 +60,7 @@ ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
 SSRN_URL = "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396"
 LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app"
-GITHUB = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v6.0.9"
+GITHUB = "https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601"
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -98,7 +98,7 @@ class HSAEPlugin:
         self.iface = iface
         self.provider = None
         self.actions = []
-        self.menu = "&HydroSovereign AI Engine v6.0.9"
+        self.menu = "&HydroSovereign AI Engine v6.0.11"
         self.toolbar = None
         self.session_basins = []  # custom basins added this session
         self.panel = None
@@ -174,7 +174,7 @@ class HSAEPlugin:
         self._add(
             "─── v6.08 NEW ───",
             lambda: None,
-            "New in v6.0.9",
+            "New in v6.0.11",
             False)
         self._add(
             "🤖 GeoAgent · Natural Language",
@@ -572,7 +572,7 @@ Map.setOptions('HYBRID');
     def webgis_map(self):
         try:
             path, _ = QFileDialog.getSaveFileName(
-                None, "Save WebGIS Map", "HSAE_WebGIS_v6.0.9", "HTML (*.html)")
+                None, "Save WebGIS Map", "HSAE_WebGIS_v6.0.11", "HTML (*.html)")
             if not path:
                 return
             if HAS_WEBGIS_V2:
@@ -717,7 +717,7 @@ function showPanel(p){{
     def icj_export(self):
         try:
             path, _ = QFileDialog.getSaveFileName(
-                None, "Export ICJ/PCA Dossier", "HSAE_ICJ_PCA_Dossier_v6.0.9",
+                None, "Export ICJ/PCA Dossier", "HSAE_ICJ_PCA_Dossier_v6.0.11",
                 "HTML (*.html);;Text (*.txt)")
             if not path:
                 return

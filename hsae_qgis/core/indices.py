@@ -1,5 +1,5 @@
 """
-hsae_qgis/core/indices.py  —  v6.0.9
+hsae_qgis/core/indices.py  —  v6.0.11
 ======================================
 SINGLE SOURCE OF TRUTH for all AWSI formulas.
 

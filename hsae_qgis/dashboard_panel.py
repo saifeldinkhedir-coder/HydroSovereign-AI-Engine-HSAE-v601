@@ -144,7 +144,7 @@ class HSAEDashboardPanel(QDockWidget):
         # Header
         ml.addWidget(
             self._lbl(
-                "🌊 HydroSovereign AI Engine v6.0.9",
+                "🌊 HydroSovereign AI Engine v6.0.11",
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(

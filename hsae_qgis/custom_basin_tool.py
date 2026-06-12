@@ -20,7 +20,7 @@ Outputs:
   · Option to add to basins registry for session
 
 Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
-Version: 6.0.10
+Version: 6.0.11
 """
 from __future__ import annotations
 from qgis.PyQt.QtWidgets import (

@@ -33,4 +33,4 @@ class HSAEProcessingProvider(QgsProcessingProvider):
         return QgsProcessingProvider.icon(self)
 
     def longName(self):
-        return "HydroSovereign AI Engine — AWSI Indices v6.0.9"
+        return "HydroSovereign AI Engine — AWSI Indices v6.0.11"
