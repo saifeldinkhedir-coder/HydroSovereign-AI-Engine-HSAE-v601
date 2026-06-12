@@ -1,5 +1,5 @@
 """
-dialog_main.py — HSAE v6.0.10 Dashboard Dialog
+dialog_main.py — HSAE v6.0.11 Dashboard Dialog
 ===============================================
 Shows all 26 basins with 6 computed indices:
 ATDI · AHIFD · CI · ATCI · NSE · KGE · Risk
@@ -12,12 +12,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QFont, QColor
 import webbrowser
-
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
+from hsae_qgis.core.indices import compute_all
 
 
 def _compute_indices(b):
@@ -26,15 +21,15 @@ def _compute_indices(b):
     cap = float(b.get("cap_bcm", b.get("cap", 10)))
     nc = float(b.get("n_countries", b.get("num_countries", 3)))
     rc = float(b.get("runoff_c", 0.35))
-    _r    = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
-    atdi  = _r['atdi']
+    _r = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+    atdi = _r['atdi']
     ahifd = _r['ahifd']
-    afsf  = _r['afsf']
-    ahlb  = _r['ahlb']
-    asi   = _r['asi']
-    atci  = _r['atci']
-    ci    = _r['ci']
-    pneg  = _r['pneg']
+    afsf = _r['afsf']
+    ahlb = _r['ahlb']
+    asi = _r['asi']
+    atci = _r['atci']
+    ci = _r['ci']
+    pneg = _r['pneg']
     nse = _r['nse']
     kge = _r['kge']
 
@@ -52,6 +47,7 @@ def _compute_indices(b):
 
     return {
         "atdi": atdi, "ahifd": ahifd, "ci": ci,
+        "afsf": afsf, "ahlb": ahlb, "asi": asi, "pneg": pneg,
         "atci": atci, "nse": nse, "kge": kge,
         "risk": risk, "region": region,
         "upstream": upstream, "downstream": downstream,
@@ -71,7 +67,7 @@ class HSAEMainDialog(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.10")
+        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.11")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
         font.setPointSize(14)
@@ -194,7 +190,7 @@ class HSAEMainDialog(QDialog):
         <p><b>Platform averages:</b>
            ATDI={avg_atdi}% &nbsp;|&nbsp; AHIFD={avg_ahifd}%
            &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
-        <p><b>Formula (calibrated v6.0.10):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
+        <p><b>Formula (calibrated v6.0.11):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
         <p><b>Thresholds (UNWC 1997):</b>
            ≥60% CRITICAL (Art.33 dispute zone) &nbsp;|&nbsp;
            ≥40% HIGH (Art.7 triggered) &nbsp;|&nbsp;
@@ -223,7 +219,7 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
         text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.10</h2>
+        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.11</h2>
         <p>Free, open-source platform automating satellite-based transboundary
         water law compliance for 26 globally contested river basins. GPL-3.0.</p>
         <p><b>6 Original Indices:</b> ATDI · AHIFD · AFSF · AHLB · ASI · ATCI</p>

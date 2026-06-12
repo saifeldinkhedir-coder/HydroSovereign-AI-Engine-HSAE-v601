@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.0.10 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.11 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -19,12 +19,8 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from pathlib import Path
 import json
+from hsae_qgis.core.indices import compute_all
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -68,10 +64,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.0.10 Real-Time Dashboard Panel."""
+    """HSAE v6.0.11 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.0.10 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.11 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -89,29 +85,23 @@ class HSAEDashboardPanel(QDockWidget):
         cap = float(b.get('cap', b.get('cap_bcm', b.get('dam_capacity_bcm', 10))))
         _nc_raw = b.get('country', b.get('countries', None))
         nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(b.get('n_countries', b.get('num_countries', 3)))
-        __skip = len(
-            b.get(
-                'country',
-                ['?'])) if isinstance(
-            b.get('country'),
-            list) else 2
         area = float(b.get('eff_cat_km2', 100000))
         disp = DISP_LEVELS.get(
             b.get(
                 'name', ''), int(
                 b.get(
                     'dispute_level', 0)))
-        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        _r = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
         atdi = _r['atdi']
         hifd = _r['ahifd']  # displayed as AHIFD
         afsf = _r['afsf']
         ahlb = _r['ahlb']
-        asi  = _r['asi']
+        asi = _r['asi']
         atci = _r['atci']
         nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = _r['pneg']
-        ci   = _r['ci']
+        ci = _r['ci']
         wqi = round(max(30, min(90, 70 - atdi * 0.3 - hifd * 0.2)), 1)
         p_mm = round(rc * 3.5 + cap / 30, 2)
         tws = round(cap * 0.3, 1)
@@ -351,7 +341,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.0.10 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.11 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {

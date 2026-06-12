@@ -1,10 +1,9 @@
 """
-hsae_processing_provider.py — HSAE v6.0.10
+hsae_processing_provider.py — HSAE v6.0.11
 Complete Processing Provider — 6 Algorithms
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import QgsProcessingProvider
-from pathlib import Path
 
 
 class HSAEProcessingProvider(QgsProcessingProvider):

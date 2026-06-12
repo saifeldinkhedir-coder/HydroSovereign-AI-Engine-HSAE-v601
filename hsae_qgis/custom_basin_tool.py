@@ -1,5 +1,5 @@
 """
-custom_basin_tool.py — HSAE v6.0.10
+custom_basin_tool.py — HSAE v6.0.11
 =====================================
 Add Custom Basin — User-Defined Basin Analyser
 Allows analysis of any basin worldwide without pre-loading.
@@ -23,30 +23,25 @@ Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 Version: 6.0.10
 """
 from __future__ import annotations
-import math
-
 from qgis.PyQt.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QPushButton, QLineEdit, QSpinBox,
     QDoubleSpinBox, QComboBox, QTextEdit,
-    QGroupBox, QMessageBox, QCheckBox, QWidget,
-    QTabWidget, QSizePolicy
+    QGroupBox, QMessageBox, QWidget,
+    QTabWidget
 )
 from qgis.PyQt.QtCore import Qt, pyqtSignal
-from qgis.PyQt.QtGui import QFont, QColor
+from hsae_qgis.core.indices import compute_all
 
 try:
     from qgis.core import (
         QgsVectorLayer, QgsFeature, QgsGeometry,
-        QgsPointXY, QgsField, QgsProject, QgsFields,
-        QgsWkbTypes
+        QgsPointXY, QgsField, QgsProject
     )
     from qgis.PyQt.QtCore import QVariant
     HAS_QGIS = True
 except ImportError:
     HAS_QGIS = False
-
-from hsae_qgis.core.indices import compute_all
 
 
 # ── Climate-zone runoff estimator ─────────────────────────
@@ -69,12 +64,12 @@ def estimate_runoff_c(lat: float, lon: float) -> float:
 
     # ── Arid / semi-arid corridors ──────────────────────────
     # N Africa Sahara: stops at ~25°E (Nile valley/East Africa excluded)
-    is_n_africa    = (15 < alat < 30 and -15 < lon < 25)   # Sahara
-    is_arabia      = (10 < alat < 35 and 42 < lon < 65)    # Arabian Peninsula (east of Red Sea)
-    is_c_asia      = (35 < alat < 50 and 50 < lon < 85)    # Karakum / Kyzylkum
-    is_aus_arid    = (lat < -20 and 115 < lon < 142)        # Australian interior
-    is_sw_usa      = (28 < alat < 40 and -120 < lon < -100) # Mojave / Great Basin
-    is_atacama     = (lat < -18 and -75 < lon < -65)        # Atacama
+    is_n_africa = (15 < alat < 30 and -15 < lon < 25)   # Sahara
+    is_arabia = (10 < alat < 35 and 42 < lon < 65)    # Arabian Peninsula (east of Red Sea)
+    is_c_asia = (35 < alat < 50 and 50 < lon < 85)    # Karakum / Kyzylkum
+    is_aus_arid = (lat < -20 and 115 < lon < 142)        # Australian interior
+    is_sw_usa = (28 < alat < 40 and -120 < lon < -100)  # Mojave / Great Basin
+    is_atacama = (lat < -18 and -75 < lon < -65)        # Atacama
 
     if any([is_n_africa, is_arabia, is_c_asia,
             is_aus_arid, is_sw_usa, is_atacama]):
@@ -182,7 +177,7 @@ class ResultWidget(QTextEdit):
 
 # ── Main Dialog ───────────────────────────────────────────
 class CustomBasinDialog(QDialog):
-    """Add Custom Basin — HSAE v6.0.10."""
+    """Add Custom Basin — HSAE v6.0.11."""
 
     #: Emitted when a basin is added to the session registry
     basin_added = pyqtSignal(dict)
@@ -213,7 +208,7 @@ class CustomBasinDialog(QDialog):
         root.setSpacing(8)
 
         # Header
-        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.10")
+        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.11")
         hdr.setAlignment(Qt.AlignCenter)
         hdr.setStyleSheet(
             "font-size:15px;font-weight:bold;color:#003660;"
@@ -233,7 +228,7 @@ class CustomBasinDialog(QDialog):
 
         # Result area
         res_box = QGroupBox("📊 AWSI Results")
-        res_lay  = QVBoxLayout(res_box)
+        res_lay = QVBoxLayout(res_box)
         self._result_widget = ResultWidget()
         self._result_widget.setPlaceholderText(
             "Results will appear here after clicking  ▶ Analyse.")
@@ -275,7 +270,7 @@ class CustomBasinDialog(QDialog):
         root.addLayout(btn_row)
 
     def _build_input_tab(self) -> QWidget:
-        w   = QWidget()
+        w = QWidget()
         lay = QVBoxLayout(w)
         lay.setSpacing(10)
 
@@ -373,7 +368,7 @@ class CustomBasinDialog(QDialog):
         return w
 
     def _build_help_tab(self) -> QWidget:
-        w   = QWidget()
+        w = QWidget()
         lay = QVBoxLayout(w)
         txt = QTextEdit()
         txt.setReadOnly(True)
@@ -427,7 +422,7 @@ class CustomBasinDialog(QDialog):
         """Estimate runoff coefficient from lat/lon."""
         lat = self._lat_spin.value()
         lon = self._lon_spin.value()
-        rc  = estimate_runoff_c(lat, lon)
+        rc = estimate_runoff_c(lat, lon)
         self._rc_spin.setValue(rc)
         QMessageBox.information(
             self,
@@ -445,11 +440,11 @@ class CustomBasinDialog(QDialog):
                                 "Please enter a Basin / Dam name.")
             return
 
-        lat  = self._lat_spin.value()
-        lon  = self._lon_spin.value()
-        cap  = self._cap_spin.value()
-        rc   = self._rc_spin.value()
-        nc   = self._nc_spin.value()
+        lat = self._lat_spin.value()
+        lon = self._lon_spin.value()
+        cap = self._cap_spin.value()
+        rc = self._rc_spin.value()
+        nc = self._nc_spin.value()
         disp = self._disp_combo.currentIndex() + 1  # 1-based
 
         # Compute all indices via central formula
@@ -484,14 +479,14 @@ class CustomBasinDialog(QDialog):
         if not self._last_result or not HAS_QGIS:
             return
 
-        r  = self._last_result
+        r = self._last_result
         inp = self._last_inputs
 
         # Create or reuse memory layer
         layer_name = "HSAE Custom Basins"
         existing = [
-            l for l in QgsProject.instance().mapLayersByName(layer_name)
-            if isinstance(l, QgsVectorLayer)
+            lyr for lyr in QgsProject.instance().mapLayersByName(layer_name)
+            if isinstance(lyr, QgsVectorLayer)
         ]
 
         if existing:
@@ -499,7 +494,7 @@ class CustomBasinDialog(QDialog):
         else:
             layer = QgsVectorLayer(
                 "Point?crs=EPSG:4326", layer_name, "memory")
-            prov  = layer.dataProvider()
+            prov = layer.dataProvider()
             fields = [
                 QgsField("name",     QVariant.String),
                 QgsField("lat",      QVariant.Double),
@@ -528,23 +523,23 @@ class CustomBasinDialog(QDialog):
         feat.setGeometry(
             QgsGeometry.fromPointXY(
                 QgsPointXY(inp["lon"], inp["lat"])))
-        feat["name"]          = inp["name"]
-        feat["lat"]           = inp["lat"]
-        feat["lon"]           = inp["lon"]
-        feat["cap_bcm"]       = inp["cap_bcm"]
-        feat["runoff_c"]      = inp["runoff_c"]
-        feat["n_countries"]   = inp["n_countries"]
+        feat["name"] = inp["name"]
+        feat["lat"] = inp["lat"]
+        feat["lon"] = inp["lon"]
+        feat["cap_bcm"] = inp["cap_bcm"]
+        feat["runoff_c"] = inp["runoff_c"]
+        feat["n_countries"] = inp["n_countries"]
         feat["dispute_level"] = inp["dispute_level"]
-        feat["atdi"]          = r["atdi"]
-        feat["ahifd"]         = r["ahifd"]
-        feat["afsf"]          = r["afsf"]
-        feat["ahlb"]          = r["ahlb"]
-        feat["asi"]           = r["asi"]
-        feat["atci"]          = r["atci"]
-        feat["ci"]            = r["ci"]
-        feat["pneg"]          = r["pneg"]
-        feat["risk"]          = r["risk"]
-        feat["articles"]      = ", ".join(r["articles"])
+        feat["atdi"] = r["atdi"]
+        feat["ahifd"] = r["ahifd"]
+        feat["afsf"] = r["afsf"]
+        feat["ahlb"] = r["ahlb"]
+        feat["asi"] = r["asi"]
+        feat["atci"] = r["atci"]
+        feat["ci"] = r["ci"]
+        feat["pneg"] = r["pneg"]
+        feat["risk"] = r["risk"]
+        feat["articles"] = ", ".join(r["articles"])
 
         layer.dataProvider().addFeature(feat)
         layer.updateExtents()
@@ -561,7 +556,7 @@ class CustomBasinDialog(QDialog):
         if not self._last_result:
             return
 
-        r   = self._last_result
+        r = self._last_result
         inp = self._last_inputs
 
         # Build basin dict compatible with basins_50.json schema

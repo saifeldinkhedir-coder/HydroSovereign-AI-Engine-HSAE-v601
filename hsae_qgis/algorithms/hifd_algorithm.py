@@ -1,16 +1,12 @@
 """
-hifd_algorithm.py — HSAE v6.0.10 QGIS Processing Algorithm
+hifd_algorithm.py — HSAE v6.0.11 QGIS Processing Algorithm
 HIFD: Human-Induced Flow Deficit
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingOutputNumber)
+from hsae_qgis.core.indices import compute_ahifd
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_all, compute_atci,
-    compute_conflict_index, compute_pneg,
-    compute_nse_approx, compute_kge_approx
-)
 
 class HIFDAlgorithm(QgsProcessingAlgorithm):
 
@@ -54,7 +50,8 @@ class HIFDAlgorithm(QgsProcessingAlgorithm):
         cap = self.parameterAsDouble(parameters, self.CAP, context)
         nc = self.parameterAsInt(parameters, self.NC, context)
         disp = self.parameterAsInt(parameters, self.DISP, context)
-        hifd = min(80.0, max(5.0, 8 + min(cap / 3, 15) + (1 - rc) * 12 + disp * 5 + (nc - 2) * 3))
+        hifd = compute_ahifd(runoff_c=rc, cap_bcm=cap,
+                             n_countries=int(nc), dispute_level=int(disp))
         feedback.pushInfo(f'HIFD = {hifd:.2f}%')
         return {self.OUT: hifd}
 

@@ -1,16 +1,10 @@
 """
-HSAE v6.0.10 -- WebGIS Map v2 (v6.0.9)
+HSAE v6.0.11 -- WebGIS Map v2 (v6.0.9)
 Professional interactive map with Search, Layer Toggle,
 Basemap Switcher, Risk Filter, Chart Popups, and Export PNG.
 """
 from __future__ import annotations
 import json as _json
-
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 
 def build_webgis_v2(basins: list, compute_fn) -> str:
@@ -119,13 +113,14 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>HSAE v6.0.10 -- WebGIS Basin Risk Map v2</title>
+<title>HSAE v6.0.11 -- WebGIS Basin Risk Map v2</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#0a0e1a;
+     color:#e2e8f0;height:100vh;display:flex;flex-direction:column}
 
   /* ── HEADER ── */
   #hdr{height:56px;background:linear-gradient(135deg,#061F4A 0%,#0E6B6A 100%);
@@ -221,8 +216,9 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <div id="hdr">
   <span class="hlogo">🌊</span>
   <div>
-    <div class="htitle">HydroSovereign AI Engine v6.0.10 -- WebGIS Basin Risk Map v2</div>
-    <div class="hsub">26 Globally Contested Basins &middot; ATDI &middot; AHIFD &middot; ATCI &middot; UNWC 1997 &middot; Plugin ID: 5040</div>
+    <div class="htitle">HydroSovereign AI Engine v6.0.11 -- WebGIS Basin Risk Map v2</div>
+    <div class="hsub">26 Globally Contested Basins &middot; ATDI &middot;
+  AHIFD &middot; ATCI &middot; UNWC 1997 &middot; Plugin ID: 5040</div>
   </div>
   <div id="hdr-right">
     <button class="btn" onclick="exportPNG()" title="Export map as PNG">&#128247; Export PNG</button>
@@ -293,13 +289,15 @@ const features = GJ.features;
 // ── BASEMAPS ──────────────────────────────────────────────────────────────
 const BASEMAPS = {
   dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.10',subdomains:'abcd',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.11',subdomains:'abcd',maxZoom:19}),
   light: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {attribution:'&copy; CARTO &middot; HSAE v6.0.10',subdomains:'abcd',maxZoom:19}),
-  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {attribution:'&copy; ESRI &middot; HSAE v6.0.10',maxZoom:19}),
+    {attribution:'&copy; CARTO &middot; HSAE v6.0.11',subdomains:'abcd',maxZoom:19}),
+  satellite: L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/'
+  + 'World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {attribution:'&copy; ESRI &middot; HSAE v6.0.11',maxZoom:19}),
   osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.10',maxZoom:19}),
+    {attribution:'&copy; OpenStreetMap &middot; HSAE v6.0.11',maxZoom:19}),
 };
 
 // ── MAP INIT ──────────────────────────────────────────────────────────────
@@ -394,7 +392,7 @@ function makePopup(p) {
       width="280" height="110"></canvas>
   </div>
   <div class="p-footer">
-    HSAE v6.0.10 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
+    HSAE v6.0.11 &middot; Plugin ID: 5040 &middot; DOI: 10.5281/zenodo.19180160
   </div>
 </div>`;
 }
@@ -633,7 +631,7 @@ function updateLegendContent(div, layer) {
 const attrCtrl = L.control({position: 'bottomleft'});
 attrCtrl.onAdd = function() {
   const div = L.DomUtil.create('div', 'legend');
-  div.innerHTML = `<b>HSAE v6.0.10</b> &middot; Plugin ID: 5040<br>
+  div.innerHTML = `<b>HSAE v6.0.11</b> &middot; Plugin ID: 5040<br>
     DOI: <a href="https://doi.org/10.5281/zenodo.19180160" target="_blank"
       style="color:#60a5fa">10.5281/zenodo.19180160</a><br>
     ORCID: <a href="https://orcid.org/0000-0003-0821-2991" target="_blank"

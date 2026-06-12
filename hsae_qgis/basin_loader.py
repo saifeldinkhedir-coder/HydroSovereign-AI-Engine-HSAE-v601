@@ -1,5 +1,5 @@
 """
-basin_loader.py — HSAE v6.0.10
+basin_loader.py — HSAE v6.0.11
 Load 26 Transboundary Basins as QGIS Vector Layer
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -8,12 +8,8 @@ from qgis.core import (QgsVectorLayer, QgsFeature, QgsGeometry,
                        QgsRendererCategory,
                        QgsMarkerSymbol)
 from qgis.PyQt.QtCore import QVariant
+from hsae_qgis.core.indices import compute_pneg, compute_all
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 DISP_LEVELS = {
     "Blue Nile (GERD)": 4,
@@ -52,7 +48,7 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     Returns the layer (caller adds to project).
     """
     lyr = QgsVectorLayer("Point?crs=EPSG:4326",
-                         "HSAE v6.0.10 — 26 Transboundary Basins", "memory")
+                         "HSAE v6.0.11 — 26 Transboundary Basins", "memory")
     pr = lyr.dataProvider()
     pr.addAttributes([
         QgsField("id", QVariant.String),
@@ -98,18 +94,18 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
         disp = DISP_LEVELS.get(name, int(b.get('dispute_level', 0)))
 
         # Compute indices
-        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        _r = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
         atdi = _r['atdi']
         hifd = _r['ahifd']
         afsf = _r['afsf']
         ahlb = _r['ahlb']
-        asi  = _r['asi']
+        asi = _r['asi']
         atci_val = _r['atci']
         nse = round(min(0.89, max(0.38, 0.55 + rc * 0.38 - min(0.18, area / 4e6) - disp * 0.04 - (nc - 2) * 0.025)), 2)
         kge = round(min(0.93, max(0.45, nse + 0.05 + rc * 0.06)), 2)
         pneg = round(
             compute_pneg(atdi=atdi, ahifd=hifd, n_countries=int(nc)), 2)
-        ci   = _r['ci']
+        ci = _r['ci']
         dlvl = ['LOW', 'LOW', 'MEDIUM', 'HIGH',
                 'CRITICAL', 'CRITICAL'][min(disp, 5)]
         arts = ['Art.5 ERU', 'Art.9 Data']
@@ -130,8 +126,8 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
             b.get('continent', b.get('region', '')), clist, nc,
             b.get('treaty', ''), b.get('legal_arts', ''),
             cap, area, rc,
-            round(atdi,1), round(hifd,1), round(afsf,3), round(ahlb,3),
-            round(asi,3), round(atci_val,1), nse, kge, ci,
+            round(atdi, 1), round(hifd, 1), round(afsf, 3), round(ahlb, 3),
+            round(asi, 3), round(atci_val, 1), nse, kge, ci,
             pneg, dlvl, ', '.join(arts),
             b.get('context', '')[:200],
         ])

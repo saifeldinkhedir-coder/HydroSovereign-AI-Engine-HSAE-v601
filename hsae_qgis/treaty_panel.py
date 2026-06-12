@@ -1,28 +1,35 @@
 """
-HSAE v6.0.10 — Treaty Analysis Panel (ATCI)
+HSAE v6.0.11 — Treaty Analysis Panel (ATCI)
 ============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays ATCI Treaty Compliance Index for any basin.
 """
 from __future__ import annotations
 import random
+from hsae_qgis.core.indices import compute_all
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 try:
     from qgis.PyQt.QtWidgets import (
-        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox, QProgressBar, QGroupBox, QGridLayout, QScrollArea, QFrame)
+        QDockWidget, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QComboBox, QProgressBar,
+        QGroupBox, QGridLayout, QScrollArea, QFrame)
     from qgis.PyQt.QtCore import Qt
     HAS_QT = True
 except ImportError:
     HAS_QT = False
 
 UNWC_ARTICLES = [
-    ("Art. 5", "Equitable & reasonable utilisation"), ("Art. 6", "Factors for equitable utilisation"), ("Art. 7", "No significant harm obligation"), ("Art. 9", "Regular exchange of data & info"), ("Art. 11", "Prior notification of planned measures"), ("Art. 12", "Six-month reply period"), ("Art. 17", "Peaceful settlement / consultations"), ("Art. 20", "Protection & preservation of ecosystems"), ("Art. 21", "Prevention of water pollution"), ("Art. 33", "Dispute settlement mechanism"),
+    ("Art. 5", "Equitable & reasonable utilisation"),
+    ("Art. 6", "Factors for equitable utilisation"),
+    ("Art. 7", "No significant harm obligation"),
+    ("Art. 9", "Regular exchange of data & info"),
+    ("Art. 11", "Prior notification of planned measures"),
+    (
+        "Art. 12", "Six-month reply period"),
+    ("Art. 17", "Peaceful settlement / consultations"),
+    ("Art. 20", "Protection & preservation of ecosystems"),
+    ("Art. 21", "Prevention of water pollution"),
+    ("Art. 33", "Dispute settlement mechanism"),
 ]
 
 
@@ -104,19 +111,14 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         disp = basin.get("dispute_level", 2)
         cap = float(basin.get("cap", basin.get("cap_bcm", basin.get("dam_capacity_bcm", 74))))
         _nc_raw = basin.get("country", basin.get("countries", None))
-        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(basin.get("n_countries", basin.get("num_countries", 3)))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(
+            basin.get("n_countries", basin.get("num_countries", 3)))
         rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
 
         # Compute ATCI
-        _r   = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
-        atdi  = _r['atdi']
-        ahifd = _r['ahifd']
-        afsf  = _r['afsf']
-        ahlb  = _r['ahlb']
-        asi   = _r['asi']
-        atci  = _r['atci']
-        ci    = _r['ci']
-        pneg  = _r['pneg']
+        _r = compute_all(runoff_c=rc, cap_bcm=cap,
+                         n_countries=int(nc), dispute_level=int(disp))
+        atci = _r['atci']
 
         # Overall metric
         color = ("#c0392b" if atci > 60 else
@@ -175,5 +177,8 @@ class HSAETreatyPanel(QDockWidget if HAS_QT else object):
         """Simple rule-based article score 0-100."""
         base = int(rc * 60 + (3 - disp) * 10)
         offsets = {
-            "Art. 5": 10, "Art. 6": 8, "Art. 7": -int(disp * 15), "Art. 9": -5, "Art. 11": -int(cap / 10), "Art. 12": 5, "Art. 17": -int(disp * 8), "Art. 20": 5, "Art. 21": 0, "Art. 33": -int(disp * 5), }
+            "Art. 5": 10, "Art. 6": 8, "Art. 7": -int(disp * 15),
+            "Art. 9": -5, "Art. 11": -int(cap / 10), "Art. 12": 5,
+            "Art. 17": -int(disp * 8), "Art. 20": 5, "Art. 21": 0,
+            "Art. 33": -int(disp * 5), }
         return max(5, min(95, base + offsets.get(art, 0) + random.randint(-3, 3)))

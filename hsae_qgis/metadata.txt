@@ -2,11 +2,11 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.10: Transboundary water sovereignty. 26 basins, 17 tools, 6 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), Add Custom Basin, GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
-version=6.0.10
+description=HSAE v6.0.11: Transboundary water sovereignty. 26 basins, 17 tools, 6 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), Add Custom Basin, GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
+version=6.0.11
 author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.0.10 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
+about=HydroSovereign AI Engine (HSAE) v6.0.11 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
     Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
     NEW in v6.0.10: Add Custom Basin tool — analyse any worldwide basin by lat/lon, dam capacity, and dispute level using all 6 AWSI indices.
     NEW in v6.0.10: Unified AWSI formula engine (core/indices.py) — ATDI calibrated to 43.6%% across all systems.
@@ -25,6 +25,12 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    v6.0.11 (June 2026) -- Code quality release:
+    Flake8: 436 style issues resolved (now 0). Imports tailored per file,
+    unused variables removed, long lines wrapped, PEP8 throughout.
+    FIX: hifd_algorithm.py was still using the legacy AHIFD formula in
+    its Processing Algorithm body -- now uses calibrated compute_ahifd().
+
     v6.0.10 (June 2026) -- Unified values hotfix:
     FIX: Risk Summary formula text updated to calibrated v6.0.10 formula
     (was showing legacy formula text while computing with new engine).

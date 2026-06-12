@@ -1,5 +1,5 @@
 """
-algorithms/custom_basin_algorithm.py — HSAE v6.0.10
+algorithms/custom_basin_algorithm.py — HSAE v6.0.11
 ====================================================
 QGIS Processing Algorithm: Custom Basin AWSI Calculator
 
@@ -24,29 +24,29 @@ from qgis.core import (
     QgsWkbTypes,
 )
 from qgis.PyQt.QtCore import QVariant
-from hsae_qgis.core.indices import compute_all
 from hsae_qgis.custom_basin_tool import estimate_runoff_c
+from hsae_qgis.core.indices import compute_all
 
 
 class CustomBasinAlgorithm(QgsProcessingAlgorithm):
     """QGIS Processing Algorithm for custom basin AWSI analysis."""
 
     # Input parameter IDs
-    NAME     = "NAME"
-    LAT      = "LAT"
-    LON      = "LON"
-    CAP_BCM  = "CAP_BCM"
+    NAME = "NAME"
+    LAT = "LAT"
+    LON = "LON"
+    CAP_BCM = "CAP_BCM"
     RUNOFF_C = "RUNOFF_C"
-    N_CNTRY  = "N_COUNTRIES"
+    N_CNTRY = "N_COUNTRIES"
     DISP_LVL = "DISPUTE_LEVEL"
-    OUTPUT   = "OUTPUT"
+    OUTPUT = "OUTPUT"
 
     # Output IDs
-    OUT_ATDI  = "ATDI"
+    OUT_ATDI = "ATDI"
     OUT_AHIFD = "AHIFD"
-    OUT_ATCI  = "ATCI"
-    OUT_CI    = "CI"
-    OUT_RISK  = "RISK"
+    OUT_ATCI = "ATCI"
+    OUT_CI = "CI"
+    OUT_RISK = "RISK"
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterString(
@@ -95,13 +95,13 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.OUT_RISK,  "Risk level"))
 
     def processAlgorithm(self, parameters, context, feedback):
-        name     = self.parameterAsString(parameters, self.NAME, context)
-        lat      = self.parameterAsDouble(parameters, self.LAT, context)
-        lon      = self.parameterAsDouble(parameters, self.LON, context)
-        cap_bcm  = self.parameterAsDouble(parameters, self.CAP_BCM, context)
+        name = self.parameterAsString(parameters, self.NAME, context)
+        lat = self.parameterAsDouble(parameters, self.LAT, context)
+        lon = self.parameterAsDouble(parameters, self.LON, context)
+        cap_bcm = self.parameterAsDouble(parameters, self.CAP_BCM, context)
         rc_input = self.parameterAsDouble(parameters, self.RUNOFF_C, context)
-        nc       = self.parameterAsInt(parameters, self.N_CNTRY, context)
-        disp     = self.parameterAsInt(parameters, self.DISP_LVL, context)
+        nc = self.parameterAsInt(parameters, self.N_CNTRY, context)
+        disp = self.parameterAsInt(parameters, self.DISP_LVL, context)
 
         # Auto-estimate runoff if not provided (0 = auto)
         rc = rc_input if rc_input > 0.01 else estimate_runoff_c(lat, lon)
@@ -149,23 +149,23 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
 
         feat = QgsFeature(fields)
         feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(lon, lat)))
-        feat["name"]          = name
-        feat["lat"]           = lat
-        feat["lon"]           = lon
-        feat["cap_bcm"]       = cap_bcm
-        feat["runoff_c"]      = rc
-        feat["n_countries"]   = nc
+        feat["name"] = name
+        feat["lat"] = lat
+        feat["lon"] = lon
+        feat["cap_bcm"] = cap_bcm
+        feat["runoff_c"] = rc
+        feat["n_countries"] = nc
         feat["dispute_level"] = disp
-        feat["atdi"]          = result["atdi"]
-        feat["ahifd"]         = result["ahifd"]
-        feat["afsf"]          = result["afsf"]
-        feat["ahlb"]          = result["ahlb"]
-        feat["asi"]           = result["asi"]
-        feat["atci"]          = result["atci"]
-        feat["ci"]            = result["ci"]
-        feat["pneg"]          = result["pneg"]
-        feat["risk"]          = result["risk"]
-        feat["articles"]      = ", ".join(result["articles"])
+        feat["atdi"] = result["atdi"]
+        feat["ahifd"] = result["ahifd"]
+        feat["afsf"] = result["afsf"]
+        feat["ahlb"] = result["ahlb"]
+        feat["asi"] = result["asi"]
+        feat["atci"] = result["atci"]
+        feat["ci"] = result["ci"]
+        feat["pneg"] = result["pneg"]
+        feat["risk"] = result["risk"]
+        feat["articles"] = ", ".join(result["articles"])
         sink.addFeature(feat)
 
         return {
@@ -177,10 +177,11 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
             self.OUT_RISK:  result["risk"],
         }
 
-    def name(self):        return "custombasinanalyser"
+    def name(self): return "custombasinanalyser"
     def displayName(self): return "Custom Basin AWSI Analyser"
-    def group(self):       return "HSAE — Custom Analysis"
-    def groupId(self):     return "hsae_custom"
+    def group(self): return "HSAE — Custom Analysis"
+    def groupId(self): return "hsae_custom"
+
     def shortHelpString(self): return (
         "Compute all 6 AWSI indices (ATDI, AHIFD, AFSF, AHLB, ASI, ATCI) "
         "for any user-defined transboundary basin.\n\n"

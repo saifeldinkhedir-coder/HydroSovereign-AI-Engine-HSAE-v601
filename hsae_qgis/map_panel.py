@@ -1,5 +1,5 @@
 """
-HSAE v6.0.10 — Interactive Basin Risk Map Panel
+HSAE v6.0.11 — Interactive Basin Risk Map Panel
 ================================================
 Pure Qt — no QWebEngineView required.
 Shows all 26 basins with ATDI/AHIFD/CI risk table.
@@ -21,12 +21,8 @@ except ImportError:
     HAS_QT = False
 
 from qgis.core import QgsMessageLog, Qgis
+from hsae_qgis.core.indices import compute_all
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app"
 
@@ -144,9 +140,10 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
         disp = basin.get("dispute_level", 2)
         cap = float(basin.get("cap", basin.get("cap_bcm", basin.get("dam_capacity_bcm", 50))))
         _nc_raw = basin.get("country", basin.get("countries", None))
-        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(basin.get("n_countries", basin.get("num_countries", 3)))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(
+            basin.get("n_countries", basin.get("num_countries", 3)))
         rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
-        _r    = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
+        _r = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
         return {
             "atdi":  _r['atdi'],
             "ahifd": _r['ahifd'],
@@ -214,9 +211,12 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
                 lon = b.get("lon", 0)
                 name = b.get("name", "Unknown").replace("'", " ")
                 color = _risk_color(d["atdi"])
-                popup = (name + " | ATDI:" + str(d["atdi"]) + "% | AAHIFD:" + str(d["ahifd"]) + "% | ATCI:" + str(d["atci"]) + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
+                popup = (name + " | ATDI:" + str(d["atdi"]) + "% | AAHIFD:" + str(d["ahifd"]) +
+                         "% | ATCI:" + str(d["atci"]) + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
                 marker_lines.append(
-                    "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + "{radius:10,color:'" + color + "',fillColor:'" + color + "',fillOpacity:0.8}).addTo(map)" + ".bindPopup('" + popup + "');"
+                    "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + "{radius:10,color:'" + color +
+                    "',fillColor:'" + color +
+                    "',fillOpacity:0.8}).addTo(map)" + ".bindPopup('" + popup + "');"
                 )
             except Exception:
                 pass

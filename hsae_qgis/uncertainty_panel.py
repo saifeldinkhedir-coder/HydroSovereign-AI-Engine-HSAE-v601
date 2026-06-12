@@ -1,5 +1,5 @@
 """
-HSAE v6.0.10 — Uncertainty & Sensitivity Panel
+HSAE v6.0.11 — Uncertainty & Sensitivity Panel
 ==============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays Bayesian confidence intervals on ATDI/AHIFD indices
@@ -7,12 +7,8 @@ and Sobol sensitivity indices as plain Qt widgets.
 """
 from __future__ import annotations
 import random
+from hsae_qgis.core.indices import compute_all
 
-from hsae_qgis.core.indices import (
-    compute_atdi, compute_ahifd, compute_afsf,
-    compute_ahlb, compute_asi, compute_atci,
-    compute_conflict_index, compute_pneg, compute_all
-)
 
 try:
     from qgis.PyQt.QtWidgets import (
@@ -96,7 +92,8 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
         disp = basin.get("dispute_level", 2)
         cap = float(basin.get("cap", basin.get("cap_bcm", basin.get("dam_capacity_bcm", 74))))
         _nc_raw = basin.get("country", basin.get("countries", None))
-        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(basin.get("n_countries", basin.get("num_countries", 3)))
+        nc = max(2, len(_nc_raw)) if isinstance(_nc_raw, list) else int(
+            basin.get("n_countries", basin.get("num_countries", 3)))
         rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
 
         # Monte Carlo N=500
@@ -107,11 +104,9 @@ class HSAEUncertaintyPanel(QDockWidget if HAS_QT else object):
             c = cap + random.gauss(0, cap * 0.1)
             n = nc + random.gauss(0, 0.2)
             r = rc + random.gauss(0, 0.05)
-            _s    = compute_all(runoff_c=r, cap_bcm=c, n_countries=int(n), dispute_level=int(d))
-            atdi  = _s['atdi']
+            _s = compute_all(runoff_c=r, cap_bcm=c, n_countries=int(n), dispute_level=int(d))
+            atdi = _s['atdi']
             ahifd = _s['ahifd']
-            afsf  = _s['afsf']
-            atci  = _s['atci']
             atdi_samples.append(atdi)
             ahifd_samples.append(ahifd)
             # afsf/atci tracked via compute_all above
