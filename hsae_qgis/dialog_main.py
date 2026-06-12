@@ -194,7 +194,7 @@ class HSAEMainDialog(QDialog):
         <p><b>Platform averages:</b>
            ATDI={avg_atdi}% &nbsp;|&nbsp; AHIFD={avg_ahifd}%
            &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
-        <p><b>Formula (calibrated v6.0.9):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
+        <p><b>Formula (calibrated v6.0.10):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
         <p><b>Thresholds (UNWC 1997):</b>
            ≥60% CRITICAL (Art.33 dispute zone) &nbsp;|&nbsp;
            ≥40% HIGH (Art.7 triggered) &nbsp;|&nbsp;
