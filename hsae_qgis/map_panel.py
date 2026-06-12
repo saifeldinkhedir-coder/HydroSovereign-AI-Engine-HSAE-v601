@@ -1,5 +1,5 @@
 """
-HSAE v6.0.9 — Interactive Basin Risk Map Panel
+HSAE v6.0.10 — Interactive Basin Risk Map Panel
 ================================================
 Pure Qt — no QWebEngineView required.
 Shows all 26 basins with ATDI/AHIFD/CI risk table.

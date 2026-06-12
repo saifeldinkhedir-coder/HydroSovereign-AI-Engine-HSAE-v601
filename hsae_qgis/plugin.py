@@ -1,5 +1,5 @@
 """
-plugin.py — HSAE v6.0.9 QGIS Plugin (Complete — May 2026)
+plugin.py — HSAE v6.0.10 QGIS Plugin (Complete — May 2026)
 ===========================================================
 15 Tools + 5 Processing Algorithms
 
@@ -58,7 +58,7 @@ from hsae_qgis.core.indices import (
 )
 
 PLUGIN_DIR = Path(__file__).parent
-VERSION = "6.0.9"
+VERSION = "6.0.10"
 AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
@@ -198,7 +198,7 @@ class HSAEPlugin:
             True)
 
     def add_custom_basin(self):
-        """Open the Add Custom Basin dialog (Tool 17, v6.0.9)."""
+        """Open the Add Custom Basin dialog (Tool 17, v6.0.10)."""
         try:
             dlg = CustomBasinDialog(
                 self.iface, self.session_basins, self.iface.mainWindow())
@@ -398,7 +398,7 @@ class HSAEPlugin:
 
     def gee_scripts(self):
         scripts = """// ============================================================
-// HSAE v6.0.9 — GEE Script Generator (7 Satellite Sensors)
+// HSAE v6.0.10 — GEE Script Generator (7 Satellite Sensors)
 // Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 // GEE Project: zinc-arc-484714-j8
 // ============================================================
@@ -483,7 +483,7 @@ Map.setCenter(35.09, 10.53, 7);
 Map.setOptions('HYBRID');
 """
         self._txt_dlg(
-            "HSAE v6.0.9 — GEE Script Generator (7 Sensors)",
+            "HSAE v6.0.10 — GEE Script Generator (7 Sensors)",
             scripts, w=780, h=560,
             save_name="HSAE_GEE_Scripts.js")
 
@@ -507,7 +507,7 @@ Map.setOptions('HYBRID');
             ]
             lyr = QgsVectorLayer(
                 "Point?crs=EPSG:4326",
-                "GRDC Stations (HSAE v6.0.9)",
+                "GRDC Stations (HSAE v6.0.10)",
                 "memory")
             pr = lyr.dataProvider()
             pr.addAttributes([QgsField("grdc_id", QVariant.String),
@@ -549,7 +549,7 @@ Map.setOptions('HYBRID');
                                 risk:<12} {
                                     d['dlvl']}")
         self._txt_dlg(
-            "HSAE v6.0.9 — Conflict Index (26 Basins · TFDD/ICOW)",
+            "HSAE v6.0.10 — Conflict Index (26 Basins · TFDD/ICOW)",
             "\n".join(rows), w=700, h=520,
             save_name="HSAE_Conflict_Index.csv")
 
@@ -568,7 +568,7 @@ Map.setOptions('HYBRID');
             rows.append(f"{b.get('name', '')[:38]:<38} {d['pneg']:>8.0%}"
                         f"  [{bar}] {strat:<16} {path}")
         self._txt_dlg(
-            "HSAE v6.0.9 — Negotiation AI (GBM Model · 478 Historical Cases)",
+            "HSAE v6.0.10 — Negotiation AI (GBM Model · 478 Historical Cases)",
             "\n".join(rows), w=720, h=520,
             save_name="HSAE_Negotiation_AI.csv")
 
@@ -628,7 +628,7 @@ Map.setOptions('HYBRID');
         geo = _j.dumps({"type": "FeatureCollection", "features": features})
         return f"""<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
-<title>HSAE v6.0.9 — WebGIS Global Basin Network</title>
+<title>HSAE v6.0.10 — WebGIS Global Basin Network</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -656,7 +656,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 </style></head><body>
 <div id="hdr">
   <div>
-    <h1>🌊 HSAE v6.0.9 — WebGIS Global Basin Network</h1>
+    <h1>🌊 HSAE v6.0.10 — WebGIS Global Basin Network</h1>
     <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
        DOI: 10.5281/zenodo.19180160 · Preprint: SSRN 2026</p>
   </div>
@@ -674,7 +674,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <script>
 var map=L.map('map',{{center:[20,30],zoom:2,preferCanvas:true}});
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'© CartoDB · HSAE v6.0.9 · Seifeldin M.G. Alkhedir'}}).addTo(map);
+  {{attribution:'© CartoDB · HSAE v6.0.10 · Seifeldin M.G. Alkhedir'}}).addTo(map);
 var data={geo};
 data.features.forEach(function(f){{
   var p=f.properties,c=f.geometry.coordinates;

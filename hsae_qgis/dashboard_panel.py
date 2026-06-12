@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.0.9 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.10 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -68,10 +68,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.0.9 Real-Time Dashboard Panel."""
+    """HSAE v6.0.10 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.0.9 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.10 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -126,7 +126,7 @@ class HSAEDashboardPanel(QDockWidget):
             arts.append('Art.20 EnvFlow')
         risk_col = RED if atdi >= 70 else ORG if atdi >= 55 else "#e3b341" if atdi >= 40 else GREEN
         risk_txt = ("🔴 CRITICAL" if atdi >= 70 else "🟠 HIGH" if atdi >= 55
-                    else "🟡 MODERATE" if atdi >= 40 else "🟢 LOW")
+                    else "🟠 HIGH" if atdi >= 40 else "🟡 MODERATE" if atdi >= 25 else "🟢 LOW")
         return dict(atdi=atdi, ahifd=hifd, hifd=hifd, afsf=afsf, ahlb=ahlb,
                     asi=asi, atci=atci, nse=nse, kge=kge, pneg=pneg, ci=ci,
                     wqi=wqi, p_mm=p_mm, tws=tws, dlvl=dlvl, arts=arts,
@@ -351,7 +351,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.0.9 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.10 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {

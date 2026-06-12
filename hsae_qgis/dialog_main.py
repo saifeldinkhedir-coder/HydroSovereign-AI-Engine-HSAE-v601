@@ -1,5 +1,5 @@
 """
-dialog_main.py — HSAE v6.0.9 Dashboard Dialog
+dialog_main.py — HSAE v6.0.10 Dashboard Dialog
 ===============================================
 Shows all 26 basins with 6 computed indices:
 ATDI · AHIFD · CI · ATCI · NSE · KGE · Risk
@@ -38,10 +38,8 @@ def _compute_indices(b):
     nse = _r['nse']
     kge = _r['kge']
 
-    # Risk from central engine (CRITICAL≥70 · HIGH≥55 · MODERATE≥40 · LOW)
+    # Risk from central engine (CRITICAL≥60 · HIGH≥40 · MODERATE≥25 · LOW)
     risk = _r['risk']
-    if risk == "MODERATE":
-        risk = "MEDIUM"  # dialog uses MEDIUM label
 
     region = b.get("continent", b.get("region", "—"))
     for emoji in ["🌍 ", "🌎 ", "🌏 ", "🌍", "🌎", "🌏"]:
@@ -73,7 +71,7 @@ class HSAEMainDialog(QDialog):
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.9")
+        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.10")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
         font.setPointSize(14)
@@ -143,7 +141,7 @@ class HSAEMainDialog(QDialog):
         RISK_COLORS = {
             "CRITICAL": QColor("#F1948A"),
             "HIGH": QColor("#FADBD8"),
-            "MEDIUM": QColor("#FDEBD0"),
+            "MODERATE": QColor("#FDEBD0"),
             "LOW": QColor("#D5F5E3"),
         }
 
@@ -183,7 +181,7 @@ class HSAEMainDialog(QDialog):
         indices = [_compute_indices(b) for b in self.basins]
         critical = [b for b, d in zip(self.basins, indices) if d["risk"] == "CRITICAL"]
         high = [b for b, d in zip(self.basins, indices) if d["risk"] == "HIGH"]
-        medium = [b for b, d in zip(self.basins, indices) if d["risk"] == "MEDIUM"]
+        medium = [b for b, d in zip(self.basins, indices) if d["risk"] == "MODERATE"]
         low = [b for b, d in zip(self.basins, indices) if d["risk"] == "LOW"]
 
         avg_atdi = round(sum(d["atdi"] for d in indices) / len(indices), 1)
@@ -198,16 +196,16 @@ class HSAEMainDialog(QDialog):
            &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
         <p><b>Formula (calibrated v6.0.9):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
         <p><b>Thresholds (UNWC 1997):</b>
-           ≥70% CRITICAL (Art.33) &nbsp;|&nbsp;
-           ≥55% HIGH (Art.33) &nbsp;|&nbsp;
-           ≥40% MEDIUM (Art.7 triggered) &nbsp;|&nbsp;
-           &lt;40% LOW</p>
+           ≥60% CRITICAL (Art.33 dispute zone) &nbsp;|&nbsp;
+           ≥40% HIGH (Art.7 triggered) &nbsp;|&nbsp;
+           ≥25% MODERATE (Art.5 attention) &nbsp;|&nbsp;
+           &lt;25% LOW</p>
         <hr>
         <p><span style='color:#c0392b'>🔴 CRITICAL — {len(critical)} basins:</span><br>
         {" · ".join(b.get("name", "") for b in critical) or "—"}</p>
         <p><span style='color:#e67e22'>🟠 HIGH — {len(high)} basins:</span><br>
         {" · ".join(b.get("name", "") for b in high) or "—"}</p>
-        <p><span style='color:#f39c12'>🟡 MEDIUM — {len(medium)} basins:</span><br>
+        <p><span style='color:#f39c12'>🟡 MODERATE — {len(medium)} basins:</span><br>
         {" · ".join(b.get("name", "") for b in medium) or "—"}</p>
         <p><span style='color:#27ae60'>🟢 LOW — {len(low)} basins:</span><br>
         {" · ".join(b.get("name", "") for b in low) or "—"}</p>
@@ -225,11 +223,11 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
         text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.9</h2>
+        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.10</h2>
         <p>Free, open-source platform automating satellite-based transboundary
         water law compliance for 26 globally contested river basins. GPL-3.0.</p>
         <p><b>6 Original Indices:</b> ATDI · AHIFD · AFSF · AHLB · ASI · ATCI</p>
-        <p><b>16 Tools + 5 Processing Algorithms</b></p>
+        <p><b>17 Tools + 6 Processing Algorithms</b></p>
         <p><b>GeoAgent integration:</b> opengeos/GeoAgent PR #79 · merged May 2026</p>
         <p><b>Author:</b> Seifeldin M.G. Alkhedir<br>
         <b>ORCID:</b> 0000-0003-0821-2991<br>

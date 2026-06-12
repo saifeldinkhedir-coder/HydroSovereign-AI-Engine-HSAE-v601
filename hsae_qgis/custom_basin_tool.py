@@ -1,5 +1,5 @@
 """
-custom_basin_tool.py — HSAE v6.0.9
+custom_basin_tool.py — HSAE v6.0.10
 =====================================
 Add Custom Basin — User-Defined Basin Analyser
 Allows analysis of any basin worldwide without pre-loading.
@@ -20,7 +20,7 @@ Outputs:
   · Option to add to basins registry for session
 
 Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
-Version: 6.0.9
+Version: 6.0.10
 """
 from __future__ import annotations
 import math
@@ -182,7 +182,7 @@ class ResultWidget(QTextEdit):
 
 # ── Main Dialog ───────────────────────────────────────────
 class CustomBasinDialog(QDialog):
-    """Add Custom Basin — HSAE v6.0.9."""
+    """Add Custom Basin — HSAE v6.0.10."""
 
     #: Emitted when a basin is added to the session registry
     basin_added = pyqtSignal(dict)
@@ -213,7 +213,7 @@ class CustomBasinDialog(QDialog):
         root.setSpacing(8)
 
         # Header
-        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.9")
+        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.10")
         hdr.setAlignment(Qt.AlignCenter)
         hdr.setStyleSheet(
             "font-size:15px;font-weight:bold;color:#003660;"

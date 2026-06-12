@@ -1,5 +1,5 @@
 """
-HSAE v6.0.9 — Treaty Analysis Panel (ATCI)
+HSAE v6.0.10 — Treaty Analysis Panel (ATCI)
 ============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays ATCI Treaty Compliance Index for any basin.

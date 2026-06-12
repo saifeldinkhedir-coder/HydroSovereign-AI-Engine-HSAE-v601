@@ -108,8 +108,12 @@ def compute_all(runoff_c:float, cap_bcm:float,
     atdi  = compute_atdi(runoff_c, cap_bcm, n_countries, dispute_level)
     ahifd = compute_ahifd(runoff_c, cap_bcm, n_countries, dispute_level)
     ci    = compute_conflict_index(atdi, ahifd, dispute_level, n_countries)
-    risk  = ("CRITICAL" if atdi>=70 else "HIGH" if atdi>=55
-             else "MODERATE" if atdi>=40 else "LOW")
+    # Legal-tier classification (UNWC 1997):
+    # CRITICAL >=60 (Art.33 dispute settlement zone)
+    # HIGH     >=40 (Art.7 No Significant Harm triggered)
+    # MODERATE >=25 (Art.5 equitable-use attention)
+    risk  = ("CRITICAL" if atdi >= 60 else "HIGH" if atdi >= 40
+             else "MODERATE" if atdi >= 25 else "LOW")
     arts  = []
     if atdi>=40: arts.append("Art.7")
     if ahifd>=25: arts.append("Art.9")
