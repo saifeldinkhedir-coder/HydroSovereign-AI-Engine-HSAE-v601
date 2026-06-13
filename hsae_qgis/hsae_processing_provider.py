@@ -1,5 +1,5 @@
 """
-hsae_processing_provider.py — HSAE v6.0.11
+hsae_processing_provider.py — HSAE v6.0.12
 Complete Processing Provider — 6 Algorithms
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -33,4 +33,4 @@ class HSAEProcessingProvider(QgsProcessingProvider):
         return QgsProcessingProvider.icon(self)
 
     def longName(self):
-        return "HydroSovereign AI Engine — AWSI Indices v6.0.11"
+        return "HydroSovereign AI Engine — AWSI Indices v6.0.12"

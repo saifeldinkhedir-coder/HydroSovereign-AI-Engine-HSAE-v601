@@ -1,5 +1,5 @@
 """
-algorithms/custom_basin_algorithm.py — HSAE v6.0.11
+algorithms/custom_basin_algorithm.py — HSAE v6.0.12
 ====================================================
 QGIS Processing Algorithm: Custom Basin AWSI Calculator
 
@@ -88,11 +88,11 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
             self.OUTPUT, "Output point layer",
             QgsProcessing.TypeVectorPoint))
 
-        self.addOutput(QgsProcessingOutputNumber(self.OUT_ATDI,  "ATDI (%)"))
+        self.addOutput(QgsProcessingOutputNumber(self.OUT_ATDI, "ATDI (%)"))
         self.addOutput(QgsProcessingOutputNumber(self.OUT_AHIFD, "AHIFD (%)"))
-        self.addOutput(QgsProcessingOutputNumber(self.OUT_ATCI,  "ATCI (0-100)"))
-        self.addOutput(QgsProcessingOutputNumber(self.OUT_CI,    "Conflict Index"))
-        self.addOutput(QgsProcessingOutputString(self.OUT_RISK,  "Risk level"))
+        self.addOutput(QgsProcessingOutputNumber(self.OUT_ATCI, "ATCI (0-100)"))
+        self.addOutput(QgsProcessingOutputNumber(self.OUT_CI, "Conflict Index"))
+        self.addOutput(QgsProcessingOutputString(self.OUT_RISK, "Risk level"))
 
     def processAlgorithm(self, parameters, context, feedback):
         name = self.parameterAsString(parameters, self.NAME, context)
@@ -123,23 +123,23 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
         # Build output layer
         fields = QgsFields()
         for fname, ftype in [
-            ("name",          QVariant.String),
-            ("lat",           QVariant.Double),
-            ("lon",           QVariant.Double),
-            ("cap_bcm",       QVariant.Double),
-            ("runoff_c",      QVariant.Double),
-            ("n_countries",   QVariant.Int),
+            ("name", QVariant.String),
+            ("lat", QVariant.Double),
+            ("lon", QVariant.Double),
+            ("cap_bcm", QVariant.Double),
+            ("runoff_c", QVariant.Double),
+            ("n_countries", QVariant.Int),
             ("dispute_level", QVariant.Int),
-            ("atdi",          QVariant.Double),
-            ("ahifd",         QVariant.Double),
-            ("afsf",          QVariant.Double),
-            ("ahlb",          QVariant.Double),
-            ("asi",           QVariant.Double),
-            ("atci",          QVariant.Double),
-            ("ci",            QVariant.Double),
-            ("pneg",          QVariant.Double),
-            ("risk",          QVariant.String),
-            ("articles",      QVariant.String),
+            ("atdi", QVariant.Double),
+            ("ahifd", QVariant.Double),
+            ("afsf", QVariant.Double),
+            ("ahlb", QVariant.Double),
+            ("asi", QVariant.Double),
+            ("atci", QVariant.Double),
+            ("ci", QVariant.Double),
+            ("pneg", QVariant.Double),
+            ("risk", QVariant.String),
+            ("articles", QVariant.String),
         ]:
             fields.append(QgsField(fname, ftype))
 
@@ -169,25 +169,33 @@ class CustomBasinAlgorithm(QgsProcessingAlgorithm):
         sink.addFeature(feat)
 
         return {
-            self.OUTPUT:    dest_id,
-            self.OUT_ATDI:  result["atdi"],
+            self.OUTPUT: dest_id,
+            self.OUT_ATDI: result["atdi"],
             self.OUT_AHIFD: result["ahifd"],
-            self.OUT_ATCI:  result["atci"],
-            self.OUT_CI:    result["ci"],
-            self.OUT_RISK:  result["risk"],
+            self.OUT_ATCI: result["atci"],
+            self.OUT_CI: result["ci"],
+            self.OUT_RISK: result["risk"],
         }
 
-    def name(self): return "custombasinanalyser"
-    def displayName(self): return "Custom Basin AWSI Analyser"
-    def group(self): return "HSAE — Custom Analysis"
-    def groupId(self): return "hsae_custom"
+    def name(self):
+        return "custombasinanalyser"
 
-    def shortHelpString(self): return (
-        "Compute all 6 AWSI indices (ATDI, AHIFD, AFSF, AHLB, ASI, ATCI) "
-        "for any user-defined transboundary basin.\n\n"
-        "Set runoff coefficient to 0 to auto-estimate from lat/lon "
-        "using a Koppen-Geiger climate zone lookup.\n\n"
-        "Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991")
+    def displayName(self):
+        return "Custom Basin AWSI Analyser"
+
+    def group(self):
+        return "HSAE — Custom Analysis"
+
+    def groupId(self):
+        return "hsae_custom"
+
+    def shortHelpString(self):
+        return (
+            "Compute all 6 AWSI indices (ATDI, AHIFD, AFSF, AHLB, ASI, ATCI) "
+            "for any user-defined transboundary basin.\n\n"
+            "Set runoff coefficient to 0 to auto-estimate from lat/lon "
+            "using a Koppen-Geiger climate zone lookup.\n\n"
+            "Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991")
 
     def createInstance(self):
         return CustomBasinAlgorithm()

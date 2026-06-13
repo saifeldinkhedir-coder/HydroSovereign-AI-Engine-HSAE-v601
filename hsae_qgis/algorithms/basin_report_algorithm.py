@@ -1,5 +1,5 @@
 """
-basin_report_algorithm.py — HSAE v6.0.11 QGIS Processing Algorithm
+basin_report_algorithm.py — HSAE v6.0.12 QGIS Processing Algorithm
 Complete Basin Legal Report Generator
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -89,8 +89,15 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
                 else 'MODERATE' if atdi >= 40 else 'LOW')
 
         from datetime import datetime
+        _art5_label = ("CRITICAL concern" if atdi >= 60 else "HIGH concern"
+                       if atdi >= 40 else "MODERATE" if atdi >= 25 else "LOW")
+        _neg_label = ("Cooperative framework" if pneg >= 0.65
+                      else "Mediation required" if pneg >= 0.40
+                      else "PCA/ICJ referral recommended")
+        _ci_label = ("immediate intervention required" if ci >= 0.6
+                     else "monitoring required" if ci >= 0.4 else "manageable")
         report = f"""
-HSAE v6.0.11 — BASIN LEGAL REPORT
+HSAE v6.0.12 — BASIN LEGAL REPORT
 {'=' * 60}
 Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
 Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991
@@ -124,10 +131,10 @@ UN ARTICLES TRIGGERED (UNWC 1997)
 
 LEGAL ASSESSMENT
 {'-' * 40}
-• {'CRITICAL concern' if atdi >= 70 else 'HIGH concern' if atdi >= 55 else 'MODERATE' if atdi >= 40 else 'LOW'} under Art.5 Equitable Utilisation  # noqa: E501
+• {_art5_label} under Art.5 Equitable Utilisation
 • HIFD of {hifd:.1f}% {'exceeds' if hifd >= 25 else 'is below'} Art.20 environmental flow threshold (25%)
-• Negotiation success probability: {pneg:.0%} → {'Cooperative framework' if pneg >= 0.65 else 'Mediation required' if pneg >= 0.40 else 'PCA/ICJ referral recommended'}  # noqa: E501
-• Conflict Index {ci:.3f}: {'immediate intervention required' if ci >= 0.6 else 'monitoring required' if ci >= 0.4 else 'manageable'}  # noqa: E501
+• Negotiation success probability: {pneg:.0%} → {_neg_label}
+• Conflict Index {ci:.3f}: {_ci_label}
 
 RECOMMENDATIONS
 {'-' * 40}

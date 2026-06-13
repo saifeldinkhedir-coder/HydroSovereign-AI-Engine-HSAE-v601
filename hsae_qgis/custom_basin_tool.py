@@ -1,5 +1,5 @@
 """
-custom_basin_tool.py — HSAE v6.0.11
+custom_basin_tool.py — HSAE v6.0.12
 =====================================
 Add Custom Basin — User-Defined Basin Analyser
 Allows analysis of any basin worldwide without pre-loading.
@@ -20,7 +20,7 @@ Outputs:
   · Option to add to basins registry for session
 
 Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
-Version: 6.0.11
+Version: 6.0.12
 """
 from __future__ import annotations
 from qgis.PyQt.QtWidgets import (
@@ -45,6 +45,12 @@ except ImportError:
 
 
 # ── Climate-zone runoff estimator ─────────────────────────
+def _country_list(raw):
+    """Parse comma-separated country names, fallback to ['Unknown']."""
+    parts = [c.strip() for c in raw.split(",") if c.strip()]
+    return parts if parts else ["Unknown"]
+
+
 def estimate_runoff_c(lat: float, lon: float) -> float:
     """Estimate basin runoff coefficient from lat/lon.
 
@@ -108,9 +114,9 @@ class ResultWidget(QTextEdit):
                     result: dict, rc: float) -> None:
         risk_color = {
             "CRITICAL": "#C0392B",
-            "HIGH":     "#E67E22",
+            "HIGH": "#E67E22",
             "MODERATE": "#F39C12",
-            "LOW":      "#27AE60",
+            "LOW": "#27AE60",
         }.get(result["risk"], "#555")
 
         arts_html = " &nbsp;|&nbsp; ".join(result["articles"]) or "None triggered"
@@ -177,7 +183,7 @@ class ResultWidget(QTextEdit):
 
 # ── Main Dialog ───────────────────────────────────────────
 class CustomBasinDialog(QDialog):
-    """Add Custom Basin — HSAE v6.0.11."""
+    """Add Custom Basin — HSAE v6.0.12."""
 
     #: Emitted when a basin is added to the session registry
     basin_added = pyqtSignal(dict)
@@ -208,7 +214,7 @@ class CustomBasinDialog(QDialog):
         root.setSpacing(8)
 
         # Header
-        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.11")
+        hdr = QLabel("🌍  Add Custom Basin — HSAE v6.0.12")
         hdr.setAlignment(Qt.AlignCenter)
         hdr.setStyleSheet(
             "font-size:15px;font-weight:bold;color:#003660;"
@@ -223,7 +229,7 @@ class CustomBasinDialog(QDialog):
 
         tabs = QTabWidget()
         tabs.addTab(self._build_input_tab(), "  📥 Basin Input  ")
-        tabs.addTab(self._build_help_tab(),  "  ℹ️  Help  ")
+        tabs.addTab(self._build_help_tab(), "  ℹ️  Help  ")
         root.addWidget(tabs)
 
         # Result area
@@ -457,10 +463,10 @@ class CustomBasinDialog(QDialog):
 
         self._last_result = result
         self._last_inputs = {
-            "name":     name,
-            "lat":      lat,
-            "lon":      lon,
-            "cap_bcm":  cap,
+            "name": name,
+            "lat": lat,
+            "lon": lon,
+            "cap_bcm": cap,
             "runoff_c": rc,
             "n_countries": nc,
             "dispute_level": disp,
@@ -496,22 +502,22 @@ class CustomBasinDialog(QDialog):
                 "Point?crs=EPSG:4326", layer_name, "memory")
             prov = layer.dataProvider()
             fields = [
-                QgsField("name",     QVariant.String),
-                QgsField("lat",      QVariant.Double),
-                QgsField("lon",      QVariant.Double),
-                QgsField("cap_bcm",  QVariant.Double),
+                QgsField("name", QVariant.String),
+                QgsField("lat", QVariant.Double),
+                QgsField("lon", QVariant.Double),
+                QgsField("cap_bcm", QVariant.Double),
                 QgsField("runoff_c", QVariant.Double),
                 QgsField("n_countries", QVariant.Int),
                 QgsField("dispute_level", QVariant.Int),
-                QgsField("atdi",     QVariant.Double),
-                QgsField("ahifd",    QVariant.Double),
-                QgsField("afsf",     QVariant.Double),
-                QgsField("ahlb",     QVariant.Double),
-                QgsField("asi",      QVariant.Double),
-                QgsField("atci",     QVariant.Double),
-                QgsField("ci",       QVariant.Double),
-                QgsField("pneg",     QVariant.Double),
-                QgsField("risk",     QVariant.String),
+                QgsField("atdi", QVariant.Double),
+                QgsField("ahifd", QVariant.Double),
+                QgsField("afsf", QVariant.Double),
+                QgsField("ahlb", QVariant.Double),
+                QgsField("asi", QVariant.Double),
+                QgsField("atci", QVariant.Double),
+                QgsField("ci", QVariant.Double),
+                QgsField("pneg", QVariant.Double),
+                QgsField("risk", QVariant.String),
                 QgsField("articles", QVariant.String),
             ]
             prov.addAttributes(fields)
@@ -561,24 +567,22 @@ class CustomBasinDialog(QDialog):
 
         # Build basin dict compatible with basins_50.json schema
         basin_dict = {
-            "name":          inp["name"],
-            "lat":           inp["lat"],
-            "lon":           inp["lon"],
-            "cap_bcm":       inp["cap_bcm"],
-            "cap":           inp["cap_bcm"],   # alias
-            "runoff_c":      inp["runoff_c"],
-            "n_countries":   inp["n_countries"],
+            "name": inp["name"],
+            "lat": inp["lat"],
+            "lon": inp["lon"],
+            "cap_bcm": inp["cap_bcm"],
+            "cap": inp["cap_bcm"],   # alias
+            "runoff_c": inp["runoff_c"],
+            "n_countries": inp["n_countries"],
             "dispute_level": inp["dispute_level"],
-            "continent":     "Custom",
-            "region":        "User-defined",
-            "country":       [c.strip() for c in
-                              inp["countries"].split(",") if c.strip()]
-                             or ["Unknown"],
+            "continent": "Custom",
+            "region": "User-defined",
+            "country": _country_list(inp["countries"]),
             # Pre-computed for quick access
-            "_atdi":  r["atdi"],
+            "_atdi": r["atdi"],
             "_ahifd": r["ahifd"],
-            "_atci":  r["atci"],
-            "_risk":  r["risk"],
+            "_atci": r["atci"],
+            "_risk": r["risk"],
             "_custom": True,
         }
 

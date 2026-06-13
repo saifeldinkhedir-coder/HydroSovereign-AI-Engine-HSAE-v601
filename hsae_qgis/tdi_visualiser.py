@@ -67,7 +67,7 @@ def apply_tdi_style(iface):
     n_low = sum(1 for v in atdi_vals if v < 25)
 
     iface.messageBar().pushSuccess(
-        "HSAE TDI v6.0.11",
+        "HSAE TDI v6.0.12",
         f"✅ ATDI style applied: "
         f"🔴 {n_crit} CRITICAL · "
         f"🟠 {n_high} HIGH · "

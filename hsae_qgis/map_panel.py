@@ -1,5 +1,5 @@
 """
-HSAE v6.0.11 — Interactive Basin Risk Map Panel
+HSAE v6.0.12 — Interactive Basin Risk Map Panel
 ================================================
 Pure Qt — no QWebEngineView required.
 Shows all 26 basins with ATDI/AHIFD/CI risk table.
@@ -145,14 +145,14 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
         rc = float(basin.get("runoff_c", basin.get("riparian_cooperation", 0.38)))
         _r = compute_all(runoff_c=rc, cap_bcm=cap, n_countries=int(nc), dispute_level=int(disp))
         return {
-            "atdi":  _r['atdi'],
+            "atdi": _r['atdi'],
             "ahifd": _r['ahifd'],
-            "afsf":  _r['afsf'],
-            "ahlb":  _r['ahlb'],
-            "asi":   _r['asi'],
-            "atci":  _r['atci'],
-            "ci":    _r['ci'],
-            "pneg":  _r['pneg'],
+            "afsf": _r['afsf'],
+            "ahlb": _r['ahlb'],
+            "asi": _r['asi'],
+            "atci": _r['atci'],
+            "ci": _r['ci'],
+            "pneg": _r['pneg'],
         }
 
     def _refresh(self) -> None:
@@ -211,13 +211,14 @@ class HSAEMapPanel(QDockWidget if HAS_QT else object):
                 lon = b.get("lon", 0)
                 name = b.get("name", "Unknown").replace("'", " ")
                 color = _risk_color(d["atdi"])
-                popup = (name + " | ATDI:" + str(d["atdi"]) + "% | AAHIFD:" + str(d["ahifd"]) +
-                         "% | ATCI:" + str(d["atci"]) + " | CI:" + str(d["ci"]) + " | " + _risk_label(d["atdi"]))
-                marker_lines.append(
-                    "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + "{radius:10,color:'" + color +
-                    "',fillColor:'" + color +
-                    "',fillOpacity:0.8}).addTo(map)" + ".bindPopup('" + popup + "');"
-                )
+                popup = name + " | ATDI:" + str(d["atdi"]) + "%"
+                popup += " | AHIFD:" + str(d["ahifd"]) + "%"
+                popup += " | ATCI:" + str(d["atci"]) + " | CI:" + str(d["ci"])
+                popup += " | " + _risk_label(d["atdi"])
+                _style = "{radius:10,color:'" + color + "',fillColor:'" + color + "',fillOpacity:0.8}"
+                _m = "L.circleMarker([" + str(lat) + "," + str(lon) + "]," + _style
+                _m += ".addTo(map).bindPopup('" + popup + "');"
+                marker_lines.append(_m)
             except Exception:
                 pass
 
