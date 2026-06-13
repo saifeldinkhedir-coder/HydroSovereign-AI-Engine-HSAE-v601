@@ -126,8 +126,20 @@ def analyze_basin(
             indices["atdi"], indices["hifd"], dispute_level, n_countries)
 
     if include_negotiation:
-        from .ai.negotiation import NegotiationAI
-        ai  = NegotiationAI()
+        try:
+            from .ai.negotiation import NegotiationAI
+            ai = NegotiationAI()
+        except ImportError:
+            class NegotiationAI:
+                def predict(self, atdi, hifd, n_countries, dispute_level):
+                    stress = (0.4*atdi + 0.3*hifd + 0.15*(dispute_level/5)*100 + 0.15*min(n_countries/6,1)*100)
+                    p = max(0.05, min(0.95, 1.0 - stress/100))
+                    strat = "PCA Arbitration" if (dispute_level>=4 or atdi>60) else ("Joint Technical Commission" if (dispute_level>=3 or atdi>40) else "Bilateral Negotiation")
+                    risk  = ("CRITICAL" if atdi >= 60
+                             else "HIGH" if atdi >= 40
+                             else "MODERATE" if atdi >= 25 else "LOW")
+                    return {"p_success":round(p,2),"strategy":strat,"un_path":"Art.33→PCA" if risk in ("HIGH","CRITICAL") else "Art.8→JTC","risk":risk}
+            ai = NegotiationAI()
         result["ai"] = ai.predict(indices["atdi"], indices["hifd"],
                                    n_countries, dispute_level)
 
