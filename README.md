@@ -59,14 +59,14 @@ The **Alkhedir Water Sovereignty Indices (AWSI)** are the first published quanti
 
 | Index | Full Name | Legal Trigger | GERD Result |
 |-------|-----------|---------------|-------------|
-| **ATDI** | Alkhedir Transparency Deficit Index | Art. 7 — No Significant Harm (≥40%) | **43.5%** ⚠️ |
-| **AHIFD** | Alkhedir Human-Induced Flow Deficit | Art. 7 — volumetric downstream harm | **20.0%** |
-| **AFSF** | Alkhedir Forensic Signal Factor | Art. 9 — data exchange obligation | 0.67 |
-| **AHLB** | Alkhedir HBV-Legal Bridge | Arts. 5,6,7 — HBV-96 → legal triggers | First of kind |
-| **ASI** | Alkhedir Sovereignty Index | Art. 5 — equitable utilisation | 0.58 |
+| **ATDI** | Alkhedir Transparency Deficit Index | Art. 7 — No Significant Harm (≥40%) | **43.6%** ⚠️ |
+| **AHIFD** | Alkhedir Human-Induced Flow Deficit | Art. 7 — volumetric downstream harm | **19.7%** |
+| **AFSF** | Alkhedir Forensic Signal Factor | Art. 9 — data exchange obligation | 0.36 |
+| **AHLB** | Alkhedir HBV-Legal Bridge | Arts. 5,6,7 — HBV-96 → legal triggers | 0.436 |
+| **ASI** | Alkhedir Sovereignty Index | Art. 5 — equitable utilisation | 0.64 |
 | **ATCI** | Alkhedir Treaty Compliance Index | Arts. 5,7,9,11,17,33 composite | **70/100** |
 
-All six indices are collectively named **AWSI** and are validated against the Blue Nile (GERD) basin with RMSE = 4.1% against 14 published benchmark values.
+All six indices are collectively named **AWSI** and are validated against the Blue Nile (GERD) basin (ATDI = 43.6%, AHIFD = 19.7%, ATCI = 70.3) calibrated to NSE = 0.63, KGE = 0.74 against GloFAS ERA5 v4.
 
 ---
 
@@ -109,21 +109,21 @@ params = dict(
 )
 
 # Compute all 6 AWSI indices
-atdi  = ATDI(**params)     # → 43.5%  ⚠️  Art. 7 UNWC triggered
-ahifd = AHIFD(**params)    # → 20.0%       20% of natural flow withheld
-afsf  = AFSF(**params)     # → 0.67        Art. 9 data exchange check
+atdi  = ATDI(**params)     # → 43.6%  ⚠️  Art. 7 UNWC triggered
+ahifd = AHIFD(**params)    # → 19.7%       ~20% of natural flow withheld
+afsf  = AFSF(**params)     # → 0.36        Art. 9 data exchange check
 ahlb  = AHLB(**params)     # →             HBV-96 → legal bridge
-asi   = ASI(**params)      # → 0.58        Art. 5 equitable use
+asi   = ASI(**params)      # → 0.64        Art. 5 equitable use
 atci  = ATCI(**params)     # → 70/100      composite compliance
 
 # Conflict assessment
 ci = ConflictIndex(atdi=atdi, ahifd=ahifd, **params)
-print(f"Conflict Index: {ci:.3f} HIGH")   # → 0.44 HIGH
+print(f"Conflict Index: {ci:.3f}")         # → 0.484
 
 # AI negotiation pathway
 ai = NegotiationAI()
 p  = ai.predict(atdi=atdi, ci=ci, n_countries=3, dispute_level=4)
-print(f"P(Negotiation): {p:.0%}")          # → 58% → Art.17 Mediation
+print(f"P(Negotiation): {p:.0%}")          # → 55% → Art.7 + Art.5
 
 # Full basin analysis (one call)
 from hydrosovereign.api import analyze_basin
@@ -155,15 +155,17 @@ Sample AWSI results across five continents:
 
 | Basin | ATDI | AHIFD | ATCI | CI | Risk | UNWC |
 |-------|------|-------|------|----|------|------|
-| Blue Nile (GERD) | 43.5% | 20.0% | 70 | 0.44 | HIGH | Art. 7 |
-| Euphrates-Atatürk | 58.2% | 31.4% | 45 | 0.61 | CRITICAL | Arts. 7,9 |
-| Mekong-Xayaburi | 51.8% | 27.6% | 52 | 0.53 | HIGH | Art. 7 |
-| Amu Darya-Nurek | 49.3% | 25.1% | 58 | 0.49 | HIGH | Art. 7 |
-| Dnieper-Kakhovka | 62.1% | 35.8% | 38 | 0.67 | CRITICAL | Arts. 7,33 |
-| Danube-Iron Gates | 38.7% | 18.9% | 75 | 0.39 | MEDIUM | Art. 5 |
-| Colorado-Hoover | 44.1% | 22.3% | 68 | 0.45 | HIGH | Art. 7 |
+| Blue Nile (GERD) | 43.6% | 19.7% | 70.3 | 0.484 | HIGH | Art. 7 |
+| Euphrates-Atatürk | 41.8% | 19.3% | 71.4 | 0.475 | HIGH | Art. 7 |
+| Nile-High Aswan | 40.8% | 19.5% | 71.8 | 0.399 | HIGH | Art. 7 |
+| Syr Darya-Toktogul | 40.6% | 19.3% | 72.0 | 0.471 | HIGH | Art. 7 |
+| Mekong-Xayaburi | 36.8% | 18.3% | 74.3 | 0.390 | MODERATE | Art. 5 |
+| Danube-Iron Gates | 32.8% | 18.7% | 76.1 | 0.250 | MODERATE | Art. 5 |
+| Rhine | 22.3% | 10.9% | 84.5 | 0.189 | LOW | — |
 
-> NSE = 0.63 · KGE = 0.74 (pre-calibration) · 56 pytest tests passing · RMSE = 4.1%
+> NSE = 0.63 · KGE = 0.74 (pre-calibration, GERD vs GloFAS ERA5 v4) · 51 pytest tests passing
+>
+> **Risk distribution across all 26 basins:** HIGH = 4 (GERD, Euphrates-Atatürk, Nile-Aswan, Syr Darya-Toktogul) · MODERATE = 14 · LOW = 8. Legal tiers: CRITICAL ≥ 60% (Art. 33) · HIGH ≥ 40% (Art. 7) · MODERATE ≥ 25% (Art. 5) · LOW < 25%.
 
 ---
 
@@ -251,7 +253,7 @@ hsae compliance --basin "Euphrates" --article 7
 ```bibtex
 @software{alkhedir2026hsae,
   author    = {Alkhedir, Seifeldin M.G.},
-  title     = {{HydroSovereign AI Engine (HSAE) v6.7.0}},
+  title     = {{HydroSovereign AI Engine (HSAE) v6.7.1}},
   year      = {2026},
   publisher = {PyPI + QGIS Plugin Repository + Zenodo},
   version   = {6.7.0},
@@ -267,7 +269,7 @@ hsae compliance --basin "Euphrates" --article 7
 
 <div align="center">
 
-*hydrosovereign v6.7.0 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
+*hydrosovereign v6.7.1 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
 
 *University of Khartoum · DOI: 10.5281/zenodo.19180160*
 

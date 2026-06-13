@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.7.0"
+version = "6.7.1"
 description = "HydroSovereign AI Engine (HSAE) — Automated satellite-driven transboundary water law compliance for 26 globally contested river basins"
 readme = "README.md"
 license = {text = "GPL-3.0"}
