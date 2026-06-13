@@ -1,20 +1,6 @@
-"""
-hydrosovereign.ai — AI & Machine Learning Module
-=================================================
-Negotiation AI, Conflict Prediction, Bayesian Risk Assessment,
-and LSTM-based discharge forecasting.
+"""hydrosovereign.ai — AI modules for water diplomacy."""
+from hydrosovereign.ai.negotiation import NegotiationAI
+from hydrosovereign.ai.conflict    import ConflictIndex
+from hydrosovereign.ai.bayesian    import BayesianUncertainty
 
-Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
-"""
-
-from .negotiation  import NegotiationAI
-from .conflict     import ConflictPredictor
-from .bayesian     import BayesianRisk
-from .forecast     import LSTMForecast
-
-__all__ = [
-    "NegotiationAI",
-    "ConflictPredictor",
-    "BayesianRisk",
-    "LSTMForecast",
-]
+__all__ = ["NegotiationAI", "ConflictIndex", "BayesianUncertainty"]

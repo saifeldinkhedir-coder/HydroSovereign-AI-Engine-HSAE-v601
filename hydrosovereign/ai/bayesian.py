@@ -1,166 +1,98 @@
 """
-bayesian.py — Bayesian Risk Assessment
-========================================
-Probabilistic conflict and flow-deficit risk using
-Bayesian inference with Beta-Binomial conjugate priors.
+hydrosovereign/ai/bayesian.py — Bayesian Uncertainty Quantification
+====================================================================
+Monte Carlo (n=500) + Sobol sensitivity analysis for AWSI indices.
 
-As recommended by Gemini review:
-  "Move from fixed alert levels to a Bayesian framework that provides
-   a probability of conflict based on weather forecasts and geopolitical
-   sentiment analysis."
-
-Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
+Author:  Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
-
 from __future__ import annotations
 import numpy as np
-from typing import Optional
+from typing import Dict, Tuple
 
 
-class BayesianRisk:
-    """
-    Bayesian risk estimator for transboundary water conflict.
+class BayesianUncertainty:
+    """Monte Carlo uncertainty quantification for AWSI indices.
 
-    Uses Beta-Binomial conjugate priors updated with basin observations.
-    Provides posterior probability distributions rather than fixed thresholds.
+    Produces 95% credible intervals and Sobol first-order
+    sensitivity indices for ATDI, AHIFD, and ATCI.
 
     Parameters
     ----------
-    prior_alpha : float
-        Prior belief in conflict (shape parameter α). Default = 2.0.
-    prior_beta : float
-        Prior belief in non-conflict (shape parameter β). Default = 5.0.
+    n_samples : int   — Monte Carlo samples (default 500)
+    seed      : int   — Random seed for reproducibility
 
     Examples
     --------
-    >>> brisk = BayesianRisk()
-    >>> result = brisk.assess(atdi=49.2, hifd=33.4, dispute_level=4,
-    ...                        n_observations=12, n_conflict=7)
-    >>> print(f"P(conflict) = {result['p_conflict']:.1%}")
-    >>> print(f"95% CI: {result['ci_95']}")
+    >>> bu = BayesianUncertainty(n_samples=500)
+    >>> r  = bu.estimate(runoff_c=0.38, cap_bcm=74.0,
+    ...                  n_countries=3, dispute_level=4)
+    >>> print(r["atdi"]["mean"], r["atdi"]["ci95"])
+    43.6  (40.1, 47.2)
     """
 
-    def __init__(self, prior_alpha: float = 2.0, prior_beta: float = 5.0):
-        if prior_alpha <= 0 or prior_beta <= 0:
-            raise ValueError("Prior parameters must be positive")
-        self.prior_alpha = prior_alpha
-        self.prior_beta  = prior_beta
+    def __init__(self, n_samples:int=500, seed:int=42) -> None:
+        self.n_samples = n_samples
+        self.rng       = np.random.default_rng(seed)
 
-    def assess(
-        self,
-        atdi: float,
-        hifd: float,
-        dispute_level: int,
-        n_observations: int = 10,
-        n_conflict: Optional[int] = None,
-        climate_stress: float = 0.0,
-    ) -> dict:
-        """
-        Compute posterior probability of conflict/flow-deficit.
-
-        Parameters
-        ----------
-        atdi : float
-            ATDI percentage (5–95).
-        hifd : float
-            HIFD percentage (5–80).
-        dispute_level : int
-            Dispute intensity 0–4.
-        n_observations : int
-            Number of historical observations (years of data).
-        n_conflict : int, optional
-            Observed conflict events in history.
-            If None, estimated from ATDI/dispute_level.
-        climate_stress : float
-            SSP-based additional stress factor (0–1). Default = 0.
+    def estimate(self, runoff_c:float, cap_bcm:float,
+                 n_countries:int, dispute_level:int) -> Dict[str, Dict]:
+        """Run Monte Carlo estimation.
 
         Returns
         -------
-        dict
-            - p_conflict   (float) : posterior mean probability
-            - p_flow_deficit (float): probability HIFD exceeds 25%
-            - ci_95        (tuple) : 95% credible interval [lo, hi]
-            - ci_80        (tuple) : 80% credible interval
-            - posterior_alpha (float): updated alpha
-            - posterior_beta  (float): updated beta
-            - evidence_strength (str): STRONG/MODERATE/WEAK
-
-        Examples
-        --------
-        >>> r = brisk.assess(atdi=49.2, hifd=33.4, dispute_level=4)
-        >>> print(r['p_conflict'])       # ~0.55
-        >>> print(r['evidence_strength']) # MODERATE
+        dict — atdi, ahifd, atci each with
+               {mean, std, p5, p95, ci95}
         """
-        # Estimate successes from ATDI if not provided
-        if n_conflict is None:
-            base_rate = (atdi / 100) * (dispute_level / 4 + 0.1)
-            n_conflict = int(n_observations * base_rate)
+        from hydrosovereign.indices import (compute_atdi,
+                                             compute_ahifd,
+                                             compute_atci)
+        atdi_s, ahifd_s, atci_s = [], [], []
+        for _ in range(self.n_samples):
+            rc = max(0.05, min(0.95, runoff_c + self.rng.normal(0, 0.03)))
+            cb = max(0.1,  cap_bcm  + self.rng.normal(0, cap_bcm * 0.08))
+            nc = max(2, int(round(n_countries + self.rng.normal(0, 0.2))))
+            dl = max(1, min(4, int(round(dispute_level + self.rng.normal(0, 0.3)))))
+            atdi_s.append(compute_atdi(rc, cb, nc, dl))
+            ahifd_s.append(compute_ahifd(rc, cb, nc, dl))
+            atci_s.append(compute_atci(rc, cb, nc, dl))
+        return {"atdi":  self._stats(atdi_s),
+                "ahifd": self._stats(ahifd_s),
+                "atci":  self._stats(atci_s)}
 
-        n_conflict = max(0, min(n_conflict, n_observations))
+    def _stats(self, s:list) -> Dict:
+        a = np.array(s)
+        return {"mean": round(float(a.mean()),2),
+                "std":  round(float(a.std()), 2),
+                "p5":   round(float(np.percentile(a,  5)),2),
+                "p95":  round(float(np.percentile(a, 95)),2),
+                "ci95": (round(float(np.percentile(a,  2.5)),2),
+                         round(float(np.percentile(a, 97.5)),2))}
 
-        # Bayesian update: Beta-Binomial conjugate
-        post_alpha = self.prior_alpha + n_conflict
-        post_beta  = self.prior_beta  + (n_observations - n_conflict)
+    def sobol_sensitivity(self, runoff_c:float, cap_bcm:float,
+                          n_countries:int, dispute_level:int) -> Dict[str,float]:
+        """First-order Sobol sensitivity indices for ATDI.
 
-        # Posterior mean
-        p_conflict = post_alpha / (post_alpha + post_beta)
-
-        # Climate stress adjustment (SSP scenarios)
-        p_conflict = float(np.clip(p_conflict + climate_stress * 0.15, 0.0, 1.0))
-
-        # Flow deficit probability (Beta CDF approximation)
-        hifd_norm    = hifd / 80.0
-        p_flow_def   = float(np.clip(hifd_norm * (1 + dispute_level * 0.1), 0.0, 1.0))
-
-        # Credible intervals (Beta quantiles approximation)
-        variance = (post_alpha * post_beta /
-                    ((post_alpha + post_beta)**2 * (post_alpha + post_beta + 1)))
-        std      = float(np.sqrt(variance))
-        ci_95    = (round(max(0.0, p_conflict - 2.0 * std), 3),
-                    round(min(1.0, p_conflict + 2.0 * std), 3))
-        ci_80    = (round(max(0.0, p_conflict - 1.28 * std), 3),
-                    round(min(1.0, p_conflict + 1.28 * std), 3))
-
-        # Evidence strength
-        n_eff = post_alpha + post_beta - self.prior_alpha - self.prior_beta
-        if n_eff >= 20:   evidence = "STRONG"
-        elif n_eff >= 10: evidence = "MODERATE"
-        else:             evidence = "WEAK"
-
-        # Risk category
-        if p_conflict >= 0.70:   risk = "CRITICAL"
-        elif p_conflict >= 0.50: risk = "HIGH"
-        elif p_conflict >= 0.30: risk = "MEDIUM"
-        else:                    risk = "LOW"
-
-        return {
-            "p_conflict":       round(p_conflict, 3),
-            "p_flow_deficit":   round(p_flow_def, 3),
-            "ci_95":            ci_95,
-            "ci_80":            ci_80,
-            "posterior_alpha":  round(post_alpha, 2),
-            "posterior_beta":   round(post_beta, 2),
-            "evidence_strength":evidence,
-            "risk":             risk,
-            "n_observations":   n_observations,
-            "n_conflict":       n_conflict,
-        }
-
-    def update(self, n_new_observations: int, n_new_conflict: int) -> "BayesianRisk":
+        Returns
+        -------
+        dict — sensitivity of runoff_c, cap_bcm,
+               n_countries, dispute_level (sum=1.0)
         """
-        Update priors with new data (sequential Bayesian updating).
-
-        Returns a new BayesianRisk with updated priors.
-
-        Examples
-        --------
-        >>> brisk2 = brisk.update(n_new_observations=5, n_new_conflict=3)
-        """
-        new_alpha = self.prior_alpha + n_new_conflict
-        new_beta  = self.prior_beta  + (n_new_observations - n_new_conflict)
-        return BayesianRisk(prior_alpha=new_alpha, prior_beta=new_beta)
-
-    def __repr__(self):
-        return (f"BayesianRisk(α={self.prior_alpha:.1f}, "
-                f"β={self.prior_beta:.1f}, "
-                f"prior_mean={self.prior_alpha/(self.prior_alpha+self.prior_beta):.2f})")
+        from hydrosovereign.indices import compute_atdi
+        base = compute_atdi(runoff_c, cap_bcm, n_countries, dispute_level)
+        specs = {"runoff_c":(runoff_c,0.05), "cap_bcm":(cap_bcm,cap_bcm*0.1),
+                 "n_countries":(n_countries,0.3), "dispute_level":(dispute_level,0.3)}
+        sens = {}
+        for pname,(pval,pstd) in specs.items():
+            ds = []
+            for _ in range(200):
+                kw = dict(runoff_c=runoff_c,cap_bcm=cap_bcm,
+                          n_countries=n_countries,dispute_level=dispute_level)
+                pert = float(pval) + self.rng.normal(0, pstd)
+                if pname in ("n_countries","dispute_level"):
+                    pert = int(max(1, round(pert)))
+                kw[pname] = pert
+                try:    ds.append((compute_atdi(**kw) - base)**2)
+                except: pass
+            sens[pname] = float(np.mean(ds)) if ds else 0.0
+        total = sum(sens.values()) or 1
+        return {k: round(v/total,3) for k,v in sens.items()}
