@@ -1,5 +1,5 @@
 """
-plugin.py — HSAE v6.0.12 QGIS Plugin (Complete — May 2026)
+plugin.py — HSAE v6.0.13 QGIS Plugin (Complete — May 2026)
 ===========================================================
 15 Tools + 5 Processing Algorithms
 
@@ -54,7 +54,7 @@ from hsae_qgis.core.indices import compute_atdi, compute_ahifd
 
 
 PLUGIN_DIR = Path(__file__).parent
-VERSION = "6.0.12"
+VERSION = "6.0.13"
 AUTHOR = "Seifeldin M.G. Alkhedir"
 ORCID = "0000-0003-0821-2991"
 DOI = "10.5281/zenodo.19180160"
@@ -98,7 +98,7 @@ class HSAEPlugin:
         self.iface = iface
         self.provider = None
         self.actions = []
-        self.menu = "&HydroSovereign AI Engine v6.0.12"
+        self.menu = "&HydroSovereign AI Engine v6.0.13"
         self.toolbar = None
         self.session_basins = []  # custom basins added this session
         self.panel = None
@@ -174,7 +174,7 @@ class HSAEPlugin:
         self._add(
             "─── v6.08 NEW ───",
             lambda: None,
-            "New in v6.0.12",
+            "New in v6.0.13",
             False)
         self._add(
             "🤖 GeoAgent · Natural Language",
@@ -194,7 +194,7 @@ class HSAEPlugin:
             True)
 
     def add_custom_basin(self):
-        """Open the Add Custom Basin dialog (Tool 17, v6.0.12)."""
+        """Open the Add Custom Basin dialog (Tool 17, v6.0.13)."""
         try:
             dlg = CustomBasinDialog(
                 self.iface, self.session_basins, self.iface.mainWindow())
@@ -275,12 +275,12 @@ class HSAEPlugin:
         arts = ['Art.5 ERU', 'Art.9 Data Sharing']
         if atdi >= 40:
             arts.append('Art.7 NSH')
-        if atdi >= 55:
+        if hifd >= 25:
+            arts.append('Art.20 Env.Flow')
+        if atdi >= 60:
             arts.append('Art.33 Dispute')
         if atdi >= 70:
             arts.append('Art.35 Emergency')
-        if hifd >= 25:
-            arts.append('Art.20 Env.Flow')
         return dict(rc=rc, cap=cap, nc=nc, area=area, disp=disp,
                     atdi=atdi, hifd=hifd, nse=nse, kge=kge,
                     pneg=pneg, ci=ci, dlvl=dlvl, arts=arts)
@@ -394,7 +394,7 @@ class HSAEPlugin:
 
     def gee_scripts(self):
         scripts = """// ============================================================
-// HSAE v6.0.12 — GEE Script Generator (7 Satellite Sensors)
+// HSAE v6.0.13 — GEE Script Generator (7 Satellite Sensors)
 // Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 // GEE Project: zinc-arc-484714-j8
 // ============================================================
@@ -479,7 +479,7 @@ Map.setCenter(35.09, 10.53, 7);
 Map.setOptions('HYBRID');
 """
         self._txt_dlg(
-            "HSAE v6.0.12 — GEE Script Generator (7 Sensors)",
+            "HSAE v6.0.13 — GEE Script Generator (7 Sensors)",
             scripts, w=780, h=560,
             save_name="HSAE_GEE_Scripts.js")
 
@@ -503,7 +503,7 @@ Map.setOptions('HYBRID');
             ]
             lyr = QgsVectorLayer(
                 "Point?crs=EPSG:4326",
-                "GRDC Stations (HSAE v6.0.12)",
+                "GRDC Stations (HSAE v6.0.13)",
                 "memory")
             pr = lyr.dataProvider()
             pr.addAttributes([QgsField("grdc_id", QVariant.String),
@@ -547,7 +547,7 @@ Map.setOptions('HYBRID');
                                 risk:<12} {
                                     d['dlvl']}")
         self._txt_dlg(
-            "HSAE v6.0.12 — Conflict Index (26 Basins · TFDD/ICOW)",
+            "HSAE v6.0.13 — Conflict Index (26 Basins · TFDD/ICOW)",
             "\n".join(rows), w=700, h=520,
             save_name="HSAE_Conflict_Index.csv")
 
@@ -566,14 +566,14 @@ Map.setOptions('HYBRID');
             rows.append(f"{b.get('name', '')[:38]:<38} {d['pneg']:>8.0%}"
                         f"  [{bar}] {strat:<16} {path}")
         self._txt_dlg(
-            "HSAE v6.0.12 — Negotiation AI (GBM Model · 478 Historical Cases)",
+            "HSAE v6.0.13 — Negotiation AI (GBM Model · 478 Historical Cases)",
             "\n".join(rows), w=720, h=520,
             save_name="HSAE_Negotiation_AI.csv")
 
     def webgis_map(self):
         try:
             path, _ = QFileDialog.getSaveFileName(
-                None, "Save WebGIS Map", "HSAE_WebGIS_v6.0.12", "HTML (*.html)")
+                None, "Save WebGIS Map", "HSAE_WebGIS_v6.0.13", "HTML (*.html)")
             if not path:
                 return
             if HAS_WEBGIS_V2:
@@ -597,9 +597,9 @@ Map.setOptions('HYBRID');
             if not lat:
                 continue
             d = self._compute(b)
-            col = ("#f85149" if d['atdi'] >= 70
-                   else "#f0883e" if d['atdi'] >= 55
-                   else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
+            col = ("#f85149" if d['atdi'] >= 60
+                   else "#f0883e" if d['atdi'] >= 40
+                   else "#e3b341" if d['atdi'] >= 25 else "#3fb950")
             clist = (
                 ", ".join(
                     b.get(
@@ -628,7 +628,7 @@ Map.setOptions('HYBRID');
         geo = _j.dumps({"type": "FeatureCollection", "features": features})
         return f"""<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
-<title>HSAE v6.0.12 — WebGIS Global Basin Network</title>
+<title>HSAE v6.0.13 — WebGIS Global Basin Network</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
@@ -656,7 +656,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 </style></head><body>
 <div id="hdr">
   <div>
-    <h1>🌊 HSAE v6.0.12 — WebGIS Global Basin Network</h1>
+    <h1>🌊 HSAE v6.0.13 — WebGIS Global Basin Network</h1>
     <p>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
        DOI: 10.5281/zenodo.19180160 · Preprint: SSRN 2026</p>
   </div>
@@ -674,7 +674,7 @@ body{{font-family:'Segoe UI',Arial,sans-serif;background:#0d1117;color:#e6edf3}}
 <script>
 var map=L.map('map',{{center:[20,30],zoom:2,preferCanvas:true}});
 L.tileLayer('https://{{s}}.basemaps.cartocdn.com/dark_all/{{z}}/{{x}}/{{y}}.png',
-  {{attribution:'© CartoDB · HSAE v6.0.12 · Seifeldin M.G. Alkhedir'}}).addTo(map);
+  {{attribution:'© CartoDB · HSAE v6.0.13 · Seifeldin M.G. Alkhedir'}}).addTo(map);
 var data={geo};
 data.features.forEach(function(f){{
   var p=f.properties,c=f.geometry.coordinates;
@@ -723,7 +723,7 @@ function showPanel(p){{
     def icj_export(self):
         try:
             path, _ = QFileDialog.getSaveFileName(
-                None, "Export ICJ/PCA Dossier", "HSAE_ICJ_PCA_Dossier_v6.0.12",
+                None, "Export ICJ/PCA Dossier", "HSAE_ICJ_PCA_Dossier_v6.0.13",
                 "HTML (*.html);;Text (*.txt)")
             if not path:
                 return
@@ -779,9 +779,9 @@ function showPanel(p){{
         rows = ""
         for b in basins:
             d = self._compute(b)
-            col = ("#f85149" if d['atdi'] >= 70
-                   else "#f0883e" if d['atdi'] >= 55
-                   else "#e3b341" if d['atdi'] >= 40 else "#3fb950")
+            col = ("#f85149" if d['atdi'] >= 60
+                   else "#f0883e" if d['atdi'] >= 40
+                   else "#e3b341" if d['atdi'] >= 25 else "#3fb950")
             cl = (
                 ", ".join(
                     b.get(

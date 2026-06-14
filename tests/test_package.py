@@ -272,8 +272,9 @@ class TestLegalAlerts:
         assert check_art20_envflow(24.9) is False
 
     def test_art33_threshold(self):
-        assert check_art33_dispute(55.0) is True
-        assert check_art33_dispute(54.9) is False
+        # Unified to legal tier: Art.33 dispute zone == CRITICAL (ATDI >= 60)
+        assert check_art33_dispute(60.0) is True
+        assert check_art33_dispute(59.9) is False
 
     def test_art35_threshold(self):
         assert check_art35_emergency(70.0) is True

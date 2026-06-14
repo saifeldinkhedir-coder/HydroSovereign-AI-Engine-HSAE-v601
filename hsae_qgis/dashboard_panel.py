@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.0.12 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.13 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -64,10 +64,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.0.12 Real-Time Dashboard Panel."""
+    """HSAE v6.0.13 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.0.12 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.13 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -107,16 +107,18 @@ class HSAEDashboardPanel(QDockWidget):
         tws = round(cap * 0.3, 1)
         dlvl = ['LOW', 'LOW', 'MEDIUM', 'HIGH',
                 'CRITICAL', 'CRITICAL'][min(disp, 5)]
-        arts = ['Art.5 ERU', 'Art.9 Data']
+        arts = ['Art.5 ERU', 'Art.9 Data Sharing']
         if atdi >= 40:
             arts.append('Art.7 NSH')
-        if atdi >= 55:
-            arts.append('Art.33 Dispute')
         if hifd >= 25:
-            arts.append('Art.20 EnvFlow')
-        risk_col = RED if atdi >= 70 else ORG if atdi >= 55 else "#e3b341" if atdi >= 40 else GREEN
-        risk_txt = ("🔴 CRITICAL" if atdi >= 70 else "🟠 HIGH" if atdi >= 55
-                    else "🟠 HIGH" if atdi >= 40 else "🟡 MODERATE" if atdi >= 25 else "🟢 LOW")
+            arts.append('Art.20 Env.Flow')
+        if atdi >= 60:
+            arts.append('Art.33 Dispute')
+        if atdi >= 70:
+            arts.append('Art.35 Emergency')
+        risk_col = RED if atdi >= 60 else ORG if atdi >= 40 else "#e3b341" if atdi >= 25 else GREEN
+        risk_txt = ("🔴 CRITICAL" if atdi >= 60 else "🟠 HIGH" if atdi >= 40
+                    else "🟡 MODERATE" if atdi >= 25 else "🟢 LOW")
         return dict(atdi=atdi, ahifd=hifd, hifd=hifd, afsf=afsf, ahlb=ahlb,
                     asi=asi, atci=atci, nse=nse, kge=kge, pneg=pneg, ci=ci,
                     wqi=wqi, p_mm=p_mm, tws=tws, dlvl=dlvl, arts=arts,
@@ -144,7 +146,7 @@ class HSAEDashboardPanel(QDockWidget):
         # Header
         ml.addWidget(
             self._lbl(
-                "🌊 HydroSovereign AI Engine v6.0.12",
+                "🌊 HydroSovereign AI Engine v6.0.13",
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(
@@ -341,7 +343,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.0.12 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.13 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {

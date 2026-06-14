@@ -202,16 +202,29 @@ def classify_risk(atdi: float) -> str:
 
 
 def triggered_articles(atdi: float, ahifd: float) -> List[str]:
-    """Return the list of UNWC articles triggered for given indices."""
-    arts: List[str] = []
+    """Return the list of UNWC 1997 articles triggered for given indices.
+
+    Unified with legal.get_triggered_articles (single source of truth):
+    Art.5 ERU and Art.9 Data Sharing are baseline duties returned for
+    every basin; the rest are conditional on the indices.
+
+    Thresholds: Art.7 NSH (ATDI>=40), Art.20 Env.Flow (AHIFD>=25),
+    Art.33 Dispute (ATDI>=60), Art.35 Emergency (ATDI>=70).
+
+    Examples
+    --------
+    >>> triggered_articles(43.6, 19.7)
+    ['Art.5 ERU', 'Art.9 Data Sharing', 'Art.7 NSH']
+    """
+    arts: List[str] = ["Art.5 ERU", "Art.9 Data Sharing"]
     if atdi >= 40:
-        arts.append("Art.7")
+        arts.append("Art.7 NSH")
     if ahifd >= 25:
-        arts.append("Art.9")
+        arts.append("Art.20 Env.Flow")
     if atdi >= 60:
-        arts.append("Art.33")
-    if atdi >= 25:
-        arts.append("Art.5")
+        arts.append("Art.33 Dispute")
+    if atdi >= 70:
+        arts.append("Art.35 Emergency")
     return arts
 
 

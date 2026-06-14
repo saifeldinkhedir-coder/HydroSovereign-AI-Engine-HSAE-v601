@@ -1,5 +1,5 @@
 """
-basin_loader.py — HSAE v6.0.12
+basin_loader.py — HSAE v6.0.13
 Load 26 Transboundary Basins as QGIS Vector Layer
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -48,7 +48,7 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
     Returns the layer (caller adds to project).
     """
     lyr = QgsVectorLayer("Point?crs=EPSG:4326",
-                         "HSAE v6.0.12 — 26 Transboundary Basins", "memory")
+                         "HSAE v6.0.13 — 26 Transboundary Basins", "memory")
     pr = lyr.dataProvider()
     pr.addAttributes([
         QgsField("id", QVariant.String),
@@ -108,13 +108,15 @@ def load_basin_layer(basins: list) -> QgsVectorLayer:
         ci = _r['ci']
         dlvl = ['LOW', 'LOW', 'MEDIUM', 'HIGH',
                 'CRITICAL', 'CRITICAL'][min(disp, 5)]
-        arts = ['Art.5 ERU', 'Art.9 Data']
+        arts = ['Art.5 ERU', 'Art.9 Data Sharing']
         if atdi >= 40:
             arts.append('Art.7 NSH')
-        if atdi >= 55:
-            arts.append('Art.33')
         if hifd >= 25:
-            arts.append('Art.20')
+            arts.append('Art.20 Env.Flow')
+        if atdi >= 60:
+            arts.append('Art.33 Dispute')
+        if atdi >= 70:
+            arts.append('Art.35 Emergency')
 
         clist = (', '.join(b.get('country', [])) if isinstance(b.get('country'), list)
                  else f"{b.get('country_up', '')} / {b.get('country_dn', '')}")

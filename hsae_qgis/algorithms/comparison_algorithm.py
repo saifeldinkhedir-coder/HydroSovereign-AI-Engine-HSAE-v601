@@ -1,5 +1,5 @@
 """
-comparison_algorithm.py — HSAE v6.0.12 QGIS Processing Algorithm
+comparison_algorithm.py — HSAE v6.0.13 QGIS Processing Algorithm
 Multi-Basin Comparison Tool (CSV + HTML report)
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -118,9 +118,9 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
                     'CRITICAL', 'CRITICAL'][min(disp, 5)]
             arts = ['Art.5', 'Art.9']
             if atdi >= 40:
-                arts.append('Art.7')
-            if atdi >= 55:
-                arts.append('Art.33')
+                arts.append('Art.7 NSH')
+            if atdi >= 60:
+                arts.append('Art.33 Dispute')
             if hifd >= 25:
                 arts.append('Art.20')
             results.append(
@@ -165,7 +165,7 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
         # HTML
         rows = ''.join([f"""<tr>
           <td><b>{r['name']}</b></td><td style='text-align:center'>{r['nc']}</td>
-          <td style='color:{"#f85149" if r["atdi"] >= 55 else "#f0883e" if r["atdi"] >= 40 else "#3fb950"};
+          <td style='color:{"#f85149" if r["atdi"] >= 60 else "#f0883e" if r["atdi"] >= 40 else "#3fb950"};
               font-weight:bold'>{r['atdi']:.1f}%</td>
           <td>{r['ahifd']:.1f}%</td><td>{r['nse']}</td><td>{r['kge']}</td>
           <td>{r['ci']:.3f}</td>
@@ -177,7 +177,7 @@ class MultiBasinComparisonAlgorithm(QgsProcessingAlgorithm):
         from datetime import datetime
         with open(outhtml, 'w', encoding='utf-8') as f:
             f.write(f"""<!DOCTYPE html><html><head>
-<title>HSAE v6.0.12 — Multi-Basin Comparison</title>
+<title>HSAE v6.0.13 — Multi-Basin Comparison</title>
 <style>
 body{{font-family:Arial,sans-serif;background:#0d1117;color:#e6edf3;padding:20px}}
 h1{{color:#58a6ff;font-size:16px}}
@@ -187,7 +187,7 @@ th{{background:#161b22;color:#58a6ff;padding:7px 5px;border:1px solid #30363d;te
 td{{padding:6px 5px;border:1px solid #21262d;vertical-align:top}}
 tr:nth-child(even){{background:#161b22}}
 </style></head><body>
-<h1>🌊 HSAE v6.0.12 — Multi-Basin Comparison Report</h1>
+<h1>🌊 HSAE v6.0.13 — Multi-Basin Comparison Report</h1>
 <h2>Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991 ·
     DOI: 10.5281/zenodo.19180160 ·
     Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</h2>
@@ -197,7 +197,7 @@ tr:nth-child(even){{background:#161b22}}
 <th>P(Neg)</th><th>UN Articles</th>
 </tr></thead><tbody>{rows}</tbody></table>
 <p style='color:#8b949e;font-size:10px;margin-top:12px'>
-HSAE v6.0.12 · {len(results)} basins · UNWC 1997 · TFDD/ICOW</p>
+HSAE v6.0.13 · {len(results)} basins · UNWC 1997 · TFDD/ICOW</p>
 </body></html>""")
 
         feedback.setProgress(100)

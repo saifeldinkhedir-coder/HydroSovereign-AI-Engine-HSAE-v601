@@ -46,12 +46,12 @@ def load_legal_layer(iface, basins):
     for b in basins:
         tdi = b.get("tdi", 0.0) * 100
 
-        if tdi >= 55:
-            risk = "HIGH"
+        if tdi >= 60:
+            risk = "CRITICAL"
         elif tdi >= 40:
-            risk = "MEDIUM"
+            risk = "HIGH"
         elif tdi >= 25:
-            risk = "LOW"
+            risk = "MODERATE"
         else:
             risk = "MINIMAL"
 

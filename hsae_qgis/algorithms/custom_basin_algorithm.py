@@ -1,5 +1,5 @@
 """
-algorithms/custom_basin_algorithm.py — HSAE v6.0.12
+algorithms/custom_basin_algorithm.py — HSAE v6.0.13
 ====================================================
 QGIS Processing Algorithm: Custom Basin AWSI Calculator
 

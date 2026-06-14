@@ -1,5 +1,5 @@
 """
-HSAE v6.0.12 — Uncertainty & Sensitivity Panel
+HSAE v6.0.13 — Uncertainty & Sensitivity Panel
 ==============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays Bayesian confidence intervals on ATDI/AHIFD indices

@@ -1,5 +1,5 @@
 """
-basin_report_algorithm.py — HSAE v6.0.12 QGIS Processing Algorithm
+basin_report_algorithm.py — HSAE v6.0.13 QGIS Processing Algorithm
 Complete Basin Legal Report Generator
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
@@ -77,16 +77,16 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
         arts = ['Art.5 ERU', 'Art.9 Data Sharing']
         if atdi >= 40:
             arts.append('Art.7 NSH')
-        if atdi >= 55:
-            arts.append('Art.33 Dispute Resolution')
+        if hifd >= 25:
+            arts.append('Art.20 Env.Flow')
+        if atdi >= 60:
+            arts.append('Art.33 Dispute')
         if atdi >= 70:
             arts.append('Art.35 Emergency')
-        if hifd >= 25:
-            arts.append('Art.20 Environmental Flows')
 
         dlvl = ['LOW', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'CRITICAL'][min(disp, 5)]
-        risk = ('CRITICAL' if atdi >= 70 else 'HIGH' if atdi >= 55
-                else 'MODERATE' if atdi >= 40 else 'LOW')
+        risk = ('CRITICAL' if atdi >= 60 else 'HIGH' if atdi >= 40
+                else 'MODERATE' if atdi >= 25 else 'LOW')
 
         from datetime import datetime
         _art5_label = ("CRITICAL concern" if atdi >= 60 else "HIGH concern"
@@ -97,7 +97,7 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
         _ci_label = ("immediate intervention required" if ci >= 0.6
                      else "monitoring required" if ci >= 0.4 else "manageable")
         report = f"""
-HSAE v6.0.12 — BASIN LEGAL REPORT
+HSAE v6.0.13 — BASIN LEGAL REPORT
 {'=' * 60}
 Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
 Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991
