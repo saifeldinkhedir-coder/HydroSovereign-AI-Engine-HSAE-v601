@@ -253,10 +253,10 @@ hsae compliance --basin "Euphrates" --article 7
 ```bibtex
 @software{alkhedir2026hsae,
   author    = {Alkhedir, Seifeldin M.G.},
-  title     = {{HydroSovereign AI Engine (HSAE) v6.7.1}},
+  title     = {{HydroSovereign AI Engine (HSAE) v6.7.2}},
   year      = {2026},
   publisher = {PyPI + QGIS Plugin Repository + Zenodo},
-  version   = {6.7.0},
+  version   = {6.7.2},
   note      = {QGIS Plugin ID: 5040. SoftwareX under review: SOFTX-D-26-00442.
                Preprint: SSRN 6661396. 362+ downloads, 20 countries.},
   url       = {https://pypi.org/project/hydrosovereign/},
@@ -269,7 +269,7 @@ hsae compliance --basin "Euphrates" --article 7
 
 <div align="center">
 
-*hydrosovereign v6.7.1 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
+*hydrosovereign v6.7.2 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
 
 *University of Khartoum · DOI: 10.5281/zenodo.19180160*
 
