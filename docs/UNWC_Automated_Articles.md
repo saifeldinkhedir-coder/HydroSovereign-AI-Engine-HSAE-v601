@@ -57,6 +57,35 @@ This means that although Articles 8 and 24 are not part of the index-trigger lis
 
 ---
 
+---
+
+## Indicator → Article mapping
+
+HSAE computes six indices (the AWSI family), but only two of them act as direct *triggers* that decide whether an article appears; the other four play supporting, interpretive, or composite roles. The table below makes this explicit.
+
+| UNWC 1997 Article | Trigger indicator | Threshold | Supporting indicator | Role |
+|---|---|---|---|---|
+| Art. 5 — Equitable & Reasonable Utilisation | — (baseline, always) | every basin | **ASI** (Alkhedir Sovereignty Index) | ASI quantifies the equity dimension |
+| Art. 9 — Regular Data Exchange | — (baseline, always) | every basin | **AFSF** (Alkhedir Forensic Signal Factor) | AFSF quantifies transparency / data availability |
+| Art. 7 — No Significant Harm | **ATDI** | ≥ 40% | — | direct trigger |
+| Art. 20 — Protection of Ecosystems | **AHIFD** | ≥ 25% | — | direct trigger |
+| Art. 33 — Settlement of Disputes | **ATDI** | ≥ 60% (= CRITICAL tier) | — | direct trigger |
+| Art. 35 — Emergency Situations | **ATDI** | ≥ 70% | — | direct trigger |
+
+### How the six indices relate to the articles
+
+Two indices do the triggering. **ATDI** (Alkhedir Transparency Deficit Index) drives three articles through three rising thresholds — Article 7 at 40%, Article 33 at 60%, and Article 35 at 70% — so a single transparency measure escalates the legal response as it grows. **AHIFD** (Alkhedir Human-Induced Flow Deficit) drives one article, Article 20, at 25%, tying ecosystem protection to the size of the human-induced flow deficit.
+
+The two baseline articles each have a dedicated index that does not gate their appearance but quantifies the obligation they express. **ASI** (Alkhedir Sovereignty Index) reads the equitable-utilisation dimension of Article 5, and **AFSF** (Alkhedir Forensic Signal Factor) reads the transparency and data-availability dimension of Article 9. Because Articles 5 and 9 are continuous duties, both are returned for every basin regardless of these values; the indices give the quantitative texture rather than the on/off decision.
+
+The remaining two indices are not tied to a specific trigger. **AHLB** (Alkhedir HBV-Legal Bridge) is the interpretive link that connects the HBV-96 hydrological model output to the legal layer, expressing how modelled flow conditions translate into legal exposure across Articles 5, 6, and 7. **ATCI** (Alkhedir Treaty Compliance Index) is a composite score on a 0–100 scale that summarises overall compliance across the full set of relevant articles, providing a single headline figure rather than a per-article trigger.
+
+### Worked reading — Blue Nile (GERD)
+
+For GERD the engine returns ATDI = 43.6%, AHIFD = 19.7%, AFSF = 0.36, AHLB = 0.436, ASI = 0.64, ATCI = 70.3. Reading these through the mapping: the two baseline articles (5 and 9) are present; ATDI at 43.6% crosses the 40% Article 7 threshold but stays below the 60% Article 33 and 70% Article 35 thresholds; and AHIFD at 19.7% stays below the 25% Article 20 threshold. The triggered set is therefore Art.5 ERU, Art.9 Data Sharing, and Art.7 NSH, with ASI and AFSF colouring the two baseline duties and ATCI = 70.3 giving the composite headline.
+
+---
+
 ## Threshold summary
 
 | Article | HSAE label | Index | Threshold | Status across 26 basins |
