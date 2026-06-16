@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.7.2"
+version = "6.8.0"
 description = "HydroSovereign AI Engine (HSAE) — Automated satellite-driven transboundary water law compliance for 26 globally contested river basins"
 readme = "README.md"
 license = {text = "GPL-3.0"}
@@ -75,7 +75,7 @@ where   = ["."]
 include = ["hydrosovereign*"]
 
 [tool.setuptools.package-data]
-"hydrosovereign"      = ["py.typed","*.json","*.csv"]
+"hydrosovereign"      = ["py.typed","*.json","*.csv","models/*.joblib"]
 "hydrosovereign.data" = ["*.json","*.csv"]
 
 [tool.pytest.ini_options]

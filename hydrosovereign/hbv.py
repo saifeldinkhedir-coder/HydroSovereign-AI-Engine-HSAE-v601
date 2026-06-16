@@ -89,7 +89,7 @@ def calibrate_hbv_sceua(
     -------
     dict — best_params, best_nse, best_kge
     """
-    from hydrosovereign.indices import compute_nse, compute_kge
+    from hydrosovereign.indices_legacy import compute_nse, compute_kge
     rng       = np.random.default_rng(seed)
     best_nse  = -999.0
     best_p: Dict = {}

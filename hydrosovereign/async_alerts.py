@@ -12,7 +12,7 @@ import asyncio
 import logging
 from typing import List, Optional, Callable
 
-from .indices import compute_atdi, compute_hifd
+from .indices_legacy import compute_atdi, compute_hifd
 from .alerts  import check_atdi_alert, AlertLevel
 
 logger = logging.getLogger(__name__)

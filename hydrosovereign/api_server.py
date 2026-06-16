@@ -182,7 +182,7 @@ def compute_indices_endpoint(
     dispute_level:int   = Query(..., ge=0, le=4),
 ):
     """Compute ATDI, HIFD, Conflict Index, and Negotiation P for given parameters."""
-    from .indices import compute_all_indices
+    from .indices_legacy import compute_all_indices
     try:
         return compute_all_indices(runoff_c, cap_bcm, n_countries, dispute_level)
     except ValueError as e:
@@ -197,7 +197,7 @@ def compute_wqi_endpoint(req: WQIRequest):
     Supply physicochemical measurements (ph, do, bod, turbidity...) for
     accurate WQI, or use atdi/hifd for proxy estimation.
     """
-    from .indices import compute_wqi
+    from .indices_legacy import compute_wqi
     measurements = {k: v for k, v in {
         "ph": req.ph, "do": req.do, "bod": req.bod,
         "turbidity": req.turbidity, "nitrates": req.nitrates,

@@ -19,6 +19,51 @@
 
 </div>
 
+## ⚠️ v6.8.0 — Major Scientific Revision (read before upgrading)
+
+Version 6.8.0 rebuilds the index engine on a **provenance-bound** foundation. This is the most important change in the project's history and it changes how you call the indices.
+
+### What changed and why
+
+The earlier index formulas combined incommensurable quantities (storage in BCM, an ordinal dispute level, a country count, a dimensionless runoff coefficient) behind undocumented constants, and produced values even when no real observations existed. Following external scientific review, the engine now:
+
+1. **Computes only from documented observations.** Every value carries provenance (source, reference, dates, quality). When the required observed data are absent, functions return `INSUFFICIENT_DATA` instead of a fabricated number.
+2. **Fixes the indices.** `HIFD` now takes independent `Q_nat` and `Q_obs` (it no longer algebraically collapses to a constant). `ATDI` is the empirical mean of per-period TDI, matching the published equations.
+3. **Separates empirical from normative.** Empirical measures (TDI, ATDI, HIFD, AFSF, AHLB) are distinct from declared normative composites (ASI, ATCI, AWGI), which expose explicit weights and sensitivity analysis.
+4. **Trains the model for real.** `TreatyClassifier` is genuinely trained on the TFDD treaties database with an honest model card (F1, ROC-AUC, cross-validation, baseline).
+5. **Validates independently.** `validate_model_skill` rejects any benchmark that shares the model's own forcing.
+
+### Index reference (v6.8.0)
+
+| Index | Kind | Inputs |
+|-------|------|--------|
+| `compute_tdi` | empirical | observed inflow, outflow |
+| `compute_atdi` | empirical | observed inflow/outflow series |
+| `compute_hifd` | empirical | independent observed Q_nat, Q_obs |
+| `compute_afsf` | empirical | observed/natural anomaly, range |
+| `compute_ahlb` | empirical | paired q_sim, q_obs (NSE) |
+| `compute_asi` | normative | equity, cooperation, data-sharing (weighted) |
+| `compute_atci` | normative | per-article compliance postures (weighted) |
+| `compute_awgi` | normative | transparency, dispute, riparians, regulation |
+| `correlation_matrix` | disclosure | cross-basin index values |
+
+### Migrating from the old API
+
+The previous heuristic functions remain available in `hydrosovereign.indices_legacy`, but they emit a `DeprecationWarning` and **will be removed in v7.0.0**:
+
+```python
+# old (deprecated, unvalidated):
+from hydrosovereign.indices_legacy import compute_atdi
+compute_atdi(runoff_c, cap_bcm, n_countries, dispute_level)
+
+# new (provenance-based):
+from hydrosovereign import compute_atdi, DataPoint, DataQuality
+compute_atdi(inflow_series, outflow_series)   # observed DataPoints
+```
+
+---
+
+
 ---
 
 ## 📋 Table of Contents

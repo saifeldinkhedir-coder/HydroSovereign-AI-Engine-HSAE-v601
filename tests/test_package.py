@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 import numpy as np
 import pytest
-from hydrosovereign.indices import (
+from hydrosovereign.indices_legacy import (
     compute_atdi, compute_hifd, compute_nse, compute_kge,
     compute_wqi, compute_conflict_index,
     compute_negotiation_probability, compute_all_indices,
