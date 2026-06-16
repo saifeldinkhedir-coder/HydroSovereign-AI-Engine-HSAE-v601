@@ -1,8 +1,14 @@
 # ════════════════════════════════════════════════════════
-# HSAE v6.0.0 — Complete Requirements
+# HSAE — Streamlit Cloud Requirements
 # HydroSovereign AI Engine
 # Author: Seifeldin M.G. Alkhedir — University of Khartoum
 # ════════════════════════════════════════════════════════
+# Core packages required for the app to start. Heavy optional
+# geospatial packages (rioxarray/planetary-computer/pystac-client)
+# are intentionally NOT pinned here: they need system GDAL and would
+# abort the whole install on Streamlit Cloud, which previously caused
+# `ModuleNotFoundError: plotly`. Those features import lazily inside
+# try/except and degrade gracefully when the packages are absent.
 
 # ── Core UI ──────────────────────────────────────────────
 streamlit>=1.35.0
@@ -20,29 +26,18 @@ streamlit-folium>=0.20.0
 # ── Machine Learning ─────────────────────────────────────
 scikit-learn>=1.4.0
 
-# ── HTTP / APIs (Open-Meteo, GloFAS, USGS, GRACE-FO) ────
+# ── HTTP / APIs (Open-Meteo, GloFAS, USGS, GRACE-FO) ─────
 requests>=2.31.0
 
 # ── Export (Excel reports) ───────────────────────────────
 openpyxl>=3.1.0
 
-# ── Alerts / Scheduler ───────────────────────────────────
-
-# ── Database ─────────────────────────────────────────────
-# SQLite is built into Python — no extra package needed
-
-# ── Optional: Production Scheduler ───────────────────────
-# APScheduler>=3.10.0   # alternative to schedule for Streamlit Cloud
-
-# ── GEE Python API (required for Direct GEE mode) ────────
+# ── GEE Python API (Direct GEE mode) ─────────────────────
 earthengine-api>=0.1.400
 
-# ── Sensor #10: Microsoft Planetary Computer (optional) ──
-# Install for full STAC access; ERA5 fallback works without these
-planetary-computer>=1.0.0
-pystac-client>=0.7.0
-rioxarray>=0.15.0
-
-# ── Install command ───────────────────────────────────────
-# pip install streamlit pandas numpy scipy plotly folium streamlit-folium \
-#             scikit-learn requests openpyxl schedule python-telegram-bot
+# ── Optional heavy geospatial (install manually if needed) ──
+# These require system GDAL; enable only with a packages.txt
+# that installs gdal/libgdal. Left out to keep Cloud deploys green.
+#   planetary-computer>=1.0.0
+#   pystac-client>=0.7.0
+#   rioxarray>=0.15.0
