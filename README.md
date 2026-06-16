@@ -19,7 +19,7 @@
 
 </div>
 
-## ⚠️ v6.8.0 — Major Scientific Revision (read before upgrading)
+## ⚠️ v6.8.1 — Major Scientific Revision (read before upgrading)
 
 Version 6.8.0 rebuilds the index engine on a **provenance-bound** foundation. This is the most important change in the project's history and it changes how you call the indices.
 
@@ -33,7 +33,7 @@ The earlier index formulas combined incommensurable quantities (storage in BCM, 
 4. **Trains the model for real.** `TreatyClassifier` is genuinely trained on the TFDD treaties database with an honest model card (F1, ROC-AUC, cross-validation, baseline).
 5. **Validates independently.** `validate_model_skill` rejects any benchmark that shares the model's own forcing.
 
-### Index reference (v6.8.0)
+### Index reference (v6.8.1)
 
 | Index | Kind | Inputs |
 |-------|------|--------|
@@ -89,12 +89,12 @@ compute_atdi(inflow_series, outflow_series)   # observed DataPoints
 - **9 satellite sensors** via Google Earth Engine (GPM, GRACE-FO, SMAP, Sentinel-1/2, ERA5, GloFAS, Open-Meteo, MODIS, VIIRS)
 - **HBV-96 hydrological model** with SCE-UA calibration and EnKF digital twin
 - **6 original compliance indices** (the Alkhedir Water Sovereignty Indices — AWSI)
-- **AI negotiation pathway** trained on 478 historical TFDD/ICOW dispute outcomes
+- **Treaty-feature classifier** genuinely trained on the TFDD treaties database (429 labelled treaties); honest model card (F1, ROC-AUC, CV, baseline). It classifies a documented treaty property — not negotiation success/failure
 - **UNWC 1997** article-by-article trigger logic (Arts. 5, 7, 9, 11, 17, 33)
 - **eWaterCycle BMI** compatible — integrates with the open-science hydrological platform
 - **GeoAgent AI** — natural language queries inside QGIS (opengeos/GeoAgent PR #79)
 
-Covers **26 globally contested transboundary basins** across 7 world regions. NSE = 0.63, KGE = 0.74 (pre-calibration, Blue Nile GERD vs GloFAS ERA5 v4).
+Covers **26 globally contested transboundary basins** across 7 world regions. Model skill is assessed only against benchmarks that are independent of the model's own forcing; `validate_model_skill` rejects a benchmark that shares the model forcing (see the v6.8.1 revision).
 
 ---
 
@@ -102,7 +102,7 @@ Covers **26 globally contested transboundary basins** across 7 world regions. NS
 
 The **Alkhedir Water Sovereignty Indices (AWSI)** are the first published quantitative framework connecting hydrological model outputs to UNWC 1997 article triggers:
 
-| Index | Full Name | Legal Trigger | GERD Result |
+| Index | Full Name | Legal Trigger | Illustrative value |
 |-------|-----------|---------------|-------------|
 | **ATDI** | Alkhedir Transparency Deficit Index | Art. 7 — No Significant Harm (≥40%) | **43.6%** ⚠️ |
 | **AHIFD** | Alkhedir Human-Induced Flow Deficit | Art. 7 — volumetric downstream harm | **19.7%** |
@@ -111,7 +111,7 @@ The **Alkhedir Water Sovereignty Indices (AWSI)** are the first published quanti
 | **ASI** | Alkhedir Sovereignty Index | Art. 5 — equitable utilisation | 0.64 |
 | **ATCI** | Alkhedir Treaty Compliance Index | Arts. 5,7,9,11,17,33 composite | **70/100** |
 
-All six indices are collectively named **AWSI** and are validated against the Blue Nile (GERD) basin (ATDI = 43.6%, AHIFD = 19.7%, ATCI = 70.3) calibrated to NSE = 0.63, KGE = 0.74 against GloFAS ERA5 v4.
+The six indices are collectively named **AWSI**. The values shown in the tables below are *illustrative outputs* of the framework, not validated field measurements: legally-relevant indices require observation-grade discharge data (see the v6.8.1 provenance model). Independent model-skill validation against a benchmark that does not share the model's forcing is pending real observed records (GRDC request in progress).
 
 ---
 
@@ -141,39 +141,29 @@ pip install hydrosovereign[full]
 ## 🚀 Quick Start
 
 ```python
-from hydrosovereign import ATDI, AHIFD, AFSF, AHLB, ASI, ATCI
-from hydrosovereign import ConflictIndex, NegotiationAI
-
-# Define any basin
-params = dict(
-    runoff_coeff=0.38,       # Blue Nile (GERD)
-    dam_capacity_bcm=74.0,
-    n_countries=3,
-    dispute_level=4,
-    basin_area_km2=174000
+from hydrosovereign import (
+    DataPoint, DataQuality, DataRegistry, hifd_for_basin,
 )
 
-# Compute all 6 AWSI indices
-atdi  = ATDI(**params)     # → 43.6%  ⚠️  Art. 7 UNWC triggered
-ahifd = AHIFD(**params)    # → 19.7%       ~20% of natural flow withheld
-afsf  = AFSF(**params)     # → 0.36        Art. 9 data exchange check
-ahlb  = AHLB(**params)     # →             HBV-96 → legal bridge
-asi   = ASI(**params)      # → 0.64        Art. 5 equitable use
-atci  = ATCI(**params)     # → 70/100      composite compliance
+# The engine computes ONLY from documented observations. Anyone holding
+# real, sourced data contributes it to an auditable registry.
+reg = DataRegistry()
+reg.submit("GERD", DataPoint(
+    value=1248.0, variable="Q_obs", unit="m3/s",
+    source="GRDC station 1577100 (El Diem)",
+    source_ref="https://grdc.bafg.de/  (request 78949)",
+    date_start="2010-01-01", date_end="2020-12-31",
+    quality=DataQuality.OBSERVED), contributor="Researcher A, ORCID ...")
 
-# Conflict assessment
-ci = ConflictIndex(atdi=atdi, ahifd=ahifd, **params)
-print(f"Conflict Index: {ci:.3f}")         # → 0.484
+# Without an independent observed Q_nat this returns INSUFFICIENT_DATA —
+# never a fabricated number.
+result = hifd_for_basin(reg, "GERD")
+print(result.status, result.value)   # INSUFFICIENT_DATA  None
+# ...once an independent observed Q_nat is also submitted, HIFD is
+# computed from the real Eq.6 and carries its full provenance.
 
-# AI negotiation pathway
-ai = NegotiationAI()
-p  = ai.predict(atdi=atdi, ci=ci, n_countries=3, dispute_level=4)
-print(f"P(Negotiation): {p:.0%}")          # → 55% → Art.7 + Art.5
-
-# Full basin analysis (one call)
-from hydrosovereign.api import analyze_basin
-result = analyze_basin("Blue Nile", lat=11.21, lon=35.09)
-print(result.summary())
+# Legacy heuristic functions still exist but are DEPRECATED:
+#   from hydrosovereign.indices_legacy import compute_atdi   # warns; removed in v7.0.0
 ```
 
 ---
@@ -196,7 +186,7 @@ HSAE covers **26 globally contested transboundary basins** across 7 world region
 
 ## 📊 Key Results — Multi-Basin
 
-Sample AWSI results across five continents:
+Illustrative AWSI framework outputs (NOT validated field measurements — real values require observation-grade discharge per basin):
 
 | Basin | ATDI | AHIFD | ATCI | CI | Risk | UNWC |
 |-------|------|-------|------|----|------|------|
@@ -208,7 +198,7 @@ Sample AWSI results across five continents:
 | Danube-Iron Gates | 32.8% | 18.7% | 76.1 | 0.250 | MODERATE | Art. 5 |
 | Rhine | 22.3% | 10.9% | 84.5 | 0.189 | LOW | — |
 
-> NSE = 0.63 · KGE = 0.74 (pre-calibration, GERD vs GloFAS ERA5 v4) · 51 pytest tests passing
+> Values above are illustrative framework outputs, not validated field measurements. Independent validation against non-shared-forcing benchmarks is pending observed discharge data. · 117 pytest tests passing
 >
 > **Risk distribution across all 26 basins:** HIGH = 4 (GERD, Euphrates-Atatürk, Nile-Aswan, Syr Darya-Toktogul) · MODERATE = 14 · LOW = 8. Legal tiers: CRITICAL ≥ 60% (Art. 33) · HIGH ≥ 40% (Art. 7) · MODERATE ≥ 25% (Art. 5) · LOW < 25%.
 
@@ -227,7 +217,7 @@ hydrosovereign/
 ├── cli.py              ← Command-line interface (hsae / hydrosovereign)
 ├── py.typed            ← PEP 561 — type hints enabled
 ├── ai/
-│   ├── negotiation.py  ← NegotiationAI (478 TFDD/ICOW cases)
+│   ├── negotiation.py  ← TreatyClassifier (429 TFDD treaties, trained)
 │   ├── conflict.py     ← Conflict Index computation
 │   ├── bayesian.py     ← Bayesian uncertainty quantification
 │   └── forecast.py     ← Time-series forecasting
@@ -298,10 +288,10 @@ hsae compliance --basin "Euphrates" --article 7
 ```bibtex
 @software{alkhedir2026hsae,
   author    = {Alkhedir, Seifeldin M.G.},
-  title     = {{HydroSovereign AI Engine (HSAE) v6.7.2}},
+  title     = {{HydroSovereign AI Engine (HSAE) v6.8.1}},
   year      = {2026},
   publisher = {PyPI + QGIS Plugin Repository + Zenodo},
-  version   = {6.7.2},
+  version   = {6.8.1},
   note      = {QGIS Plugin ID: 5040. SoftwareX under review: SOFTX-D-26-00442.
                Preprint: SSRN 6661396. 362+ downloads, 20 countries.},
   url       = {https://pypi.org/project/hydrosovereign/},
@@ -314,7 +304,7 @@ hsae compliance --basin "Euphrates" --article 7
 
 <div align="center">
 
-*hydrosovereign v6.7.2 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
+*hydrosovereign v6.8.1 · GPL-3.0 · Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991*
 
 *University of Khartoum · DOI: 10.5281/zenodo.19180160*
 

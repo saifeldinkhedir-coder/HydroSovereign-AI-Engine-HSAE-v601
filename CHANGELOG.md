@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.8.1] — 2026-06 — Documentation consistency fix
+
+### Fixed
+- README/PyPI description fully reconciled with the v6.8.0 provenance
+  engine: removed contradictory legacy examples and claims (the old
+  `ATDI(**params)` heuristic call, "478 TFDD/ICOW", "NSE=0.63 vs GloFAS
+  ERA5"), relabelled tabulated index values as *illustrative framework
+  outputs* (not validated field measurements), updated the quick-start to
+  the provenance-based API, citation to v6.8.1, and test count to 117.
+- No code/behaviour change from 6.8.0; documentation only.
+
+
 ## [6.8.0] — 2026-06 — Major Scientific Revision
 
 ### Changed (breaking in spirit; backward-compatible via legacy module)
