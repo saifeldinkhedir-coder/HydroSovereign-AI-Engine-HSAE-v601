@@ -9,7 +9,6 @@
 [![QGIS Plugin](https://img.shields.io/badge/QGIS_Plugin-ID_5040-589632?style=for-the-badge&logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/hsae_qgis/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.19180160-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.19180160)
 [![Preprint](https://img.shields.io/badge/Preprint-SSRN_6661396-B31B1B?style=for-the-badge)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6661396)
-[![SoftwareX](https://img.shields.io/badge/SoftwareX-Under_Review-005A8E?style=for-the-badge)](https://www.sciencedirect.com/journal/softwarex)
 [![License](https://img.shields.io/github/license/saifeldinkhedir-coder/hydrosovereign?style=for-the-badge)](LICENSE)
 [![ORCID](https://img.shields.io/badge/ORCID-0000--0003--0821--2991-a6ce39?style=for-the-badge&logo=orcid&logoColor=white)](https://orcid.org/0000-0003-0821-2991)
 
@@ -21,7 +20,7 @@
 
 ## ⚠️ v6.8.1 — Major Scientific Revision (read before upgrading)
 
-Version 6.8.0 rebuilds the index engine on a **provenance-bound** foundation. This is the most important change in the project's history and it changes how you call the indices.
+Version 6.8.1 rebuilds the index engine on a **provenance-bound** foundation. This is the most important change in the project's history and it changes how you call the indices.
 
 ### What changed and why
 
@@ -273,7 +272,7 @@ hsae compliance --basin "Euphrates" --article 7
 | Resource | URL |
 |----------|-----|
 | 🔌 QGIS Plugin (ID 5040) | [plugins.qgis.org/plugins/hsae_qgis/](https://plugins.qgis.org/plugins/hsae_qgis/) |
-| 🌐 Live Streamlit App | [HSAE v6.0.8](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app) |
+| 🌐 Live Streamlit App | [HSAE v6.0.14](https://hydrosovereign-ai-engine-hsae-v601-6euz2zxcmerkzxgordmvxf.streamlit.app) |
 | 📦 GitHub (Main Repo) | [HydroSovereign-AI-Engine-HSAE-v601](https://github.com/saifeldinkhedir-coder/HydroSovereign-AI-Engine-HSAE-v601) |
 | 🤖 GeoAgent Integration | [opengeos/GeoAgent PR #79](https://github.com/opengeos/GeoAgent/pull/79) |
 | 🏛️ Zenodo Archive | [doi.org/10.5281/zenodo.19180160](https://doi.org/10.5281/zenodo.19180160) |
