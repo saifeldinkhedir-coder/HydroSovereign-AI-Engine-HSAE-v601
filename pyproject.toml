@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydrosovereign"
-version = "6.8.1"
+version = "6.8.2"
 description = "HydroSovereign AI Engine (HSAE) — Automated satellite-driven transboundary water law compliance for 26 globally contested river basins"
 readme = "README.md"
-license = {text = "GPL-3.0"}
+license = "GPL-3.0-or-later"
 requires-python = ">=3.9"
 authors = [{name = "Seifeldin M.G. Alkhedir", email = "saifeldinkhedir@gmail.com"}]
 maintainers = [{name = "Seifeldin M.G. Alkhedir", email = "saifeldinkhedir@gmail.com"}]
@@ -25,7 +25,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Intended Audience :: Legal Industry",
     "Intended Audience :: Education",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
