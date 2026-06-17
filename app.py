@@ -705,11 +705,16 @@ data_mode  = st.session_state.get("data_mode", "Simulation")
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🌐 HSAE **v6.0.0**")
+    st.markdown("## 🌐 HSAE **v6.0.14**")
     st.markdown("""
 <span style='background:#10b981;color:#000;border-radius:4px;padding:2px 8px;font-size:0.7rem;font-weight:700;'>
-  ✨ REAL DATA + AI + CLIMATE
+  ✨ PROVENANCE-BOUND ENGINE
 </span>""", unsafe_allow_html=True)
+    st.caption(
+        "⚠️ Pages showing modelled or synthetic series are **scenario / "
+        "illustrative** — not validated field measurements. Provenance-bound "
+        "results require observed data (see the Validation and Negotiation "
+        "AI pages).")
 
     st.markdown("### 📑 Navigation")
 
@@ -1315,7 +1320,7 @@ elif page == "🌌 GRACE-FO · Water Storage":
             paper_bgcolor="#0F1117", plot_bgcolor="#0F1117",
             font=dict(color="#E0E0E0"),
         )
-        st.plotly_chart(fig_tws, use_container_width=True)
+        st.plotly_chart(fig_tws, width='stretch')
 
         # ── Metrics ───────────────────────────────────────────────────────
         col1, col2, col3, col4 = st.columns(4)
