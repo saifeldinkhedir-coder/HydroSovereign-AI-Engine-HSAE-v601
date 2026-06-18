@@ -1,5 +1,5 @@
 """
-HSAE v6.0.13 — Uncertainty & Sensitivity Panel
+HSAE v6.0.14 — Uncertainty & Sensitivity Panel
 ==============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays Bayesian confidence intervals on ATDI/AHIFD indices
@@ -7,7 +7,7 @@ and Sobol sensitivity indices as plain Qt widgets.
 """
 from __future__ import annotations
 import random
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 try:

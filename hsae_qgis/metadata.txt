@@ -2,11 +2,11 @@
 name=HydroSovereign AI Engine
 qgisMinimumVersion=3.16
 qgisMaximumVersion=3.99
-description=HSAE v6.0.13: Transboundary water sovereignty. 26 basins, 17 tools, 6 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), Add Custom Basin, GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
-version=6.0.13
+description=HSAE v6.0.14: Transboundary water sovereignty. 26 basins, 17 tools, 6 Processing Algorithms, 6 original indices (ATDI/AHIFD/AFSF/AHLB/ASI/ATCI), Add Custom Basin, GeoAgent AI, WebGIS Map v2, UNWC 1997, SHA-256 chain
+version=6.0.14
 author=Seifeldin M.G. Alkhedir
 email=saifeldinkhedir@gmail.com
-about=HydroSovereign AI Engine (HSAE) v6.0.13 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
+about=HydroSovereign AI Engine (HSAE) v6.0.14 automates the full pipeline from live satellite observation to international water law compliance in under 2 minutes per basin. Free, open-source, GPL-3.0.
     Covers 26 globally contested basins using 9 GEE satellite sensors (GPM IMERG, GRACE-FO, SMAP, Sentinel-1/2, ERA5, Open-Meteo, MODIS, VIIRS).
     NEW in v6.0.10+: Add Custom Basin tool — analyse any worldwide basin by lat/lon, dam capacity, and dispute level using all 6 AWSI indices.
     NEW in v6.0.10+: Unified AWSI formula engine (core/indices.py) — ATDI calibrated to 43.6%% across all systems.
@@ -25,6 +25,16 @@ icon=icon.png
 experimental=False
 deprecated=False
 changelog=
+    v6.0.14 (June 2026) -- Provenance-bound engine + Observed Data Mode:
+    Adds a clean provenance-based engine (core/indices.py) that computes
+    indices ONLY from documented observed discharge and returns
+    INSUFFICIENT_DATA when real data are absent. New 'Observed Data Mode'
+    panel lets users enter sourced observations and get provenance-carrying
+    results. The interactive parameter mode is retained as SCENARIO MODE,
+    now clearly labelled as illustrative heuristic (not validated
+    measurement). Heuristic formulas moved to core/indices_scenario.py.
+    Addresses scientific review: no fabricated values presented as results.
+
     v6.0.13 (June 2026) -- UNWC article-trigger unification:
     All surfaces (plugin, basin_loader, dashboard, basin_report,
     comparison, legal_layer) now share one article-trigger scheme

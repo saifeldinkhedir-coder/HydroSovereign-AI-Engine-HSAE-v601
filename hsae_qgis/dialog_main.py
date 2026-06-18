@@ -1,5 +1,5 @@
 """
-dialog_main.py — HSAE v6.0.13 Dashboard Dialog
+dialog_main.py — HSAE v6.0.14 Dashboard Dialog
 ===============================================
 Shows all 26 basins with 6 computed indices:
 ATDI · AHIFD · CI · ATCI · NSE · KGE · Risk
@@ -12,7 +12,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QFont, QColor
 import webbrowser
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 def _compute_indices(b):
@@ -60,14 +60,14 @@ class HSAEMainDialog(QDialog):
         super().__init__(iface.mainWindow())
         self.iface = iface
         self.basins = basins
-        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.13")
+        self.setWindowTitle("🌊 HydroSovereign AI Engine v6.0.14")
         self.setMinimumSize(1000, 620)
         self._build_ui()
 
     def _build_ui(self):
         layout = QVBoxLayout()
 
-        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.13")
+        header = QLabel("🌊 HydroSovereign AI Engine — HSAE v6.0.14")
         header.setAlignment(Qt.AlignCenter)
         font = QFont()
         font.setPointSize(14)
@@ -190,7 +190,7 @@ class HSAEMainDialog(QDialog):
         <p><b>Platform averages:</b>
            ATDI={avg_atdi}% &nbsp;|&nbsp; AHIFD={avg_ahifd}%
            &nbsp;|&nbsp; NSE={avg_nse} &nbsp;|&nbsp; KGE={avg_kge}</p>
-        <p><b>Formula (calibrated v6.0.13):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
+        <p><b>Formula (calibrated v6.0.14):</b> ATDI = 10 + min(cap/8.5, 11) + disp×4.8 + (nc−2)×2 + (1−rc)×6</p>
         <p><b>Thresholds (UNWC 1997):</b>
            ≥60% CRITICAL (Art.33 dispute zone) &nbsp;|&nbsp;
            ≥40% HIGH (Art.7 triggered) &nbsp;|&nbsp;
@@ -219,7 +219,7 @@ class HSAEMainDialog(QDialog):
         text = QTextEdit()
         text.setReadOnly(True)
         text.setHtml("""
-        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.13</h2>
+        <h2>🌊 HydroSovereign AI Engine — HSAE v6.0.14</h2>
         <p>Free, open-source platform automating satellite-based transboundary
         water law compliance for 26 globally contested river basins. GPL-3.0.</p>
         <p><b>6 Original Indices:</b> ATDI · AHIFD · AFSF · AHLB · ASI · ATCI</p>

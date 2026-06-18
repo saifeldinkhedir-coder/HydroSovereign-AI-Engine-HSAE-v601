@@ -1,12 +1,12 @@
 """
-HSAE v6.0.13 — Treaty Analysis Panel (ATCI)
+HSAE v6.0.14 — Treaty Analysis Panel (ATCI)
 ============================================
 Pure Qt (no WebEngine) — works in all QGIS versions.
 Displays ATCI Treaty Compliance Index for any basin.
 """
 from __future__ import annotations
 import random
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 try:

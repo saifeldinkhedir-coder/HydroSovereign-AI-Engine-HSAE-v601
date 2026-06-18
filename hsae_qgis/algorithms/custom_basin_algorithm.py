@@ -1,5 +1,5 @@
 """
-algorithms/custom_basin_algorithm.py — HSAE v6.0.13
+algorithms/custom_basin_algorithm.py — HSAE v6.0.14
 ====================================================
 QGIS Processing Algorithm: Custom Basin AWSI Calculator
 
@@ -25,7 +25,7 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import QVariant
 from hsae_qgis.custom_basin_tool import estimate_runoff_c
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 class CustomBasinAlgorithm(QgsProcessingAlgorithm):

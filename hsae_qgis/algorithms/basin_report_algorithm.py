@@ -1,12 +1,12 @@
 """
-basin_report_algorithm.py — HSAE v6.0.13 QGIS Processing Algorithm
+basin_report_algorithm.py — HSAE v6.0.14 QGIS Processing Algorithm
 Complete Basin Legal Report Generator
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingParameterString,
                        QgsProcessingParameterFileDestination)
-from hsae_qgis.core.indices import compute_atdi, compute_ahifd
+from hsae_qgis.core.indices_scenario import compute_atdi, compute_ahifd
 
 
 class BasinReportAlgorithm(QgsProcessingAlgorithm):
@@ -97,7 +97,7 @@ class BasinReportAlgorithm(QgsProcessingAlgorithm):
         _ci_label = ("immediate intervention required" if ci >= 0.6
                      else "monitoring required" if ci >= 0.4 else "manageable")
         report = f"""
-HSAE v6.0.13 — BASIN LEGAL REPORT
+HSAE v6.0.14 — BASIN LEGAL REPORT
 {'=' * 60}
 Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
 Author: Seifeldin M.G. Alkhedir | ORCID: 0000-0003-0821-2991

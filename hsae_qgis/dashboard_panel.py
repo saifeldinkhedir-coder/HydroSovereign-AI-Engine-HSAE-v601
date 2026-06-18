@@ -1,5 +1,5 @@
 """
-dashboard_panel.py — HSAE v6.0.13 Real-Time QGIS Dashboard Panel
+dashboard_panel.py — HSAE v6.0.14 Real-Time QGIS Dashboard Panel
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.PyQt.QtWidgets import (
@@ -19,7 +19,7 @@ from qgis.PyQt.QtWidgets import (
 from qgis.PyQt.QtCore import Qt
 from pathlib import Path
 import json
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 DISP_LEVELS = {
@@ -64,10 +64,10 @@ BRD2 = "#21262d"
 
 
 class HSAEDashboardPanel(QDockWidget):
-    """HSAE v6.0.13 Real-Time Dashboard Panel."""
+    """HSAE v6.0.14 Real-Time Dashboard Panel."""
 
     def __init__(self, iface, parent=None):
-        super().__init__("🌊 HSAE v6.0.13 Dashboard", parent)
+        super().__init__("🌊 HSAE v6.0.14 Dashboard", parent)
         self.iface = iface
         self.basins = self._load_basins()
         self.current = self.basins[0] if self.basins else {}
@@ -146,12 +146,18 @@ class HSAEDashboardPanel(QDockWidget):
         # Header
         ml.addWidget(
             self._lbl(
-                "🌊 HydroSovereign AI Engine v6.0.13",
+                "🌊 HydroSovereign AI Engine v6.0.14",
                 f"color:{BLUE};font-weight:bold;font-size:13px"))
         ml.addWidget(
             self._lbl(
                 "Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991",
                 f"color:{GRAY};font-size:9px"))
+        ml.addWidget(
+            self._lbl(
+                "⚠ SCENARIO MODE — illustrative heuristic values, "
+                "NOT validated measurements. For provenance-bound results "
+                "from observed data, use the Observed Data Mode panel.",
+                f"color:{ORG};font-size:9px;font-weight:bold"))
 
         # Basin selector
         hl = QHBoxLayout()
@@ -343,7 +349,7 @@ class HSAEDashboardPanel(QDockWidget):
             return
         from datetime import datetime
         with open(path, 'w', encoding='utf-8') as f:
-            f.write(f"HSAE v6.0.13 — Basin Report\n{'=' * 50}\n")
+            f.write(f"HSAE v6.0.14 — Basin Report\n{'=' * 50}\n")
             f.write(f"Basin:  {b.get('name', '')}\n")
             f.write(
                 f"Date:   {

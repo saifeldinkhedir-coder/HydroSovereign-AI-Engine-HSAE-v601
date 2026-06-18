@@ -1,5 +1,5 @@
 """
-HSAE v6.0.13 — Interactive Basin Risk Map Panel
+HSAE v6.0.14 — Interactive Basin Risk Map Panel
 ================================================
 Pure Qt — no QWebEngineView required.
 Shows all 26 basins with ATDI/AHIFD/CI risk table.
@@ -21,7 +21,7 @@ except ImportError:
     HAS_QT = False
 
 from qgis.core import QgsMessageLog, Qgis
-from hsae_qgis.core.indices import compute_all
+from hsae_qgis.core.indices_scenario import compute_all
 
 
 LIVE_APP = "https://hydrosovereign-ai-engine-hsae-v6.0.9-6euz2zxcmerkzxgordmvxf.streamlit.app"

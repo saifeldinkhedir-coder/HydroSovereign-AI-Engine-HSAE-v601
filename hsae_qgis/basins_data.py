@@ -1,3 +1,7 @@
+# NOTE: the "tdi" field is an ILLUSTRATIVE SCENARIO PRIOR per basin,
+# NOT a measured Transparency Deficit Index and NOT a computed result.
+# A real TDI/ATDI must be computed from observation-grade data via the
+# provenance engine, which returns INSUFFICIENT_DATA when data are absent.
 """
 basins_data.py — 26 Basin Registry for HSAE QGIS Plugin
 Each basin: id, name, region, lat, lon, bbox [lon_min, lat_min, lon_max, lat_max],

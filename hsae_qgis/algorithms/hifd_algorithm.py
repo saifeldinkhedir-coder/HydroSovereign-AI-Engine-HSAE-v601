@@ -1,11 +1,11 @@
 """
-hifd_algorithm.py — HSAE v6.0.13 QGIS Processing Algorithm
+hifd_algorithm.py — HSAE v6.0.14 QGIS Processing Algorithm
 HIFD: Human-Induced Flow Deficit
 Author: Seifeldin M.G. Alkhedir · ORCID: 0000-0003-0821-2991
 """
 from qgis.core import (QgsProcessingAlgorithm, QgsProcessingParameterNumber,
                        QgsProcessingOutputNumber)
-from hsae_qgis.core.indices import compute_ahifd
+from hsae_qgis.core.indices_scenario import compute_ahifd
 
 
 class HIFDAlgorithm(QgsProcessingAlgorithm):
